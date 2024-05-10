@@ -1,0 +1,39 @@
+﻿@using FMS.Common
+@model FMS.Web.ViewModels.ContactDetailDisplayViewModel
+
+
+<div class="panel panel-info">
+    <div class="panel-heading">Contact Information</div>
+    <div class="panel-body" id="operatorInfo">
+        <strong>Contact Name</strong>
+        <p id="oContactName">@Model.ContactName</p>
+        <strong>Contact Center</strong>
+        <p id="oCenter">@Model.Center</p>
+        @{
+            if (@Model.Contacttype == (int)Parameters.ContactType.Supplier)
+            {
+                <strong>Contact Person</strong>
+                <p id="oContactPerson">@Model.ContactPerson</p>
+                <strong>Street Address</strong>
+                <p id="oStreetAddress">@Model.StreetAddress</p>
+                <strong>Website</strong>
+                <p id="oWebsite">@Model.Website</p>
+
+            }
+        }
+        <strong>Facsimile</strong>
+        <p id="oFacsimile">@Model.Facsimile</p>
+
+        <strong>Telephone</strong>
+        <p id="oTelephone">@Model.Telephone</p>
+
+        <strong>Mobile</strong>
+        <p id="oMobile">@Model.Mobile</p>
+
+        <strong>Email</strong>
+        <p id="oEmail">@Model.Email</p>
+
+        <strong>Comments</strong>
+        <p id="oComments">@Model.Comments</p>
+    </div>
+</div>

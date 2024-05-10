@@ -1,0 +1,523 @@
+﻿@using FMS.Common
+
+@{
+    ViewBag.Title = "Vehicle Registry";
+
+    //set UI visibility permissions
+    var canSetupNewVehicle = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionSetupNewVehicle"];
+    var canUpdateVehicleRegistry = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionUpdateVehicleRegistry"];
+    var canViewVehicleDetails = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionViewVehicles"];
+    var canDisposeVehicle = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionDisposeVehicle"];
+
+}
+
+
+
+<div class="container-fluid">
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            <fieldset id="fldsVehicleSearch">
+                <legend>Search</legend>
+                <!--Business Units Dropdownlist-->
+                @(Html.Kendo().ComboBox()
+                                                        .Name("cbxBusinessUnit")
+                                                        .Placeholder("Select Business Unit...")
+                                                        .DataTextField("Text")
+                                                        .DataValueField("Value")
+                                                        .Filter(FilterType.Contains)
+                                                        .DataSource(source =>
+                                                        {
+                                                            source.Read(read =>
+                                                            {
+                                                                read.Action("GetBusinessUnits", "VehicleManagement");
+                                                            });
+                                                        })
+                                                        .HtmlAttributes(new { style = "width:180px" })
+                )
+
+                <!--Business Groups Cascading Dropdownlist-->
+                @(Html.Kendo().ComboBox()
+                                                        .Name("cbxBusinessGroup")
+                                                        .Placeholder("Select Business Group...")
+                                                        .DataTextField("Text")
+                                                        .DataValueField("Value")
+                                                        .Filter(FilterType.Contains)
+                                                        .DataSource(source =>
+                                                        {
+                                                            source.Read(read =>
+                                                            {
+                                                                read.Action("GetBusinessGroupsByBusinessUnitId", "VehicleManagement")
+                                                                    .Data("filterBusinessGroups");
+                                                            }).ServerFiltering(true);
+                                                        })
+                                                        .Enable(false)
+                                                        .AutoBind(false)
+                                                        .CascadeFrom("cbxBusinessUnit")
+                                                        .HtmlAttributes(new { style = "width:180px" })
+                )
+
+                <!--Center Dropdownlist-->
+                @(Html.Kendo().DropDownList()
+                                                                .Name("drpCenter")
+                                                                .DataValueField("Value")
+                                                                .DataTextField("Text")
+                                                                .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                .Filter(FilterType.Contains)
+                                                                .ValuePrimitive(true)
+                                                                .HtmlAttributes(new { style = "width:170px" })
+                                                                .BindTo((System.Collections.IEnumerable)ViewBag.Centers)
+                                                                .Events(events => events.DataBound("onDrpCenterDataBound"))
+                )
+
+                @(Html.Kendo().MaskedTextBox()
+                                                                        .Name("registrationNumber")
+                                                                        .HtmlAttributes(new { @placeholder = "Enter Rego #..." })
+                )
+
+
+                @(Html.Kendo().MaskedTextBox()
+                                                                                                .Name("assetNumber")
+                                                                                                .HtmlAttributes(new { @placeholder = "Enter Asset #..." })
+                )
+
+                @(Html.Kendo().Button()
+                                                                                                .Name("btnSearch")
+                                                                                                .HtmlAttributes(new { type = "button", @class = "k-primary" })
+                                                                                                .Content("<span class='k-icon' title='Search'></span>")
+                                                                                                .Icon("search")
+                                                                                                .Events(events =>
+                                                                                                {
+                                                                                                    events.Click("onSearch");
+                                                                                                })
+                )
+
+                @(Html.Kendo().Button()
+                                                                                                .Name("btnReset")
+                                                                                                .Tag("em")
+                                                                                                .Icon("refresh")
+                                                                                                .Content("<span class='k-icon' title='Refresh'></span>")
+                                                                                                .HtmlAttributes(new { @title = "Reset" })
+                                                                                                .Events(events =>
+                                                                                                {
+                                                                                                    events.Click("onReset");
+                                                                                                })
+                )
+            </fieldset>
+
+            @(Html.Kendo().Grid<FMS.Web.ViewModels.VehicleDisplayViewModel>()
+                                                        .Name("gridVehicles")
+                                                        .Columns(columns =>
+                                                        {
+                                                            columns.Bound(vm => vm.AssetNumber).Title("Asset #").Width(70).Media("(min-width: 992px)");
+                                                            columns.Bound(vm => vm.RegistrationNumber).Title("Rego #").Media("(min-width: 544px)").Width(80);
+                                                            columns.Bound(vm => vm.VehicleType).Title("Type").Width(120).Media("(min-width: 768px)");
+                                                            columns.Bound(vm => vm.Make).Title("Make").Width(90).Media("(min-width: 544px)");
+                                                            columns.Bound(vm => vm.Model).Title("Model").Width(120).Media("(min-width: 544px)");
+                                                            columns.Bound(vm => vm.BusinessGroup).Title("Business Group").Media("(min-width: 992px)");
+                                                            columns.Bound(vm => vm.Center).Title("Center").Media("(min-width: 768px)");
+                                                            columns.Bound(vm => vm.Condition).Title("Condition").Media("(min-width: 768px)");
+                                                            columns.Bound(vm => vm.Status).Title("Status").Media("(min-width: 544px)");
+                                                            columns.Bound(vm => vm.CurrentMileage).Title("Mileage").Width(70).Media("(min-width: 992px)");
+                                                            columns.Bound(vm => vm.BOS_Recommendation).Title("BOS").Width(70).Media("(min-width: 544px)")
+                                                                .ClientTemplate(
+                                                                "# if (BOS_Recommendation == 'Yes' && StatusId != vehicleFinancialStatusDisposed ) { #" +
+                                                                    "<span><i title='Board of Survey recommendation given' class='fas fa-check' style='font-size:24px;color:\\#00ff00;'></i></span>" +
+                                                                    "# } else { #" +
+                                                                    "<span></span>" +
+                                                                    "# } #"
+
+                                                                );
+                                                            columns.Template(@<text></text>).ClientTemplate("#=resColTemplate(data)#").Title("Items").Media("(max-width: 544px)");
+                                                            columns.Command(command =>
+                                                            {
+                                                                command.Custom("view").Text(" ").Click("viewDetails").IconClass("far fa-eye").HtmlAttributes(new { @title = "View" }).Visible("canViewVehicleDetails");
+                                                                command.Custom("edit").Text(" ").Click("editDetails").IconClass("fas fa-edit").HtmlAttributes(new { @title = "Edit" }).Visible("canUpdateVehicleRegistry");
+                                                                command.Custom("delete").Text(" ").Click("openDeleteConfirmationWindow").IconClass("fas fa-trash-alt").HtmlAttributes(new { @title = "Delete" }).Visible("canUpdateVehicleRegistry");
+                                                                command.Custom("dispose").Text(" ").Click("disposeDetails").Visible("disposeVisible").IconClass("fas fa-archive").HtmlAttributes(new { @title = "Dispose" }).Visible("canDisposeVehicle");
+                                                            }).Title("").Width(210);
+                                                        })
+                                                                .ToolBar(toolBar =>
+                                                                {
+                                                                toolBar.Template(
+                                                                    @<text>      
+                                                                            @if (canSetupNewVehicle) {
+                                                                                <a class='k-button' style="float:left" href="#" onclick="onAddNewVehicleClick(event)">
+                                                                                    <span class='k-icon k-i-add'></span>Add New Vehicle
+                                                                                </a>
+                                                                            }
+                                                                        </text>
+                                                                         
+                                                                         
+                                                                   );
+                                                                    
+                                                                })
+                                                                        .Pageable()
+                                                                        .Sortable()
+                                                                        .Scrollable(s => s.Height("auto"))
+                                                                        .DataSource(dataSource => dataSource
+                                                                            .Ajax()
+                                                                            .ServerOperation(true)
+                                                                            .PageSize(20)
+                                                                            .Events(events => events.Error("error_handler"))
+                                                                            .Model(model => model.Id(vm => vm.Id))
+                                                                            .Read(read => read.Action("GetVehiclesList", "VehicleManagement").Data("GridFilterParams"))
+
+                                                                        )
+                                                                        .Events(events => events
+                                                                            .DataBound("onDataBound")
+                                                                            .Save("onSave")
+                                                                            .Edit("onEdit")
+                                                                        )
+            )
+
+
+            <div id="wndDeleteConfirmation"></div>
+            <div id="wndVehicleDisposal"></div>
+        </div>
+    </div>
+</div>
+<style>
+</style>
+
+
+@section scripts{
+
+    <script id="templateResponsiveColumn" type="text/x-kendo-template">
+        <strong>Asset No.</strong>
+        <p class="col-template-val">#=data.AssetNumber#</p>
+
+        <strong>Rego No.</strong>
+        <p class="col-template-val">#=data.RegistrationNumber#</p>
+
+        <strong>Type</strong>
+        <p class="col-template-val">#=data.VehicleType#</p>
+
+        <strong>Make</strong>
+        <p class="col-template-val">#=data.Make#</p>
+
+        <strong>Model</strong>
+        <p class="col-template-val">#=data.Model#</p>
+
+        <strong>Business Group</strong>
+        <p class="col-template-val">#=data.BusinessGroup#</p>
+
+        <strong>Center</strong>
+        <p class="col-template-val">#=data.Center#</p>
+
+        <strong>Condition</strong>
+        <p class="col-template-val">#=data.Condition#</p>
+
+        <strong>Status</strong>
+        <p class="col-template-val">#=data.Status#</p>
+
+        <strong>Mileage</strong>
+        <p class="col-template-val">#=data.CurrentMileage#</p>
+
+        <strong>BOS</strong>
+        <p class="col-template-val">#=data.BOS_Recommendation#</p>
+
+    </script>
+
+
+    <script type="text/x-kendo-template" id="templateDeleteConfirmation">
+        <div id="details-container">
+            <h4>#= RegistrationNumber #</h4>
+            <em>#= Make #, #= Model #, #= VehicleType # </em>
+            <dl>
+                <dt>Condition: #= Condition #</dt>
+                <dt>Status : #= Status #</dt>
+            </dl>
+        </div>
+        <div class="modalWindow">
+            <h2>Are you sure you want to delete this vehicle record?</h2>
+            <button id="yes" class="k-button">Yes</button>
+            <button id="no" class="k-button k-primary">No</button>
+        </div>
+    </script>
+
+
+    <script type="text/javascript">
+
+    //********************* Begin - Global Document Scope Variables *****************************
+    var windowDeleteConfirmation;
+    var windowVehicleDisposal;
+    var gridData;
+    var rowDispose;
+    var vehicleFinancialStatusDisposed = Number('@((int)Parameters.VehicleFinancialStatus.Disposed)');
+    //var defaultCenterNumber;
+    //*******************************************************************************************
+
+
+    function onDrpCenterDataBound(e) {
+        //var defaultItem = e.sender.dataSource.at(0);
+        //defaultCenterNumber = defaultItem.Value;
+
+    }
+
+    var resColTemplate = kendo.template($("#templateResponsiveColumn").html());
+
+    function filterBusinessGroups() {
+        return {
+            businessUnitId: $("#cbxBusinessUnit").val(),
+            businessGroupFilter: $("#cbxBusinessGroup").data("kendoComboBox").input.val()
+
+        };
+    }
+
+    function onUpload(e) {
+        $("#CODReport").val(e.files[0].name);
+        e.data = { fileType: "CODReport" };
+    }
+
+    function onRemove(e) {
+        $("#CODReport").val("");
+    }
+
+    function initializeVehicleDisposalModalWindow() {
+
+        $("#frmVehicleDisposal").submit(function (event) {
+            event.preventDefault();
+            ajaxCreateUpdate(this, $("#frmVehicleDisposal #Id").val(), "VehicleDisposal", "DisposeVehicle","", "", windowVehicleDisposal);
+            gridData.removeRow(rowDispose); //removes row only
+
+        });
+
+
+        $("#btnClose").click(function (e) {
+            e.preventDefault();
+            windowVehicleDisposal.close();
+        });
+
+        $("#Date").data("kendoDatePicker").value(kendo.parseDate(new Date()), "dd/MM/yyyy");
+    }
+
+
+    $(document).ready(function () {
+
+        templateDeleteConfirmation = kendo.template($("#templateDeleteConfirmation").html());
+
+        gridData = $("#gridVehicles").data("kendoGrid");
+
+        setGridFormSubmitNotification();
+
+        //initialize the kendo delete confirmation modal window
+        windowDeleteConfirmation = $("#wndDeleteConfirmation").kendoWindow({
+            title: "Delete Confirmation",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+
+        //initialize the kendo vehicle disposal modal window
+        windowVehicleDisposal = $("#wndVehicleDisposal").kendoWindow({
+            title: "Dispose Vehicle",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 540
+        }).data("kendoWindow");
+
+        //because you are loading a view through an action, use the bind to the "refresh" function
+        windowVehicleDisposal.bind("refresh", function (e) {
+            initializeVehicleDisposalModalWindow();
+            //NB: need to put the center open window in the refresh method coz if you put it outside, the center window fires b4 content is loaded and messes up the UI
+            windowVehicleDisposal.center().open();
+        });
+
+        //tooltips
+        $("#gridVehicles").kendoTooltip({ filter: "a[title]" });
+        $("#gridVehicles").kendoTooltip({ filter: "span>i.fas.fa-check[title]" });
+        $("#btnReset").kendoTooltip({ content: "Reset" });
+
+    });
+
+    function openDeleteConfirmationWindow(e) {
+        e.preventDefault();
+
+        var grid = this;
+
+        var row = $(e.currentTarget).closest("tr");
+        var dataItem = this.dataItem(row);
+
+        windowDeleteConfirmation.content(templateDeleteConfirmation(dataItem));
+
+        windowDeleteConfirmation.center().open();
+
+        $("#yes").click(function () {
+
+            $.when($.ajax({
+                type: "POST",
+                url: '@Url.Action("CheckIfVehicleIsInUse","VehicleManagement")',
+                data: { id : dataItem.Id },
+                dataType: "json",
+                beforeSend: function () {
+                    //show progress bar
+                    kendo.ui.progress($("#progressIndicator"), true);
+                }
+            })).done(function (returndata) {
+                //hide progress bar
+                kendo.ui.progress($("#progressIndicator"), false);
+
+                if (returndata.isError) {
+                    App.notification.show({
+                        message: returndata.message
+                    }, "error");
+                }
+                else {
+                    if (returndata.isInUse) {
+                        App.notification.show({
+                            message: returndata.message + " Vechicle record cannot be deleted."
+                        },"error");
+                    }
+                    else {
+                        ajaxDelete(dataItem.Id, "VehicleManagement","DeleteVehicle");
+                        grid.removeRow(row); //removes row only
+                    }
+
+                }
+
+            });
+
+
+            windowDeleteConfirmation.close();
+        });
+
+        $("#no").click(function () {
+            windowDeleteConfirmation.close();
+        });
+    }
+
+
+
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+    function GridFilterParams() {
+
+        return {
+            assetNumber: $("#assetNumber").val(),
+            registrationNumber: $("#registrationNumber").val(),
+            unitNumber: (Number($("#cbxBusinessUnit").val()) == 0) ? -1 : Number($("#cbxBusinessUnit").val()),
+            groupNumber: (Number($("#cbxBusinessGroup").val()) == 0) ? -1 : Number($("#cbxBusinessGroup").val()),
+            center: (Number($("#drpCenter").val()) == 0) ? -1 : Number($("#drpCenter").val())
+        }
+    }
+    function onSearch(e) {
+        e.preventDefault();
+        gridData.dataSource.query({ page: 1, pageSize: 20 });
+    }
+    function onReset(e) {
+        e.preventDefault();
+        $("#assetNumber").val("");
+        $("#registrationNumber").val("");
+        $("#cbxBusinessUnit").data("kendoComboBox").value("");
+        $("#cbxBusinessGroup").data("kendoComboBox").value("");
+        $("#drpCenter").data("kendoDropDownList").value("");
+        gridData.dataSource.read();
+    }
+    function onEdit(e) { }
+    function onSave(e) { }
+    function onDataBound(e) {
+        //$("#fldsVehicleSearch").fadeIn("slow", function () {
+        //    // Animation complete
+        //});
+    }
+    function editDetails(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var vehicleId = dataItem.Id;
+        window.location.href = '@Url.Action("EditVehicle", "VehicleManagement")?id=' + vehicleId;
+    }
+    function onAddNewVehicleClick(e) {
+        e.preventDefault();
+        window.location.href = '@Url.Action("CreateVehicle", "VehicleManagement")';
+    }
+    function viewDetails(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var vehicleId = dataItem.Id;
+        window.location.href = '@Url.Action("GetVehicleDetails", "VehicleManagement")?id=' + vehicleId;
+    }
+    function disposeDetails(e) {
+        e.preventDefault();
+
+        rowDispose = $(e.currentTarget).closest("tr");
+        var dataItem = this.dataItem(rowDispose);
+        var vehicleId = dataItem.Id;
+
+        //the bound refresh method of the window object is fired here
+        windowVehicleDisposal.refresh({
+            url: "/VehicleDisposal/GetDisposeVehicle",
+            data: { vehId: vehicleId },
+            beforeSend: function (xhr) {
+                //show progress bar
+                kendo.ui.progress($("#progressIndicator"), true);
+            },
+            complete: function (xhr, status) {
+                kendo.ui.progress($("#progressIndicator"), false);
+            }
+        });
+    }
+    function disposeVisible(dataItem) {
+        return dataItem.BOS_Recommendation == 'Yes';
+        }
+
+    function canUpdateVehicleRegistry()
+    {
+        var r = '@canUpdateVehicleRegistry';
+
+        if (r === "True") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    function canDisposeVehicle() {
+
+        var r = '@canDisposeVehicle';
+
+        if (r === "True") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    function canViewVehicleDetails() {
+
+        var r = '@canViewVehicleDetails';
+
+        if (r === "True") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    </script>
+}

@@ -1,0 +1,275 @@
+﻿@{
+    ViewBag.Title = "Vehicle Models";
+
+    //set UI visibility permissions   
+    var canManageVehicleModel = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionManageVehicleModel"];
+
+
+}
+
+<div class="container-fluid">
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            <fieldset id="fldsVehicleSearch">
+                <legend>Search</legend>
+
+                <!--Region Dropdownlist-->
+                @(Html.Kendo().DropDownList()
+                                                        .Name("drpVehicleMake")
+                                                        .DataValueField("Value")
+                                                        .DataTextField("Text")
+                                                        .OptionLabel(new { Text = "Select Vehicle Make", Value = "" })
+                                                        .Filter(FilterType.Contains)
+                                                        .ValuePrimitive(true)
+                                                        .HtmlAttributes(new { style = "max-width:200px;width:100%" })
+                                                        .BindTo((System.Collections.IEnumerable)ViewBag.VehicleMakes)
+                                                        .Events(events =>
+                                                        {
+                                                            events.Change("onSystemParamCodeChange");
+                                                        })
+                )
+
+                @(Html.Kendo().MaskedTextBox()
+                                                    .Name("txtVehicleModel")
+                                                    .HtmlAttributes(new { @placeholder = "Vehicle Model Name ...", style = "width:100%;max-width:190px;" })
+                )
+
+                @(Html.Kendo().Button()
+                                                        .Name("btnSearch")
+                                                        .HtmlAttributes(new { type = "button", @class = "k-primary" })
+                                                        .Content("<span class='k-icon' title='Search'></span>")
+                                                        .Icon("search")
+                                                        .Events(events =>
+                                                        {
+                                                            events.Click("onSearchButtonClick");
+                                                        })
+                )
+
+                @(Html.Kendo().Button()
+                                                        .Name("btnReset")
+                                                        .Tag("em")
+                                                        .Icon("refresh")
+                                                        .Content("<span class='k-icon' title='Refresh'></span>")
+                                                        .HtmlAttributes(new { @title = "Reset" })
+                                                        .Events(events =>
+                                                        {
+                                                            events.Click("onResetButtonClick");
+                                                        })
+                )
+            </fieldset>
+
+
+
+            @(Html.Kendo().Grid<FMS.Web.ViewModels.VehicleModelViewModel>()
+                                                                                    .Name("gridVehicleModels")
+                                                                                    .Columns(columns =>
+                                                                                    {
+                                                                                        columns.Bound(vm => vm.Name).Width(150);
+                                                                                        columns.Bound(vm => vm.MakeId).ClientTemplate("#:Make#").Width(100);
+                                                                                        columns.Command(command =>
+                                                                                        {
+                                                                                            command.Edit().Text(" ").UpdateText(" ").CancelText(" ").Visible("canManageVehicleModel");
+                                                                                            command.Custom("deleteVehicleModel").Text(" ").Click("onDeleteDetailsClick").IconClass("fas fa-trash-alt").HtmlAttributes(new { @title = "Delete", @style = "min-width:46px;min-height:26px" }).Visible("canManageVehicleModel");
+                                                                                        }).Title("").Width(210);
+                                                                                    })
+                                                                                    .ToolBar(toolBar =>
+                                                                                    {
+                                                                                        toolBar.Template(@<text>
+
+                                                                                            @if (canManageVehicleModel)
+                                                                                                {
+                                                                                                <a class='k-button' style="float:left" href="#" onclick="onAddNewModel(event)">
+                                                                                                    <span class='k-icon k-i-add'></span>Add New Vehicle Model
+                                                                                                </a>
+                                                                                                }                                                                                    
+
+                                                                                        </text>);
+                                                                                    })
+                                                                                    .Editable(editable => editable.Mode(GridEditMode.InLine).DisplayDeleteConfirmation(false))
+                                                                                    .Pageable()
+                                                                                    .Sortable()
+                                                                                    .Scrollable(s => s.Height("auto"))
+                                                                                    .DataSource(dataSource => dataSource
+                                                                                        .Ajax()
+                                                                                        .PageSize(20)
+                                                                                        .Events(events => events
+                                                                                            .RequestEnd("onDataSourceRequestEnd")
+                                                                                            .Error("onError")
+                                                                                        )
+                                                                                        .Model(model =>
+                                                                                        {
+                                                                                            model.Id(vm => vm.Id);
+                                                                                            model.Field(vm => vm.Id).Editable(false);
+                                                                                        })
+                                                                                        .Read(read => read.Action("GetVehicleModelList", "SystemParameter").Data("gridFilterParams"))
+                                                                                        .Create(create => create.Action("CreateVehicleModel", "SystemParameter"))
+                                                                                        .Update(update => update.Action("EditVehicleModel", "SystemParameter"))
+                                                                                        .Destroy(destroy => destroy.Action("DeleteVehicleModel", "SystemParameter"))
+                                                                                    )
+
+            )
+        </div>
+    </div>
+    <div id="wndDeleteConfirmation"></div>
+</div>
+
+<style>
+</style>
+@section scripts{
+    <script type="text/x-kendo-template" id="templateDeleteConfirmation">
+        <div class="modalWindow">
+            <h2>Are you sure you want to delete this record?</h2>
+            <button id="yes" class="k-button">Yes</button>
+            <button id="no" class="k-button k-primary">No</button>
+        </div>
+    </script>
+
+    <script type="text/javascript">
+
+        var gridData;
+
+        $(document).ready(function () {
+            //tooltips
+            $("#gridVehicleModels").kendoTooltip({ filter: "a[title]" });
+
+
+            gridData = $("#gridVehicleModels").data("kendoGrid");
+
+            //initialize the kendo delete confirmation modal window
+            templateDeleteConfirmation = kendo.template($("#templateDeleteConfirmation").html());
+
+            windowDeleteConfirmation = $("#wndDeleteConfirmation").kendoWindow({
+                title: "Delete Confirmation",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+
+        });
+
+        function onSystemParamCodeChange(e) {
+            $("#btnSearch").trigger("click");
+        }
+
+
+        function onError(e) {
+            if (e.errors) {
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                e.sender.read(); //refresh the datasource
+                App.notification.show({
+                    message: message.length > 100 ? message.substring(0, 100) + "..." : message
+                }, "error");
+            }
+        }
+
+        function onDeleteDetailsClick(e) {
+
+            e.preventDefault();
+
+            var grid = this;
+
+            var row = $(e.currentTarget).closest("tr");
+            var dataItem = this.dataItem(row);
+
+            windowDeleteConfirmation.content(templateDeleteConfirmation(dataItem));
+
+            windowDeleteConfirmation.center().open();
+
+            $("#yes").click(function () {
+                grid.removeRow(row); //removes row only
+                windowDeleteConfirmation.close();
+            });
+
+            $("#no").click(function () {
+                windowDeleteConfirmation.close();
+            });
+        }
+
+
+        function onDataSourceRequestEnd(e) {
+            if (e.type == "create" && !e.response.Errors) {
+                App.notification.show({
+                    message: "Vehicle model created successfully."
+                }, "success");
+
+                e.sender.read(); //refresh the datasource
+            }
+
+            if (e.type == "update" && !e.response.Errors) {
+                App.notification.show({
+                    message: "Vehicle model updated successfully."
+                }, "success");
+
+                e.sender.read(); //refresh the datasource
+            }
+
+            if (e.type == "destroy" && !e.response.Errors) {
+                App.notification.show({
+                    message: "Vehicle model deleted successfully."
+                }, "success");
+
+                e.sender.read(); //refresh the datasource
+            }
+
+
+        }
+
+
+
+        function gridFilterParams() {
+
+            return {
+                vehicleModel: $("#txtVehicleModel").val(),
+                vehicleMake: (Number($("#drpVehicleMake").val()) == 0) ? -1 : Number($("#drpVehicleMake").val())
+            }
+        }
+        function onSearchButtonClick(e) {
+            e.preventDefault();
+            gridData.dataSource.query({ page: 1, pageSize: 20 });
+        }
+        function onResetButtonClick(e) {
+            e.preventDefault();
+            $("#txtVehicleModel").val("");
+            $("#drpVehicleMake").data("kendoDropDownList").value("");
+            gridData.dataSource.read();
+        }
+
+        function onAddNewModel(e) {
+            gridData.addRow();
+        }
+
+        
+        function canManageVehicleModel()
+        {
+            var r = '@canManageVehicleModel';
+
+            if (r === "True") {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+
+    </script>
+}

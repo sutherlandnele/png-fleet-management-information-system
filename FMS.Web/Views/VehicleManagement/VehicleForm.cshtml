@@ -1,0 +1,752 @@
+﻿@using FMS.Web.CustomHTMLHelpers
+@using FMS.Common
+@model FMS.Web.ViewModels.VehicleEditViewModel
+
+@{
+    ViewBag.Title = "Create/Update Vehicle Information";
+
+    FileInfo bosRptFileInfo = null;
+
+    if (!string.IsNullOrEmpty(Model.BosReport))
+    {
+        var fileNameBOSRpt = Server.MapPath(Parameters.AppConstant.BOSRPT_PATH + "/" + Model.BosReport);
+
+        if (System.IO.File.Exists(fileNameBOSRpt))
+        {
+            bosRptFileInfo = new System.IO.FileInfo(fileNameBOSRpt);
+        }
+    }
+}
+
+@using (Html.BeginForm("frmVehicleForm"))
+{
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="container-fluid">
+        <div class="row h-100 justify-content-center align-items-center formButtonRow">
+            @Html.Partial("_FormButtonsTopPartial")
+        </div>
+
+        <div class="row h-100 justify-content-center align-items-center">
+            <div class="col-md-6">
+                <div class="table-responsive">
+                    <table class="table no-border">
+                        <tr>
+                            <th>@Html.LabelForRequired(model => model.AssetNumber)</th>
+                            <td>
+                                @Html.HiddenFor(model => model.Id)
+                                @Html.HiddenFor(model => model.RegistrationExpiry)
+                                @Html.HiddenFor(model => model.SafetyStickyExpiry)
+                                @Html.HiddenFor(model => model.CurrentMileage)
+                                @Html.HiddenFor(model => model.LastServiceDate)
+                                @Html.HiddenFor(model => model.CreatedBy)
+                                @Html.HiddenFor(model => model.CreatedDate)
+
+                                @(Html.Kendo().MaskedTextBoxFor(model => model.AssetNumber)
+                                                                            .Name("AssetNumber")
+                                                                            .HtmlAttributes(new { style = "width:250px" })
+                                )
+                                <br /><span class="k-invalid-msg" data-for="AssetNumber"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.LabelForRequired(model => model.RegistrationNumber)</th>
+                            <td>
+                                @(Html.Kendo().MaskedTextBoxFor(model => model.RegistrationNumber)
+                                                                                                                            .Name("RegistrationNumber")
+                                                                                                                            .HtmlAttributes(new { style = "width:250px" })
+
+                                )
+                                <br /><span class="k-invalid-msg" data-for="RegistrationNumber"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.LabelForRequired(model => model.MadeId)</th>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.MadeId)
+                                                                                                                            .Name("MadeId")
+                                                                                                                            .DataValueField("Value")
+                                                                                                                            .DataTextField("Text")
+                                                                                                                            .OptionLabel(new { Text = "Select Make...", Value = "" })
+                                                                                                                            .Filter(FilterType.Contains)
+                                                                                                                            .ValuePrimitive(true)
+                                                                                                                            .HtmlAttributes(new { style = "width:250px" })
+                                                                                                                            .BindTo((System.Collections.IEnumerable)ViewBag.Makes)
+                                )
+                                <br /><span class="k-invalid-msg" data-for="MadeId"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@Html.LabelForRequired(model => model.ModelId)</th>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.ModelId)
+                                                                                                                            .Name("ModelId")
+                                                                                                                            .OptionLabel(new { Text = "Select Model...", Value = "" })
+                                                                                                                            .DataTextField("Text")
+                                                                                                                            .DataValueField("Value")
+                                                                                                                            .Filter("contains").DataSource(ds =>
+                                                                                                                            {
+                                                                                                                                ds.Read(read =>
+                                                                                                                                {
+                                                                                                                                    read.Action("GetModelsByMakeId", "VehicleManagement")
+                                                                                                                                        .Data("filterModels");
+                                                                                                                                }).ServerFiltering(true);
+                                                                                                                            })
+                                                                                                                            .Enable(false)
+                                                                                                                            .ValuePrimitive(true)
+                                                                                                                            .CascadeFrom("MadeId")
+                                                                                                                            .HtmlAttributes(new { style = "width:250px" })
+
+                                )
+                                <br /><span class="k-invalid-msg" data-for="ModelId"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@Html.LabelForRequired(model => model.VehicleTypeId)</th>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.VehicleTypeId)
+                                                                                                                            .Name("VehicleTypeId")
+                                                                                                                            .DataValueField("Value")
+                                                                                                                            .DataTextField("Text")
+                                                                                                                            .OptionLabel(new { Text = "Select Vehicle Type...", Value = "" })
+                                                                                                                            .ValuePrimitive(true)
+                                                                                                                            .HtmlAttributes(new { style = "width:250px" })
+                                                                                                                            .Filter(FilterType.Contains)
+                                                                                                                            .BindTo((System.Collections.IEnumerable)ViewBag.VehicleTypes))
+                                <br /><span class="k-invalid-msg" data-for="VehicleTypeId"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.LabelForRequired(model => model.AcquisitionDate)</th>
+                            <td>
+                                @(Html.Kendo().DatePickerFor(model => model.AcquisitionDate)
+                                                                                                                            .Name("AcquisitionDate")
+                                                                                                                            .HtmlAttributes(new { style = "width:250px" })
+                                )
+                                <br /><span class="k-invalid-msg" data-for="AcquisitionDate"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.LabelForRequired(model => model.AcquisitionCost)</th>
+                            <td>
+                                @(Html.Kendo().NumericTextBoxFor(model => model.AcquisitionCost)
+                                                                                                                            .Name("AcquisitionCost")
+                                                                                                                            .Placeholder("Enter a numeric value")
+                                                                                                                            .HtmlAttributes(new { style = "width:250px" }) )
+                                <br /><span class="k-invalid-msg" data-for="AcquisitionCost"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.LabelForRequired(model => model.AcquisitionTypeId)</th>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.AcquisitionTypeId)
+                                                                                                                            .Name("AcquisitionTypeId")
+                                                                                                                            .DataValueField("Value")
+                                                                                                                            .DataTextField("Text")
+                                                                                                                            .OptionLabel(new { Text = "Select Acquisition Type...", Value = "" })
+                                                                                                                            .ValuePrimitive(true)
+                                                                                                                            .HtmlAttributes(new { style = "width:250px" })
+                                                                                                                            .Filter(FilterType.Contains)
+                                                                                                                            .BindTo((System.Collections.IEnumerable)ViewBag.AcquisitionTypes))
+                                <br /><span class="k-invalid-msg" data-for="AcquisitionTypeId"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><div id="dtLeasedExpirydateLabel">@Html.LabelFor(model => model.LeasedExpirydate, htmlAttributes: new { @class = "vwLabel" })</div></th>
+                            <td>
+                                <div id="dtLeasedExpirydateControl">
+                                    @(Html.Kendo().DatePickerFor(model => model.LeasedExpirydate)
+                                                                                                                    .Name("LeasedExpirydate")
+                                                                                                                    .HtmlAttributes(new { style = "width:250px" })
+                                    )
+                                    <span class="k-invalid-msg" data-for="LeasedExpirydate"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@Html.LabelForRequired(model => model.Supplier)</th>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.Supplier)
+                                                                                                                            .Name("Supplier")
+                                                                                                                            .DataValueField("Value")
+                                                                                                                            .DataTextField("Text")
+                                                                                                                            .OptionLabel(new { Text = "Select Supplier...", Value = "" })
+                                                                                                                            .ValuePrimitive(true)
+                                                                                                                            .HtmlAttributes(new { style = "width:250px" })
+                                                                                                                            .Filter(FilterType.Contains)
+                                                                                                                            .BindTo((System.Collections.IEnumerable)ViewBag.Suppliers))
+                                <br /><span class="k-invalid-msg" data-for="Supplier"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.LabelForRequired(model => model.PurchasingReferance)</th>
+                            <td>
+                                @(Html.Kendo().MaskedTextBoxFor(model => model.PurchasingReferance)
+                                                                                                                            .Name("PurchasingReferance")
+                                                                                                                            .HtmlAttributes(new { style = "width:250px" })
+                                )
+                                <br /><span class="k-invalid-msg" data-for="PurchasingReferance"></span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>@Html.LabelForRequired(model => model.StartingMileage)</th>
+                            <td>
+                                @(Html.Kendo().NumericTextBoxFor(model => model.StartingMileage)
+                                                                                                                    .Name("StartingMileage")
+                                                                                                                    .Placeholder("Enter a numeric value")
+                                                                                                                    .HtmlAttributes(new { style = "width:250px" }) )
+
+                                <br /><span class="k-invalid-msg" data-for="StartingMileage"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@Html.LabelFor(model => model.CurrentMileageDisplay, htmlAttributes: new { @class = "vwLabel" })</th>
+                            <td>
+                                @Html.DisplayFor(model => model.CurrentMileageDisplay, new { style = "width:250px" })
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.LabelFor(model => model.TransmissionId, htmlAttributes: new { @class = "vwLabel" })</th>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.TransmissionId)
+                                                                                                                    .Name("TransmissionId")
+                                                                                                                    .DataValueField("Value")
+                                                                                                                    .DataTextField("Text")
+                                                                                                                    .OptionLabel(new { Text = "Select Transmission Type...", Value = "" })
+                                                                                                                    .ValuePrimitive(true)
+                                                                                                                    .HtmlAttributes(new { style = "width:250px" })
+                                                                                                                    .Filter(FilterType.Contains)
+                                                                                                                    .BindTo((System.Collections.IEnumerable)ViewBag.Transmissions))
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.LabelFor(model => model.RegistrationExpiryDisplay, htmlAttributes: new { @class = "vwLabel" })</th>
+                            <td>
+                                @Html.DisplayFor(model => model.RegistrationExpiryDisplay, new { style = "width:250px" })
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th> @Html.LabelFor(model => model.SafetyStickerExpiryDisplay, htmlAttributes: new { @class = "vwLabel" })</th>
+                            <td>
+                                @Html.DisplayFor(model => model.SafetyStickerExpiryDisplay, new { style = "width:250px" })
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.LabelFor(model => model.VehicleLife, htmlAttributes: new { @class = "vwLabel" })</th>
+                            <td>
+                                @Html.DisplayFor(model => model.VehicleLife, new { style = "width:250px" })
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.LabelFor(model => model.Comments, htmlAttributes: new { @class = "vwLabel" })</th>
+                            <td>
+                                @Html.TextAreaFor(model => model.Comments, htmlAttributes: new { @class = "k-textbox", id = "Comments", style = "resize:none;width:300px;height:100px;" })
+                                @Html.ValidationMessageFor(model => model.Comments, "", new { @class = "text-danger" })
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th> @Html.LabelFor(model => model.CreatedByDisplay, htmlAttributes: new { @class = "vwLabel" })</th>
+                            <td>
+                                @Html.DisplayFor(model => model.CreatedByDisplay, new { style = "width:250px" })
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th> @Html.LabelFor(model => model.CreatedDateDisplay, htmlAttributes: new { @class = "vwLabel" })</th>
+                            <td>
+                                @Html.DisplayFor(model => model.CreatedDateDisplay, new { style = "width:250px" })
+                            </td>
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="table-responsive">
+                    <table class="table no-border">
+
+                        <tr>
+                            <th> @Html.LabelForRequired(model => model.FuelTypeId)</th>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.FuelTypeId)
+                                                        .Name("FuelTypeId")
+                                                        .DataValueField("Value")
+                                                        .DataTextField("Text")
+                                                        .OptionLabel(new { Text = "Select Fuel Type...", Value = "" })
+                                                        .ValuePrimitive(true)
+                                                        .HtmlAttributes(new { style = "width:250px" })
+                                                        .Filter(FilterType.Contains)
+                                                        .BindTo((System.Collections.IEnumerable)ViewBag.FuelTypes))
+                                <br /><span class="k-invalid-msg" data-for="FuelTypeId"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.LabelForRequired(model => model.VehicleColor)</th>
+                            <td>
+                                @(Html.Kendo().MaskedTextBoxFor(model => model.VehicleColor)
+                                                        .Name("VehicleColor")
+                                                        .HtmlAttributes(new { style = "width:250px" })
+                                )
+                                <br /><span class="k-invalid-msg" data-for="VehicleColor"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@Html.LabelForRequired(model => model.EngineNumber)</th>
+                            <td>
+                                @(Html.Kendo().MaskedTextBoxFor(model => model.EngineNumber)
+                                                        .Name("EngineNumber")
+                                                        .HtmlAttributes(new { style = "width:250px" })
+                                )
+                                <br /><span class="k-invalid-msg" data-for="EngineNumber"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@Html.LabelForRequired(model => model.ChassisNumber)</th>
+                            <td>
+                                @(Html.Kendo().MaskedTextBoxFor(model => model.ChassisNumber)
+                                                        .Name("ChassisNumber")
+                                                        .HtmlAttributes(new { style = "width:250px" })
+                                )
+                                <br /><span class="k-invalid-msg" data-for="ChassisNumber"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@Html.Label("Business Unit", htmlAttributes: new { @class = "vwLabel" })</th>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(model => model.BusinessUnitId)
+                                                        .Name("BusinessUnitId")
+                                                        .DataValueField("Value")
+                                                        .DataTextField("Text")
+                                                        .OptionLabel(new { Text = "Select Business Unit...", Value = "-1" })
+                                                        .ValuePrimitive(true)
+                                                        .HtmlAttributes(new { style = "width:250px" })
+                                                        .Filter(FilterType.Contains)
+                                                        .BindTo((System.Collections.IEnumerable)ViewBag.BusinessUnits))
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@Html.LabelForRequired(model => model.BusinessGroupId)</th>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.BusinessGroupId)
+                                                        .Name("BusinessGroupId")
+                                                        .OptionLabel(new { Text = "Select Business Group...", Value = "" })
+                                                        .DataTextField("Text")
+                                                        .DataValueField("Value")
+                                                        .Value(Model.BusinessGroupId.ToString())
+                                                        .Filter("contains").DataSource(ds =>
+                                                        {
+                                                            ds.Read(read =>
+                                                            {
+                                                                read.Action("GetBusinessGroupsByBusinessUnitId", "VehicleManagement")
+                                                                    .Data("filterBusinessGroups");
+                                                            }).ServerFiltering(true);
+                                                        })
+                                                        .Enable(false)
+                                                        .ValuePrimitive(true)
+                                                        .CascadeFrom("BusinessUnitId")
+                                                        .HtmlAttributes(new { style = "width:250px" })
+                                )
+                                <br /><span class="k-invalid-msg" data-for="BusinessGroupId"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.Label("Region", htmlAttributes: new { @class = "vwLabel" })</th>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(model => model.RegionId)
+                                                                            .Name("RegionId")
+                                                                            .DataValueField("Value")
+                                                                            .DataTextField("Text")
+                                                                            .OptionLabel(new { Text = "Select Region...", Value = "-1" })
+                                                                            .ValuePrimitive(true)
+                                                                            .HtmlAttributes(new { style = "width:250px" })
+                                                                            .Filter(FilterType.Contains)
+                                                                            .BindTo((System.Collections.IEnumerable)ViewBag.Regions))
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.LabelForRequired(model => model.CenterId)</th>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.CenterId)
+                                                                                    .Name("CenterId")
+                                                                                    .OptionLabel(new { Text = "Select Center...", Value = "" })
+                                                                                    .HtmlAttributes(new { style = "width:250px" })
+                                                                                    .DataTextField("Text")
+                                                                                    .DataValueField("Value")
+                                                                                    .Enable(false)
+                                                                                    .Filter("contains").DataSource(ds =>
+                                                                                    {
+                                                                                        ds.Read(read =>
+                                                                                        {
+                                                                                            read.Action("GetCentersByRegionId", "VehicleManagement")
+                                                                                                .Data("filterCenters");
+                                                                                        }).ServerFiltering(true);
+                                                                                    })
+                                                                                    .ValuePrimitive(true)
+                                                                                    .CascadeFrom("RegionId")
+
+                                )
+                                <br /><span class="k-invalid-msg" data-for="CenterId"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.LabelForRequired(model => model.LastServiceDateDisplay)</th>
+                            <td>
+                                @Html.DisplayFor(model => model.LastServiceDateDisplay, new { style = "width:250px" })
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.LabelForRequired(model => model.ConditionId)</th>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.ConditionId)
+                                                                                        .Name("ConditionId")
+                                                                                        .DataValueField("Value")
+                                                                                        .DataTextField("Text")
+                                                                                        .OptionLabel(new { Text = "Select Condition...", Value = "" })
+                                                                                        .ValuePrimitive(true)
+                                                                                        .HtmlAttributes(new { style = "width:250px" })
+                                                                                        .Filter(FilterType.Contains)
+                                                                                        .BindTo((System.Collections.IEnumerable)ViewBag.Conditions))
+                                <br /><span class="k-invalid-msg" data-for="ConditionId"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.LabelForRequired(model => model.StatusId)</th>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.StatusId)
+                                                                                        .Name("StatusId")
+                                                                                        .DataValueField("Value")
+                                                                                        .DataTextField("Text")
+                                                                                        .OptionLabel(new { Text = "Select Status...", Value = "" })
+                                                                                        .ValuePrimitive(true)
+                                                                                        .HtmlAttributes(new { style = "width:250px" })
+                                                                                        .Filter(FilterType.Contains)
+                                                                                        .BindTo((System.Collections.IEnumerable)ViewBag.OperationStatuses))
+                                <br /><span class="k-invalid-msg" data-for="StatusId"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@Html.LabelForRequired(model => model.FinancialStatusId)</th>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.FinancialStatusId)
+                                                                                    .Name("FinancialStatusId")
+                                                                                    .DataValueField("Value")
+                                                                                    .DataTextField("Text")
+                                                                                    .OptionLabel(new { Text = "Select Financial Status...", Value = "" })
+                                                                                    .ValuePrimitive(true)
+                                                                                    .HtmlAttributes(new { style = "width:250px" })
+                                                                                    .Filter(FilterType.Contains)
+                                                                                    .BindTo((System.Collections.IEnumerable)ViewBag.FinancialStatuses))
+                                <br /><span class="k-invalid-msg" data-for="FinancialStatusId"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@Html.LabelForRequired(model => model.UsageStatusId)</th>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.UsageStatusId)
+                                                                                    .Name("UsageStatusId")
+                                                                                    .DataValueField("Value")
+                                                                                    .DataTextField("Text")
+                                                                                    .OptionLabel(new { Text = "Select Usage Status...", Value = "" })
+                                                                                    .ValuePrimitive(true)
+                                                                                    .HtmlAttributes(new { style = "width:250px" })
+                                                                                    .Filter(FilterType.Contains)
+                                                                                    .BindTo((System.Collections.IEnumerable)ViewBag.UsageStatuses))
+                                <br /><span class="k-invalid-msg" data-for="UsageStatusId"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.LabelFor(model => model.BOS_Recommendation, "BOS Recommendation", htmlAttributes: new { @class = "vwLabel" })</th>
+                            <td>
+                                @(Html.Kendo().CheckBoxFor(model => model.BOS_Recommendation)
+                                                                            .Name("BOS_Recommendation")
+                                                                            .HtmlAttributes(new { style = "width:250px" })
+                                )
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <fieldset id="fldsBoardOfSurveyDetails">
+                                    <legend style="font-size:14px !important">Board of Survey Details</legend>
+                                    <div class="table-responsive">
+                                        <table class="table no-border">
+                                            <tr>
+                                                <th>@Html.LabelFor(model => model.BosReport, htmlAttributes: new { @class = "vwLabel" })</th>
+                                                <td>
+                                                    @Html.HiddenFor(model => model.BosReport)
+                                                    @(Html.Kendo().Upload()
+                                                                                            .Name("files")
+                                                                                            .Multiple(false)
+                                                                                            .Validation(action =>
+                                                                                             {
+                                                                                                 action.AllowedExtensions(new string[] { ".doc", ".docx", ".pdf" });
+                                                                                                 action.MaxFileSize(3145728);
+                                                                                             })
+                                                                                            .Async(a => a
+                                                                                                .Save("File_Add", "VehicleManagement")
+                                                                                                .Remove("File_Remove", "VehicleManagement")
+                                                                                                .AutoUpload(true)
+                                                                                            )
+                                                                                            .Events(events => events
+                                                                                                .Upload("onUpload")
+                                                                                                .Remove("onRemove")
+                                                                                            )
+                                                                                            .Files(files =>
+                                                                                            {
+
+                                                                                                if (bosRptFileInfo != null)
+                                                                                                {
+                                                                                                    files.Add()
+                                                                                                        .Name(bosRptFileInfo.Name)
+                                                                                                        .Extension(bosRptFileInfo.Extension)
+                                                                                                        .Size(bosRptFileInfo.Length);
+                                                                                                }
+                                                                                            }
+                                                                                            )
+                                                    )
+                                                    <div style="font-style:italic; font-size:12px;">You can only upload<strong> DOC</strong> ,<strong> DOCX</strong> and<strong> PDF</strong> files. Max. file size allowed is <strong>3MB</strong></div>
+                                                    @if (bosRptFileInfo != null)
+                                                    {
+                                                        @(Html.Kendo().Button()
+                                                                                            .Name("btnDownloadReport")
+                                                                                            .Content("Download Report")
+                                                                                            .HtmlAttributes(new { type = "button", style = "margin-top:5px;" })
+                                                                                            .Events(ev => ev.Click("onDownloadClick"))
+                                                        )
+                                                    }
+
+
+
+
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>@Html.LabelFor(model => model.BOSNumber, htmlAttributes: new { @class = "vwLabel" })</th>
+                                                <td>
+                                                    @(Html.Kendo().MaskedTextBoxFor(model => model.BOSNumber)
+                                                                                                .Name("BOSNumber")
+                                                                                                .HtmlAttributes(new { style = "width:250px" })
+                                                    )
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </fieldset>
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.LabelFor(model => model.LastUpdatedBy, htmlAttributes: new { @class = "vwLabel" })</th>
+                            <td>
+                                @Html.DisplayFor(model => model.LastUpdatedBy, new { style = "width:250px" })
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.LabelFor(model => model.LastUpdatedDate, htmlAttributes: new { @class = "vwLabel" })</th>
+                            <td>
+                                @Html.DisplayFor(model => model.LastUpdatedDate, new { style = "width:250px" })
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row h-100 justify-content-center align-items-center formButtonRow">
+            @Html.Partial("_FormButtonsBottomPartial")
+        </div>
+    </div>
+}
+
+
+
+<style>
+</style>
+@section scripts{
+    <script type="text/javascript">
+
+
+    function onDownloadClick(e) {
+        e.preventDefault();
+        @if (bosRptFileInfo != null) {
+            <text>
+                window.location.href = '@Url.Action("DownloadFile", "VehicleManagement")?fileName=@bosRptFileInfo.Name';
+            </text>
+        }
+    }
+
+
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+
+    //************ Cascading Dropdownlist related ***************
+    function filterBusinessGroups() {
+        return {
+            businessUnitId: $("#BusinessUnitId").val(),
+            businessGroupFilter: $("#BusinessGroupId").data("kendoDropDownList").filterInput.val()
+        };
+    }
+    function filterCenters() {
+        return {
+            regionId: $("#RegionId").val(),
+            centerFilter: $("#CenterId").data("kendoDropDownList").filterInput.val()
+        };
+    }
+    function filterModels() {
+        return {
+            makeId: $("#MadeId").val(),
+            modelFilter: $("#ModelId").data("kendoDropDownList").filterInput.val()
+        };
+    }
+     //**********************************************************
+
+    function onUpload(e) {
+        $("#BosReport").val(e.files[0].name);
+        e.data = { fileType: "BOSReport" };
+    }
+
+    function onRemove(e) {
+        $("#BosReport").val("");
+        $("#btnDownloadReport").hide();
+    }
+
+    function getFilesInfo(e) {
+        return $.map(e.files, function (file) {
+            var info = file.name;
+
+            // File size is not available in all browsers
+            if (file.size > 0) {
+                info += " (" + Math.ceil(file.size / 1024) + " KB)";
+            }
+            return info;
+        }).join(", ");
+    }
+
+        $(document).ready(function () {
+
+
+        //**************** BOS Related Code Execution on load ***********************
+        $("#BOS_Recommendation").change(function () {
+            if (this.checked) {
+                toggleDisableBOSFieldSet(false);
+            }
+            else {
+                toggleDisableBOSFieldSet(true);
+            }
+        });
+        //bos related
+        checkToggleDisableBOSFieldSet();
+        toggleDisableBOSRecomendationCheckBox();
+
+        $("#StatusId").change(function () {
+            toggleDisableBOSRecomendationCheckBox();
+        });
+        $("#FinancialStatusId").change(function () {
+            toggleDisableBOSRecomendationCheckBox()
+        });
+
+        //lease expiry related
+        checkToggleVisibilityLeaseExpiryDate();
+        $("#AcquisitionTypeId").change(function () {
+            checkToggleVisibilityLeaseExpiryDate();
+        });
+        //**********************************************************
+
+        $("#btnBottomCancel").click(function (e) {
+            e.preventDefault();
+             window.location.href = '@Url.Action("Vehicles", "VehicleManagement")?message=NA&isError=false';
+        });
+
+        $("#btnTopCancel").click(function (e) {
+             e.preventDefault();
+             window.location.href = '@Url.Action("Vehicles", "VehicleManagement")?message=NA&isError=false';
+        });
+
+    });
+
+    //**************** BOS Related Functions ******************
+    function toggleDisableBOSFieldSet(isDisable) {
+        if (isDisable) {
+            $("#btnDownloadReport").prop("disabled", true);
+            $("#files").data("kendoUpload").disable();
+            $("#BOSNumber").data("kendoMaskedTextBox").enable(false);
+            //$("#fldsBoardOfSurveyDetails").fadeOut("slow", function () {});
+
+        }
+        else {
+            $("#btnDownloadReport").prop("disabled", false);
+            $("#files").data("kendoUpload").enable();
+            //$('#fldsBoardOfSurveyDetails').prop('disabled', false);
+            $("#BOSNumber").data("kendoMaskedTextBox").enable();
+            //$("#fldsBoardOfSurveyDetails").fadeIn("slow", function () { });
+
+        }
+
+    }
+    function checkToggleDisableBOSFieldSet() {
+        if ($("#BOS_Recommendation").prop('checked')) {
+            toggleDisableBOSFieldSet(false);
+        }
+        else {
+
+            toggleDisableBOSFieldSet(true);
+        }
+    }
+    function toggleDisableBOSRecomendationCheckBox() {
+
+        var isBOSRecommendationDue = $("#StatusId").data("kendoDropDownList").text() == "Not Operational" && $("#FinancialStatusId").data("kendoDropDownList").text() == "Due for BOS";
+
+        if (isBOSRecommendationDue) {
+            $("#BOS_Recommendation").prop("disabled", false);
+            checkToggleDisableBOSFieldSet();
+        }
+        else {
+            $("#BOS_Recommendation").prop("disabled", true);
+            toggleDisableBOSFieldSet(true);
+        }
+    }
+    //**********************************************************
+
+     //**************** Lease Expiry Related *******************
+    function checkToggleVisibilityLeaseExpiryDate() {
+        var isAcquisitionTypeLease = $("#AcquisitionTypeId").data("kendoDropDownList").text() == "Lease";
+        if (isAcquisitionTypeLease) {
+
+            $("#dtLeasedExpirydateLabel").show();
+            $("#dtLeasedExpirydateControl").show();
+
+        }
+        else {
+
+            $("#LeasedExpirydate").data("kendoDatePicker").value("");
+            $("#dtLeasedExpirydateLabel").hide();
+            $("#dtLeasedExpirydateControl").hide();
+        }
+    }
+    //**********************************************************
+
+    //********************* Form Related ***********************
+    $("#frmVehicleForm").submit(function (event) {
+        event.preventDefault();
+        ajaxCreateUpdate(this,$("#Id").val(), "VehicleManagement", "CreateVehicle","EditVehicle", "Vehicles", "");
+
+    });
+   //***********************************************************
+
+
+    </script>
+    }

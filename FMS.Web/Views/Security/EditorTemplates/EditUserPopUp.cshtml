@@ -1,0 +1,63 @@
+﻿@using FMS.Web.CustomHTMLHelpers
+@model FMS.Web.ViewModels.UserViewModel
+
+    <div class="container-fluid" id="FormContainer">
+        <div class="row no-gutters h-100 justify-content-center align-items-center">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table no-border">
+                        <tr>
+                            <th>@Html.LabelForRequired(model => model.Email)</th>
+                            <td>
+                                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "k-textbox", style = "width:250px", @autocomplete = "off" } })
+                                <input type="email" style="display:none">
+                                <br />@Html.ValidationMessageFor(model => model.Email)
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@Html.LabelForRequired(model => model.Role)</th>
+                            <td>
+                                @(Html.Kendo().DropDownListFor(m => m.Role)
+                                        .Name("Role")
+                                        .DataValueField("Value")
+                                        .DataTextField("Text")
+                                        .OptionLabel(new { Text = "Select User Role...", Value = "" })
+                                        .ValuePrimitive(true)
+                                        .HtmlAttributes(new { style = "width:250px" })
+                                        .Filter(FilterType.Contains)
+                                        .BindTo((System.Collections.IEnumerable)ViewBag.Roles))
+                                
+                            </td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <td>
+                                @(Html.Kendo().CheckBoxFor(model => model.ResetPassword)
+                                    .Name("ResetPassword")
+                                )
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@Html.LabelForRequired(model => model.Password)</th>
+                            <td>
+                                @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "k-textbox", style = "width:250px", @autocomplete = "new-password" } })
+                                <input type="password" style="display:none">
+                                <br />@Html.ValidationMessageFor(model => model.Password)
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@Html.LabelForRequired(model => model.ConfirmPassword)</th>
+                            <td>
+                                @Html.EditorFor(model => model.ConfirmPassword, new { htmlAttributes = new { @class = "k-textbox", style = "width:250px", @autocomplete = "new-password" } })
+                                <input type="password" style="display:none">
+                                <br />@Html.ValidationMessageFor(model => model.ConfirmPassword)
+                            </td>
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+

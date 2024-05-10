@@ -1,0 +1,268 @@
+﻿@model FMS.Web.ViewModels.ComplianceReportParameterViewModel
+@{
+
+    ViewBag.Title = "Compliance Reports";
+
+    //set UI visibility permissions   
+    var canExecuteRegistrationExpiryReport = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionRunRegistrationExpiryReport"];
+    var canExecuteSafetyStickerExpiryReport = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionRunSafetyStickerExpiryReport"];
+    var canExecuteVehicleServiceDueNoticeReport = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionRunScheduleServiceDueNoticeReport"];
+    var canExecuteDriverLicenseExpiryReport = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionRunDriverServiceExpiryNoticeReport"];
+    var canExecuteComplianceMonthlySummaryReport = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionRunComplianceMonthlySummaryReport"];
+
+}
+
+<div class="container-fluid">
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            @using (Html.BeginForm("ExecuteComplianceReport", "ReportManagement", FormMethod.Post, new { target = "_blank", id = "frmComplianceReportParameter", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <fieldset id="fldsVehicleRegistryReportParameter">
+
+                    <legend>Select Report Parameters</legend>
+                    <div class="row h-100 justify-content-center align-items-center">
+                        <div class="col-md-12">
+
+                            @(Html.Kendo().Button()
+                                                                                                .Name("btnReset")
+                                                                                                .Tag("em")
+                                                                                                .Icon("refresh")
+                                                                                                .Content("<span class='k-icon'></span>")
+                                                                                                .HtmlAttributes(new { style = "float:right", @title = "Reset Parameter Fields" })
+                                                                                                .Events(events =>
+                                                                                                {
+                                                                                                    events.Click("onResetClick");
+                                                                                                })
+                            )
+
+                        </div>
+                    </div>
+                    <div class="row h-100 justify-content-center align-items-center">
+                        <div class="col-md-4">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.BusinessUnit)</th>
+                                        <td>
+                                            @Html.HiddenFor(m => m.ReportType)
+                                            @(Html.Kendo().DropDownListFor(m => m.BusinessUnit)
+                                                                                        .DataValueField("Value")
+                                                                                        .DataTextField("Text")
+                                                                                        .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                        .Filter(FilterType.Contains)
+                                                                                        .ValuePrimitive(true)
+                                                                                        .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                                                                        .BindTo((System.Collections.IEnumerable)ViewBag.BusinessUnits)
+                                            )
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.LabelFor(model => model.ExpiryDateFrom)</th>
+                                        <td>
+                                            @(Html.Kendo().DatePickerFor(model => model.ExpiryDateFrom)
+                                                                        .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                            )
+                                        </td>
+                                    </tr>
+
+
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.BusinessGroup)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.BusinessGroup)
+                                                                                                .DataValueField("Value")
+                                                                                                .DataTextField("Text")
+                                                                                                .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                                .Filter(FilterType.Contains)
+                                                                                                .ValuePrimitive(true)
+                                                                                                .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                                                                                .BindTo((System.Collections.IEnumerable)ViewBag.BusinessGroups)
+                                            )
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.LabelFor(model => model.ExpiryDateTo)</th>
+                                        <td>
+                                            @(Html.Kendo().DatePickerFor(model => model.ExpiryDateTo)
+                                                                                .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                            )
+                                        </td>
+                                    </tr>
+
+
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.Center)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.Center)
+                                                                                        .DataValueField("Value")
+                                                                                        .DataTextField("Text")
+                                                                                        .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                        .Filter(FilterType.Contains)
+                                                                                        .ValuePrimitive(true)
+                                                                                        .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                                                                        .BindTo((System.Collections.IEnumerable)ViewBag.Centers)
+                                            )
+                                        </td>
+                                    </tr>
+
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </fieldset>
+
+                <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-md-12">
+
+                        <fieldset id="fldsFuelManagementReportExecution">
+
+                            <legend>Execute Report</legend>
+
+                            <div class="fa-box-link">
+
+                                <ul>
+                                    @if (canExecuteRegistrationExpiryReport)
+                                    {
+                                        <li>
+                                            <a href="#" id="Registration-Expiry" rel="nofollow">
+                                                <i class="fas fa-chart-line"></i>
+                                                <span>Registration Expiry Report</span>
+                                            </a>
+                                        </li>
+                                    }
+
+                                    @if (canExecuteSafetyStickerExpiryReport)
+                                    {
+
+                                        <li>
+                                            <a href="#" id="Safety-Sticker-Expiry" rel="nofollow">
+                                                <i class="fas fa-chart-pie"></i>
+                                                <span>Safety Sticker Expiry Report</span>
+                                            </a>
+                                        </li>
+                                    }
+
+                                    @if (canExecuteVehicleServiceDueNoticeReport)
+                                    {
+                                        <li>
+                                            <a href="#" id="Vehicle-Schedule-Service-Due-Notice" rel="nofollow">
+                                                <i class="fas fa-chart-area"></i>
+                                                <span>Vehicle Schedule Service Due Notice Report</span>
+                                            </a>
+                                        </li>
+                                    }
+
+                                    @if (canExecuteDriverLicenseExpiryReport)
+                                    {
+                                        <li>
+                                            <a href="#" id="Driver-License-Expiry" rel="nofollow">
+                                                <i class="fas fa-chart-bar"></i>
+                                                <span>Driver License Expiry Report</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    @if (canExecuteComplianceMonthlySummaryReport)
+                                    {
+                                        <li>
+                                            <a href="#" id="Compliance-Monthly-Summary" rel="nofollow">
+                                                <i class="fas fa-tachometer-alt"></i>
+                                                <span>Compliance Monthly Summary Report</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    </ul>
+                            </div>
+                        </fieldset>
+
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+</div>
+
+<style>
+</style>
+@section scripts{
+
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            //tooltips
+            $("#btnReset").kendoTooltip({ content: "Reset" });
+
+            //execute report actions
+            $("#Registration-Expiry").click(function (e) {
+                $("#ReportType").val("500");
+                $("#frmComplianceReportParameter").submit();
+            });
+
+            $("#Safety-Sticker-Expiry").click(function (e) {
+                $("#ReportType").val("501");
+                $("#frmComplianceReportParameter").submit();
+            });
+
+            $("#Vehicle-Schedule-Service-Due-Notice").click(function (e) {
+                $("#ReportType").val("502");
+                $("#frmComplianceReportParameter").submit();
+            });
+
+
+            $("#Driver-License-Expiry").click(function (e) {
+                $("#ReportType").val("503");
+                $("#frmComplianceReportParameter").submit();
+            });
+
+
+            $("#Compliance-Monthly-Summary").click(function (e) {
+                $("#ReportType").val("504");
+                $("#frmComplianceReportParameter").submit();
+            });
+
+        });
+
+        function onResetClick(e) {
+            e.preventDefault();
+
+            $("#ReportType").val("");
+            $("#ExpiryDateFrom").data("kendoDatePicker").value("");
+            $("#ExpiryDateTo").data("kendoDatePicker").value("");
+            $("#BusinessUnit").data("kendoDropDownList").value("");
+            $("#BusinessGroup").data("kendoDropDownList").value("");
+            $("#Center").data("kendoDropDownList").value("");
+        }
+
+
+
+
+    </script>
+    }

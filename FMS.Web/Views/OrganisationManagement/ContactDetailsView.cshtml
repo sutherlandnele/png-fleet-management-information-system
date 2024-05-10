@@ -1,0 +1,251 @@
+﻿@using FMS.Web.CustomHTMLHelpers
+@using FMS.Common
+@model FMS.Web.ViewModels.ContactDetailDisplayViewModel
+
+@{
+    ViewBag.Title = ViewBag.FormTitle;
+}
+
+<div id="view-details" class="container-fluid" style="margin-top:15px">
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters h-100 justify-content-center align-items-center">
+
+        <div class="col-md-12">
+
+            <div class="container-fluid" id="FormContainer" style="margin-bottom:15px;">
+                <div class="row no-gutters h-100 justify-content-center align-items-center">
+                    <div class="col-md-6">
+                        <div class="table-responsive">
+                            <table class="table no-border">
+
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.ContactName)</th>
+                                    <td>
+                                        @Html.HiddenFor(m => m.Id)
+                                        @Html.HiddenFor(m => m.Contacttype)
+                                        @Html.DisplayFor(m => m.ContactName)
+                                    </td>
+                                </tr>
+
+                                <!-- Supplier Type table row -->
+                                @{
+                                    if (ViewBag.ContactType == (int)Parameters.ContactType.Supplier)
+                                    {
+                                        <tr>
+                                            <th> @Html.LabelFor(m => m.SupplierType)</th>
+                                            <td>
+                                                @Html.DisplayFor(m => m.SupplierType)
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th> @Html.LabelFor(m => m.StreetAddress)</th>
+                                            <td>
+                                                @Html.DisplayFor(m => m.StreetAddress)
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th> @Html.LabelFor(m => m.Website)</th>
+                                            <td>
+                                                @Html.DisplayFor(m => m.Website)
+                                            </td>
+                                        </tr>
+
+                                    }
+                                }
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.Facsimile)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.Facsimile)
+                                    </td>
+                                </tr>
+
+
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.Email)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.Email)
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.Comments)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.Comments)
+                                    </td>
+                                </tr>
+
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="table-responsive">
+                            <table class="table no-border">
+                                <tr>
+
+                                    <th>@Html.LabelFor(m => m.Center)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.Center)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.PostalAddress)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.PostalAddress)
+                                    </td>
+                                </tr>
+                                @{
+                                    if (ViewBag.ContactType == (int)Parameters.ContactType.Supplier)
+                                    {
+                                        <tr>
+                                            <th>@Html.LabelFor(m => m.ContactPerson)</th>
+                                            <td>
+                                                @Html.DisplayFor(m => m.ContactPerson)
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.Telephone)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.Telephone)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.Mobile)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.Mobile)
+                                    </td>
+                                </tr>
+                                <!-- Is Driver Type checkbox table row -->
+                                @{
+                                    if (ViewBag.ContactType == (int)Parameters.ContactType.Employee)
+                                    {
+                                        <tr>
+                                            <th>@Html.Label("Is Driver? ")</th>
+                                            <td>
+                                                @Html.DisplayFor(m => m.IsDriver)
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+
+
+
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Driver Info Div Row -->
+                @{
+                    if (ViewBag.ContactType == (int)Parameters.ContactType.Employee)
+                    {
+                        <div id="driverDetailsHeading" class="row no-gutters h-100 justify-content-center align-items-center">
+                            <div class="col-md-6"><h4>Driver Details</h4></div>
+                        </div>
+
+                        <div id="driverDetails" class="row no-gutters h-100 justify-content-center align-items-center">
+                            <div class="col-md-6">
+                                <div class="table-responsive">
+                                    <table class="table no-border">
+                                        <tr>
+                                            <th>@Html.LabelFor(m => m.DateOfBirth)</th>
+                                            <td>
+                                                @Html.DisplayFor(m => m.DateOfBirth)
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>@Html.LabelFor(m => m.LicenceNumber)</th>
+                                            <td>
+                                                @Html.DisplayFor(m => m.LicenceNumber)
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>@Html.LabelFor(m => m.LicenceExpiryDate)</th>
+                                            <td>
+                                                @Html.DisplayFor(m => m.LicenceExpiryDate)
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>@Html.LabelFor(m => m.PPLPermitIssueDate)</th>
+                                            <td>
+                                                @Html.DisplayFor(m => m.PPLPermitIssueDate)
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="table-responsive">
+                                    <table class="table no-border">
+                                        <tr>
+                                            <th>@Html.LabelFor(m => m.Gender)</th>
+                                            <td>
+                                                @Html.DisplayFor(m => m.Gender)
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>@Html.LabelFor(m => m.LicenceClass)</th>
+                                            <td>
+                                                @Html.DisplayFor(m => m.LicenceClass)
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>@Html.LabelFor(m => m.PPLPermitNumber)</th>
+                                            <td>
+                                                @Html.DisplayFor(m => m.PPLPermitNumber)
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+
+                <div class="row no-gutters h-100 justify-content-center align-items-center">
+                    <div class="col-md-12" style="margin-bottom: -10px;margin-top: -30px;">
+                        <hr />
+                    </div>
+                </div>
+                <div class="row no-gutters h-100 justify-content-center align-items-center" style="float: right;margin-right: 50px;">
+                    <div class="col-md-12">
+                        <div>
+
+                            @(Html.Kendo().Button()
+                                                        .Name("btnBottomCancel")
+                                                        .Content("Back")
+                                                        .HtmlAttributes(new { type = "button", @class = "k-button" })
+                                                        .Icon("undo")
+                            )
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+
+
+        $(document).ready(function () {
+
+            $("#btnBottomCancel").click(function (event) {
+                var newSrc = "NA";
+                window.location.href = document.referrer.replace(/(message=).*?(&)/, '$1' + newSrc + '$2');
+            });
+
+        });
+
+
+    </script>
+    }

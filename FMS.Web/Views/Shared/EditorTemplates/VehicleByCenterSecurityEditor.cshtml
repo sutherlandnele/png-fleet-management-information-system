@@ -1,0 +1,10 @@
+﻿@model FMS.Web.ViewModels.ListOfValuesDisplayViewModel
+
+@(Html.Kendo().DropDownListFor(m=>m)
+        .DataValueField("Value")
+        .DataTextField("Text")
+        .OptionLabel(new { Text = "Select ...", Value = "" })
+        .Filter(FilterType.Contains)
+        .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+        .BindTo((System.Collections.IEnumerable)ViewBag.Vehicles)
+)

@@ -1,0 +1,92 @@
+﻿@model FMS.Web.ViewModels.VehicleDisplayViewModel
+
+<div class="row">
+    <div class="col-sm-4">
+        <div class="table-responsive">
+            <table class="table no-border view-only">
+                <tr>
+                    <th>@Html.LabelFor(model => model.Status, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.Status, new { htmlAttributes = new { @class = "vwDisplay" } })
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.LabelFor(model => model.Condition, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.Condition, new { htmlAttributes = new { @class = "vwDisplay" } })
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.LabelFor(model => model.NextService, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.NextService, new { htmlAttributes = new { @class = "vwDisplay" } })
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.LabelFor(model => model.LastService, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.LastService, new { htmlAttributes = new { @class = "vwDisplay" } })
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.LabelFor(model => model.NextServiceMileage, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.NextServiceMileage, new { htmlAttributes = new { @class = "vwDisplay" } })
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.LabelFor(model => model.LastServiceMileage, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.LastServiceMileage, new { htmlAttributes = new { @class = "vwDisplay" } })
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.LabelFor(model => model.LastServiceDate, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model =>model.LastServiceDate, new { htmlAttributes = new { @class = "vwDisplay" } })
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.LabelFor(model => model.UsageStatus, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.UsageStatus, new { htmlAttributes = new { @class = "vwDisplay" } })
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.LabelFor(model => model.FinancialStatus, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.FinancialStatus, new { htmlAttributes = new { @class = "vwDisplay" } })
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+
+    <div class="col-sm-4">
+        <div class="table-responsive">
+            <table class="table no-border view-only">
+                <tr>
+                    <th>@Html.LabelFor(model => model.CurrentAllocation, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.CurrentAllocation, new { htmlAttributes = new { @class = "vwDisplay" } })
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.LabelFor(model => model.TotalFuelConsumptionCostToDate, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.TotalFuelConsumptionCostToDate, new { htmlAttributes = new { @class = "vwDisplay" } })
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.LabelFor(model => model.TotalServiceCostToDate, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.TotalServiceCostToDate, new { htmlAttributes = new { @class = "vwDisplay" } })
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+
+</div>

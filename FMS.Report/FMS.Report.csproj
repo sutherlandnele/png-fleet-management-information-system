@@ -1,0 +1,271 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7CC95AF2-5961-46DD-B4C2-92924E210BAA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FMS.Report</RootNamespace>
+    <AssemblyName>FMS.Report</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Telerik.Reporting, Version=12.2.18.1129, Culture=neutral, PublicKeyToken=a9d7983dfcc261be" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AllocatedVehiclesReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="AllocatedVehiclesReport.Designer.cs">
+      <DependentUpon>AllocatedVehiclesReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BowserDailyFuelUsageReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="BowserDailyFuelUsageReport.Designer.cs">
+      <DependentUpon>BowserDailyFuelUsageReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BowserFuelStatusReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="BowserFuelStatusReport.Designer.cs">
+      <DependentUpon>BowserFuelStatusReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ComplianceMonthlySummaryReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ComplianceMonthlySummaryReport.Designer.cs">
+      <DependentUpon>ComplianceMonthlySummaryReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DisposedVehiclesListing.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DisposedVehiclesListing.Designer.cs">
+      <DependentUpon>DisposedVehiclesListing.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DriverInformationReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DriverInformationReport.Designer.cs">
+      <DependentUpon>DriverInformationReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DriverLicenseExpiry.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DriverLicenseExpiry.Designer.cs">
+      <DependentUpon>DriverLicenseExpiry.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IncidentStatusReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="IncidentStatusReport.Designer.cs">
+      <DependentUpon>IncidentStatusReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MonthlyFuelConsumption.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MonthlyFuelConsumption.Designer.cs">
+      <DependentUpon>MonthlyFuelConsumption.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RegistrationExpiry.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RegistrationExpiry.Designer.cs">
+      <DependentUpon>RegistrationExpiry.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SafetyStickerExpiry.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="SafetyStickerExpiry.Designer.cs">
+      <DependentUpon>SafetyStickerExpiry.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceDetailsReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ServiceDetailsReport.Designer.cs">
+      <DependentUpon>ServiceDetailsReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceMonthlySummary.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ServiceMonthlySummary.Designer.cs">
+      <DependentUpon>ServiceMonthlySummary.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UnAllocatedVehiclesReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UnAllocatedVehiclesReport.Designer.cs">
+      <DependentUpon>UnAllocatedVehiclesReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VehicleAcquisitionReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="VehicleAcquisitionReport.designer.cs">
+      <DependentUpon>VehicleAcquisitionReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VehicleActivitiesHistory.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="VehicleActivitiesHistory.Designer.cs">
+      <DependentUpon>VehicleActivitiesHistory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VehicleAllocationDetails.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="VehicleAllocationDetails.Designer.cs">
+      <DependentUpon>VehicleAllocationDetails.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VehicleIncidentDetails.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="VehicleIncidentDetails.Designer.cs">
+      <DependentUpon>VehicleIncidentDetails.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VehicleInformationReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="VehicleInformationReport.Designer.cs">
+      <DependentUpon>VehicleInformationReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VehicleRefuelDetails.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="VehicleRefuelDetails.Designer.cs">
+      <DependentUpon>VehicleRefuelDetails.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VehicleScheduleServiceDueNotice.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="VehicleScheduleServiceDueNotice.Designer.cs">
+      <DependentUpon>VehicleScheduleServiceDueNotice.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VehicleScheduleServiceReport.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="VehicleScheduleServiceReport.Designer.cs">
+      <DependentUpon>VehicleScheduleServiceReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VehicleServiceDetails.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="VehicleServiceDetails.Designer.cs">
+      <DependentUpon>VehicleServiceDetails.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AllocatedVehiclesReport.resx">
+      <DependentUpon>AllocatedVehiclesReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BowserDailyFuelUsageReport.resx">
+      <DependentUpon>BowserDailyFuelUsageReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BowserFuelStatusReport.resx">
+      <DependentUpon>BowserFuelStatusReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ComplianceMonthlySummaryReport.resx">
+      <DependentUpon>ComplianceMonthlySummaryReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DisposedVehiclesListing.resx">
+      <DependentUpon>DisposedVehiclesListing.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DriverInformationReport.resx">
+      <DependentUpon>DriverInformationReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DriverLicenseExpiry.resx">
+      <DependentUpon>DriverLicenseExpiry.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IncidentStatusReport.resx">
+      <DependentUpon>IncidentStatusReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MonthlyFuelConsumption.resx">
+      <DependentUpon>MonthlyFuelConsumption.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
+    <EmbeddedResource Include="RegistrationExpiry.resx">
+      <DependentUpon>RegistrationExpiry.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SafetyStickerExpiry.resx">
+      <DependentUpon>SafetyStickerExpiry.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ServiceDetailsReport.resx">
+      <DependentUpon>ServiceDetailsReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ServiceMonthlySummary.resx">
+      <DependentUpon>ServiceMonthlySummary.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UnAllocatedVehiclesReport.resx">
+      <DependentUpon>UnAllocatedVehiclesReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VehicleAcquisitionReport.resx">
+      <DependentUpon>VehicleAcquisitionReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VehicleActivitiesHistory.resx">
+      <DependentUpon>VehicleActivitiesHistory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VehicleAllocationDetails.resx">
+      <DependentUpon>VehicleAllocationDetails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VehicleIncidentDetails.resx">
+      <DependentUpon>VehicleIncidentDetails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VehicleInformationReport.resx">
+      <DependentUpon>VehicleInformationReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VehicleRefuelDetails.resx">
+      <DependentUpon>VehicleRefuelDetails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VehicleScheduleServiceDueNotice.resx">
+      <DependentUpon>VehicleScheduleServiceDueNotice.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VehicleScheduleServiceReport.resx">
+      <DependentUpon>VehicleScheduleServiceReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VehicleServiceDetails.resx">
+      <DependentUpon>VehicleServiceDetails.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

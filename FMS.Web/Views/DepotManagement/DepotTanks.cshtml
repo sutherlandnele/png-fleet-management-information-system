@@ -1,0 +1,298 @@
+﻿@using FMS.Web.ViewModels;
+
+@{
+    ViewBag.Title = "Depot Tank Management";
+    var canManageBowserSetup = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionManageTankStatusSetup"];
+}
+
+
+<div class="container-fluid">
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row h-100 justify-content-center align-items-center">
+
+
+        <fieldset id="fldsDepotDailyMeasurementSearch">
+            <legend>Search</legend>
+
+
+            @(Html.Kendo().MaskedTextBox()
+                                    .Name("txtBowserNumber")
+                                    .HtmlAttributes(new { @placeholder = "Enter Tank #...", style = "width:180px;" })
+            )
+
+            @(Html.Kendo().MaskedTextBox()
+                                    .Name("txtName")
+                                    .HtmlAttributes(new { @placeholder = "Enter Tank Name...", style = "width:180px;" })
+            )
+            @(Html.Kendo().MaskedTextBox()
+                                    .Name("txtCurrentVolume")
+                                    .HtmlAttributes(new { @placeholder = "Enter Current Volume...", style = "width:180px;" })
+            )
+            @(Html.Kendo().MaskedTextBox()
+                                    .Name("txtMaximumCapacity")
+                                    .HtmlAttributes(new { @placeholder = "Enter Capacity...", style = "width:180px;" })
+            )
+
+
+
+            @(Html.Kendo().Button()
+                                    .Name("btnSearch")
+                                    .HtmlAttributes(new { type = "button", @class = "k-primary" })
+                                    .Content("<span class='k-icon' title='Search'></span>")
+                                    .Icon("search")
+                                    .Events(events =>
+                                    {
+                                        events.Click("onSearchClick");
+                                    })
+            )
+
+            @(Html.Kendo().Button()
+                                    .Name("btnReset")
+                                    .Tag("em")
+                                    .Icon("refresh")
+                                    .Content("<span class='k-icon' title='Refresh'></span>")
+                                    .HtmlAttributes(new { @title = "Reset" })
+                                    .Events(events =>
+                                    {
+                                        events.Click("onResetClick");
+                                    })
+            )
+
+        </fieldset>
+
+        <div class="col-md-12">
+            @(Html.Kendo().Grid<FMS.Web.ViewModels.DepotTankEditViewModel>()
+                                                    .Name("gridDepotRefuel")
+                                                    .Columns(columns =>
+                                                    {
+                                                        columns.Bound(vm => vm.RegionId).ClientTemplate("#:RegionDisplay#").Width(130);
+                                                        columns.Bound(vm => vm.CenterId).ClientTemplate("#:CenterDisplay#").Width(130);
+                                                        columns.Bound(vm => vm.BowserNumber).Width(130);
+                                                        columns.Bound(vm => vm.Name).Width(130);
+                                                        columns.Bound(vm => vm.FuelTypeId).ClientTemplate("#:FuelTypeDisplay#").Width(130);
+                                                        columns.Bound(vm => vm.CurrentVolume).ClientTemplate("#:CurrentVolumeDisplay#").Media("(min-width: 544px)").Width(80);
+                                                        columns.Bound(vm => vm.MaximumCapacity).ClientTemplate("#:MaximumCapacityDisplay#").Media("(min-width: 544px)").Width(80);
+                                                        columns.Command(command =>
+                                                        {
+                                                            command.Edit().Text(" ").UpdateText(" ").CancelText(" ").Visible("canManageBowserSetup");
+                                                            command.Custom("deleteDepotTankRecord").Text(" ").Click("onDeleteDetailsClick").IconClass("fas fa-trash-alt").HtmlAttributes(new { @title = "Delete", @style = "min-width:46px;min-height:26px" }).Visible("canManageBowserSetup");
+
+                                                        }).Title("").Width(140);
+                                                    })
+                                                    .ToolBar(toolBar =>
+                                                    {
+                                                        toolBar.Template(@<text>
+
+
+                                                            @if (canManageBowserSetup)
+                                                             {
+                                                            <a class='k-button' style="float:left" href="#" onclick="onAddNewDepotDailyMeasurement(event)">
+                                                                <span class='k-icon k-i-add'></span>Add New Bowser
+                                                            </a>
+                                                            }                                                            
+
+                                                        </text>);
+                                                    })
+                                            .Editable(editable => editable.Mode(GridEditMode.InLine).DisplayDeleteConfirmation(false))
+                                            .Pageable()
+                                            .Sortable()
+                                            .Scrollable(s => s.Height("auto"))
+                                            .DataSource(dataSource => dataSource
+                                                .Ajax()
+                                                .PageSize(20)
+                                                .Events(events => events
+                                                    .Error("onError")
+                                                    .RequestEnd("onDataSourceRequestEnd")
+                                                )
+                                                .Model(model =>
+                                                {
+                                                    model.Id(vm => vm.BowserNumber);
+                                                })
+                                                    .Read(read => read.Action("GetDepotTankList", "DepotManagement").Data("gridFilterParams"))
+                                                    .Create(create => create.Action("CreateDepotTank", "DepotManagement"))
+                                                    .Update(update => update.Action("UpdateDepotTank", "DepotManagement"))
+                                                    .Destroy(delete => delete.Action("DeleteDepotTank", "DepotManagement"))
+
+                            )
+                                .Events(events => events
+                                        .Edit("onGridItemEdit")
+                            )
+
+            )
+
+        </div>
+    </div>
+
+    <div id="wndDeleteConfirmation"></div>
+</div>
+<style>
+    .k-grid .field-validation-error {
+        display: none;
+    }
+
+    span#dtEntryDate_validationMessage {
+        z-index: 2;
+        position: absolute;
+        margin-top: 30px;
+        margin-left: -130px;
+    }
+</style>
+@section scripts{
+    <script type="text/x-kendo-template" id="templateDeleteConfirmation">
+        <div class="modalWindow">
+            <h2>Are you sure you want to delete this record?</h2>
+            <button id="yes" class="k-button">Yes</button>
+            <button id="no" class="k-button k-primary">No</button>
+        </div>
+    </script>
+
+
+    <script type="text/javascript">
+
+
+        var gridData;
+
+
+
+        $(document).ready(function () {
+            //tooltips
+            $("#gridDepotRefuel").kendoTooltip({ filter: "a[title]" });
+
+            //initialize the kendo delete confirmation modal window
+            templateDeleteConfirmation = kendo.template($("#templateDeleteConfirmation").html());
+
+            windowDeleteConfirmation = $("#wndDeleteConfirmation").kendoWindow({
+                title: "Delete Confirmation",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+            gridData = $("#gridDepotRefuel").data("kendoGrid");
+
+
+        });
+
+
+        function onSearchClick(e) {
+            gridData.dataSource.read();
+        }
+
+        function onResetClick(e) {
+
+            e.preventDefault();
+
+
+            $("#txtCurrentVolume").val("");
+            $("#txtMaximumCapacity").val("");
+            $("#txtBowserNumber").val("");
+            $("#txtName").val("");
+
+
+
+            gridData.dataSource.read();
+
+        }
+
+        function editorFilterCenters() {
+            return {
+                regionId: $("#RegionId").data("kendoDropDownList").value(),
+                centerFilter: $("#CenterId").data("kendoDropDownList").filterInput.val()
+            };
+        }
+
+        function gridFilterParams() {
+            return {
+
+                currentVolume: $("#txtCurrentVolume").val(),
+                maximumCapacity: $("#txtMaximumCapacity").val(),
+                bowserNumber: $("#txtBowserNumber").val(),
+                name: $("#txtName").val()
+            }
+        }
+
+        function onDataSourceRequestEnd(e) {
+
+            if ((e.type == "create" || e.type == "update" || e.type == "destroy") && !e.response.Errors) {
+
+                App.notification.show({
+                    message: "Changes saved successfully."
+                }, "success");
+
+                e.sender.read(); //refresh the datasource
+            }
+        }
+
+        function onError(e) {
+            if (e.errors) {
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                App.notification.show({
+                    message: message
+                }, "error");
+            }
+        }
+
+
+        function onDeleteDetailsClick(e) {
+
+            e.preventDefault();
+
+            var grid = this;
+
+            var row = $(e.currentTarget).closest("tr");
+            var dataItem = this.dataItem(row);
+
+            windowDeleteConfirmation.content(templateDeleteConfirmation(dataItem));
+
+            windowDeleteConfirmation.center().open();
+
+            $("#yes").click(function () {
+                grid.removeRow(row); //removes row only
+                windowDeleteConfirmation.close();
+            });
+
+            $("#no").click(function () {
+                windowDeleteConfirmation.close();
+            });
+        }
+
+        function onGridItemEdit(e) {
+
+            if (!e.model.isNew()) {
+                $("#BowserNumber").data("kendoMaskedTextBox").readonly(true);
+            }
+        }
+
+        function onAddNewDepotDailyMeasurement(e) {
+            gridData.addRow();
+        }
+
+        function canManageBowserSetup()
+        {
+            var r = '@canManageBowserSetup';
+
+            if (r === "True") {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+
+    </script>
+    }

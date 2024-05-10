@@ -1,0 +1,36 @@
+﻿@model FMS.Web.ViewModels.VehicleDisplayViewModel
+<div class="row">
+    <div class="col-sm-4">
+        <div class="table-responsive">
+            <table class="table no-border view-only">
+                <tr>
+                    <th> @Html.LabelFor(model => model.CreatedBy, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.CreatedBy, new { style = "width:250px" })
+                    </td>
+                </tr>
+
+                <tr>
+                    <th> @Html.LabelFor(model => model.CreatedDate, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.CreatedDate, new { style = "width:250px" })
+                    </td>
+                </tr>
+
+                <tr>
+                    <th> @Html.LabelFor(model => model.LastUpdatedBy, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.LastUpdatedBy, new { style = "width:250px" })
+                    </td>
+                </tr>
+                <tr>
+                    <th> @Html.LabelFor(model => model.LastUpdatedDate, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.LastUpdatedDate, new { style = "width:250px" })
+                    </td>
+                </tr>
+
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,91 @@
+﻿@model FMS.Web.ViewModels.VehicleAllocationReportParameterViewModel
+@{
+
+    ViewBag.Title = "Vehicle Allocation Reports";
+    var canExecuteAllocatedVehiclesReport = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionRunAllocatedVehicleReport"];
+    var canExecuteUnAllocatedVehiclesReport = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionRunUnallocatedVehicleReport"];
+
+}
+<div class="container-fluid">
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            @using (Html.BeginForm("ExecuteVehicleAllocationReport", "ReportManagement", FormMethod.Post, new { target = "_blank", id = "frmVehicleAllocationReportParameter", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-md-12">
+
+                        <fieldset id="fldsVehicleAllocationReportExecution">
+
+                            <legend>Execute Report</legend>
+
+                            <div class="fa-box-link">
+
+                                <ul>
+                                    @if (canExecuteAllocatedVehiclesReport)
+                                    {
+                                        <li>
+                                            @Html.HiddenFor(m => m.ReportType)
+                                            <a href="#" id="Allocated-Vehicles-Report" rel="nofollow">
+                                                <i class="fas fa-chart-line"></i>
+                                                <span>Allocated Vehicles Report</span>
+                                            </a>
+                                        </li>
+                                    }
+
+                                    @if (canExecuteUnAllocatedVehiclesReport)
+                                    {
+                                        <li>
+                                            <a href="#" id="UnAllocated-Vehicles-Report" rel="nofollow">
+                                                <i class="fas fa-chart-area"></i>
+                                                <span>UnAllocated Vehicles Report</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    </ul>
+                            </div>
+                        </fieldset>
+
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+</div>
+@section scripts{
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            //execute report actions
+            $("#Allocated-Vehicles-Report").click(function (e) {
+                $("#ReportType").val("300");
+                $("#frmVehicleAllocationReportParameter").submit();
+            });
+
+            $("#UnAllocated-Vehicles-Report").click(function (e) {
+                $("#ReportType").val("301");
+                $("#frmVehicleAllocationReportParameter").submit();
+            });
+
+
+
+        });
+
+
+
+
+    </script>
+    }

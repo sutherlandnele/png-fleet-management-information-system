@@ -1,0 +1,53 @@
+﻿@using FMS.Web.ViewModels
+@using FMS.Web.CustomHTMLHelpers
+
+@model AppIssueEditViewModel
+
+
+@using (Html.BeginForm("frmApplicationIssueRegistration"))
+{
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="container-fluid" id="FormContainer">
+        <div class="row no-gutters h-100 justify-content-center align-items-center">
+            <div class="col-sm-12">
+                <div class="table-responsive">
+                    <table class="table no-border">
+                        <tr>
+                            <th>@Html.LabelForRequired(m => m.AppIssueTypeId)</th>
+                            <td>
+                                @Html.HiddenFor(m => m.Id)
+                                @(Html.Kendo().DropDownListFor(m => m.AppIssueTypeId)
+                                                                    .DataValueField("Value")
+                                                                    .DataTextField("Text")
+                                                                    .Filter(FilterType.Contains)
+                                                                    .ValuePrimitive(true)
+                                                                    .HtmlAttributes(new { style = "width:250px;" })
+                                                                    .BindTo((System.Collections.IEnumerable)ViewBag.AppIssueTypes)
+                                )
+                                <br /><span class="k-invalid-msg" data-for="AppIssueTypeId"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@Html.LabelFor(m => m.Description)</th>
+                            <td>
+                                @Html.TextAreaFor(m => m.Description, htmlAttributes: new { @class = "k-textbox", style = "resize:none;width:250px;height:300px;" })
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@Html.LabelForRequired(m => m.CreatedBy)</th>
+                            <td>
+                                @(Html.Kendo().TextBoxFor(m => m.CreatedBy)
+                                                             .HtmlAttributes(new { style = "width:250px;" }))
+                                <br /><span class="k-invalid-msg" data-for="CreatedBy"></span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div id="wndProgressIndicator"></div>
+        </div>
+        <div class="row h-100 justify-content-center align-items-center formButtonRow">
+            @Html.Partial("_ModalFormButtons")
+        </div>
+    </div>
+}

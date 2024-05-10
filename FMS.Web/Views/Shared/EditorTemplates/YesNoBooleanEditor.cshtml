@@ -1,0 +1,19 @@
+﻿@model Nullable<System.Boolean>
+
+
+@(Html.Kendo().DropDownListFor(m=>m)                            
+    .DataTextField("Text")
+    .DataValueField("Value")
+    .BindTo(new List<SelectListItem>() {
+            new SelectListItem() {
+                Text = "Yes",
+                Value = "true"
+            },
+            new SelectListItem() {
+                Text = "No",
+                Value = "false"
+            }
+    })
+    .Value("0")
+    .HtmlAttributes(new { style = "width: 100%; max-width:170px" })
+)

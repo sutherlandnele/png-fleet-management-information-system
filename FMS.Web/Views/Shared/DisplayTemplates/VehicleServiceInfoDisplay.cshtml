@@ -1,0 +1,41 @@
+﻿@model FMS.Web.ViewModels.VehicleServiceDisplayViewModel
+
+<div class="panel panel-info">
+    <div class="panel-heading">Vehicle Service Information</div>
+    <div class="panel-body" id="vehicleServiceInfo">
+        <strong>Service Job #</strong>
+        <p id="vsServiceJobNumber">@Html.DisplayFor(m => m.ServiceJobNumber)</p>
+        <strong>Start Date</strong>
+        <p id="vsStartDate">@Model.StartDate</p>
+
+        <strong>End Date</strong>
+        <p id="vsEndDate">@Model.EndDate</p>
+
+        <strong>Is Invoice Amount Paid?</strong>
+        <p id="vsIsAmountPaid">@{if (Model.IsAmountPaid) { @Html.Raw("Yes") }  else { @Html.Raw("No") } }</p>
+        @{
+            if (Model.IsAmountPaid)
+            {
+                <strong>Cost (Kina)</strong>
+                <p id="vsCost">@Model.Cost</p>
+            }
+        }
+
+        <strong>Service Provider</strong>
+        <p id="vsProvider">@Model.Provider</p>
+
+        <strong>Service Mechanic</strong>
+        <p id="vsServiceMechanic">@Model.ServiceMechanic</p>
+
+        <strong>Is Incident Service?</strong>
+        <p id="vsIsIncidentService">@{if (Model.IsIncidentService) { @Html.Raw("Yes") } else { @Html.Raw("No") } }</p>
+        @{
+            if (Model.IsIncidentService)
+            {
+                <strong>Incident File #</strong>
+                <p id="vsIsIncident">@Model.Incident</p>
+            }
+        }
+
+    </div>
+</div>

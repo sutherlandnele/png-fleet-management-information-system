@@ -1,0 +1,425 @@
+﻿
+@{
+    ViewBag.Title = "Manage Users";
+    //set UI visibility permissions   
+    var canManageUserInformation = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionManageUserInformation"];
+    var canViewUserInformation = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionViewUserInformation"];
+
+}
+<div class="container-fluid">
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            <fieldset id="fldsUserDetailsSearch">
+                <legend>Search</legend>
+
+                @(Html.Kendo().MaskedTextBox()
+                                            .Name("txtUserName")
+                                            .HtmlAttributes(new { @placeholder = "User Name ...", style = "width:100%;max-width:170px" })
+                )
+
+
+                @(Html.Kendo().Button()
+                                                .Name("btnSearch")
+                                                .HtmlAttributes(new { type = "button", @class = "k-primary" })
+                                                    .Content("<span class='k-icon' title='Search'></span>")
+                                                .Icon("search")
+                                                .Events(events =>
+                                                {
+                                                    events.Click("onSearchButtonClick");
+                                                })
+                )
+
+                @(Html.Kendo().Button()
+                                                .Name("btnReset")
+                                                .Tag("em")
+                                                .Icon("refresh")
+                                                .Content("<span class='k-icon' title='Refresh'></span>")
+                                                .HtmlAttributes(new { @title = "Reset" })
+                                                .Events(events =>
+                                                {
+                                                    events.Click("onResetButtonClick");
+                                                })
+                )
+            </fieldset>
+
+            @(Html.Kendo().Grid<FMS.Web.ViewModels.UserViewModel>()
+                                                                                                .Name("gridUsers")
+                                                                                                .Columns(columns =>
+                                                                                                {
+                                                                                                    columns.Bound(vm => vm.Email).Title("Username").Width(150);
+                                                                                                    columns.Bound(vm => vm.Role).Title("Role").Width(150);
+                                                                                                    columns.Bound(vm => vm.LastLoginTime).Title("Last Login").Width(150);
+                                                                                                    columns.Bound(vm => vm.IsLockedOut).Title("Lockout Status").Width(60)
+                                                                                                        .ClientTemplate(
+                                                                                                        "# if (IsLockedOut) { #" +
+                                                                                                            "<span><a href='\\#' onclick='onUnlockUserAccountClick(event)' id='lnkUnlockUser'><i title='Account is locked out. Click here to force unlock the account.' class='fa fa-lock' style='font-size:24px;color:\\#ff1919;'></i></a></span>" +
+                                                                                                            "# } else { #" +
+                                                                                                            "<span><i title='Account is unlocked.' class='fa fa-unlock' style='font-size:24px;color:\\#00ff00;'></i></span>" +
+                                                                                                            "# } #"
+                                                                                                        ).Visible(canManageUserInformation);
+                                                                                                    columns.Bound(vm => vm.Email).Title("Online Status").Width(60)
+                                                                                                        .ClientTemplate("#=onlineStatus(Email)#");
+                                                                                                    columns.Command(command =>
+                                                                                                    {
+                                                                                                        command.Edit().Text(" ").UpdateText(" ").CancelText(" ").Visible("canManageUserInformation");
+                                                                                                        command.Custom("deleteUser").Text(" ").Click("onDeleteDetailsClick").IconClass("fas fa-trash-alt").HtmlAttributes(new { @title = "Delete", @style = "min-width:46px;min-height:26px" }).Visible("canManageUserInformation");
+                                                                                                        command.Custom("disable-account").Text(" ").Click("onDisableAccountClick").IconClass("fas fa-ban").HtmlAttributes(new { @title = "Disable Account" }).Visible("showDisableAccountButton").Visible("canManageUserInformation");
+                                                                                                    }).Title("").Width(210);
+                                                                                                })
+                                                                                                    .ToolBar(toolBar =>
+                                                                                                    {
+                                                                                                        toolBar.Template(@<text>
+
+                                                                                                            @if (canManageUserInformation)
+                                                                                                            {
+                                                                                                            <a class='k-button' style="float:left" href="#" onclick="onAddNewUser(event)">
+                                                                                                                <span class='k-icon k-i-add'></span>Add New User
+                                                                                                            </a>
+                                                                                                            }                                                                                                            
+                                                                                                        </text>);
+                                                                                                    })
+                                                                                                    .Editable(editable => editable.Mode(GridEditMode.PopUp).DisplayDeleteConfirmation(false)
+                                                                                                        .TemplateName("EditUserPopUp").Window(w => w.Title("Create/Update User Information").Name("editUserWindow").Width(420))
+                                                                                                    )
+                                                                                                    .Pageable()
+                                                                                                    .Sortable()
+                                                                                                    .Scrollable(s => s.Height("auto"))
+                                                                                                    .DataSource(dataSource => dataSource
+                                                                                                        .Ajax()
+                                                                                                        .PageSize(20)
+                                                                                                      .Events(events => events
+                                                                                                            .RequestEnd("onDataSourceRequestEnd")
+                                                                                                            .Error("onError")
+                                                                                                        )                                                                                                        
+                                                                                                        .Model(model =>
+                                                                                                        {
+                                                                                                            model.Id(vm => vm.Email);
+                                                                                                            model.Field(vm => vm.Id).DefaultValue(Guid.Empty);
+                                                                                                        })
+                                                                                                        .Read(read => read.Action("Users_Grid_Read", "Security").Data("gridFilterParams"))
+                                                                                                        .Create(create => create.Action("User_Grid_Create", "Security"))
+                                                                                                        .Update(update => update.Action("User_Grid_Update", "Security"))
+                                                                                                        .Destroy(destroy => destroy.Action("User_Grid_Destroy", "Security"))
+                                                                                                    )
+                                                                                                     .Events(events => events
+                                                                                                            .Edit("onEdit")
+
+
+                                                                                                 )
+                                                                                                 .AutoBind(false) //set Grid Autobind to false to cater for SignalR to set values for Online Users
+
+            )
+
+        </div>
+    </div>
+    <div id="wndDeleteConfirmation"></div>
+</div>
+
+
+@section scripts{
+
+    <script type="text/x-kendo-template" id="templateDeleteConfirmation">
+        <div class="modalWindow">
+            <h2>Are you sure you want to delete this record?</h2>
+            <button id="yes" class="k-button">Yes</button>
+            <button id="no" class="k-button k-primary">No</button>
+        </div>
+    </script>
+
+
+    <script type="text/javascript">
+
+        //global documument variables
+        var gridData;
+        var onlineUsers;
+
+        $(document).ready(function () {
+
+            window.hubReady.done(function () {
+
+                //get connected users using SignalR
+                $.connection.comsHub.server.getAllActiveConnections().done(function (connections) {
+                    onlineUsers = connections;
+                    gridData = $("#gridUsers").data("kendoGrid");
+                    gridData.dataSource.read(); //set Grid Autobind to false to cater for SignalR to set values for Online Users
+                });
+            });
+
+            //initialize the kendo delete confirmation modal window
+            templateDeleteConfirmation = kendo.template($("#templateDeleteConfirmation").html());
+
+            windowDeleteConfirmation = $("#wndDeleteConfirmation").kendoWindow({
+                title: "Delete Confirmation",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+            //tooltips
+            $("#gridUsers").kendoTooltip({ filter: "a[title]" });
+            $("#gridUsers").kendoTooltip({ filter: "span>a>i.fa.fa-lock[title]" });
+            $("#gridUsers").kendoTooltip({ filter: "span>i.fa.fa-unlock[title]" });
+
+
+            notification = $("#notifyPopup").data("kendoNotification");
+
+            $("#FormContainer").kendoValidator();
+        });
+
+        function onDataSourceRequestEnd(e) {
+            if (e.type == "create" && !e.response.Errors) {
+                notification.show({
+                    message: "User created successfully."
+                }, "success");
+            }
+
+            if (e.type == "update" && !e.response.Errors) {
+                notification.show({
+                    message: "User updated successfully."
+                }, "success");
+            }
+
+            if (e.type == "destroy" && !e.response.Errors) {
+                notification.show({
+                    message: "User deleted successfully."
+                }, "success");
+            }
+        }
+
+
+        function onDeleteDetailsClick(e) {
+
+            e.preventDefault();
+
+            var grid = this;
+
+            var row = $(e.currentTarget).closest("tr");
+            var dataItem = this.dataItem(row);
+
+            windowDeleteConfirmation.content(templateDeleteConfirmation(dataItem));
+
+            windowDeleteConfirmation.center().open();
+
+            $("#yes").click(function () {
+                grid.removeRow(row); //removes row only
+                windowDeleteConfirmation.close();
+            });
+
+            $("#no").click(function () {
+                windowDeleteConfirmation.close();
+            });
+        }
+
+
+        function onDisableAccountClick(e) {
+            e.preventDefault();
+
+            var row = $(e.currentTarget).closest("tr");
+            var dataItem = gridData.dataItem(row);
+            var strUsername = dataItem.Email;
+
+            ajaxUpdateUser(strUsername, "/Security/DisableUser");
+
+            //force logout disabled user
+            window.hubReady.done(function () {                
+                $.connection.comsHub.server.forceLogOut(strUsername);
+            })
+        }
+
+        function showDisableAccountButton(dataItem) {
+            return dataItem.IsLockedOut == false;;
+        }
+
+        function onUnlockUserAccountClick(e) {
+            e.preventDefault();
+
+            var row = $(e.currentTarget).closest("tr");
+            var dataItem = gridData.dataItem(row);
+            var strUsername = dataItem.Email;
+
+            ajaxUpdateUser(strUsername, "/Security/UnlockUser")
+        }
+
+        function onError(e) {
+            if (e.errors) {
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                App.notification.show({
+                    message: message
+                }, "error");
+            }
+        }
+
+        //reference the popup window fields 1st
+        function onEdit(e) {
+
+
+            e.container.find("input[name=ResetPassword]").bind("change",
+                function () {
+                    if (this.checked) {
+
+                        toggleDisablePassword(false);
+
+                    }
+                    else {
+
+                        toggleDisablePassword(true);
+
+                    }
+                }
+            );
+
+
+            if (!e.model.isNew()) { //edit mode
+                toggleDisableUserName(true);
+                toggleDisablePassword(true);
+                e.container.find("input[name=ResetPassword]").prop("disabled", false);
+                e.container.find("input[name=ResetPassword]").prop("checked", false);
+            }
+            else //create mode
+            {
+                e.container.find("input[name=Email]").val("");
+                e.container.find("input[name=Password]").val("");
+                e.container.find("input[name=ResetPassword]").prop("disabled", true);
+
+                toggleDisablePassword(false);
+                toggleDisableUserName(false);
+            }
+
+        }
+
+        function onAddNewUser(e) {
+            gridData.addRow();
+        }
+
+        function toggleDisableUserName(isDisabled) {
+            $("input[name=Email]").attr("disabled", isDisabled);
+            $("input[name=Email]").css("background-color", isDisabled ? "LightGray" : "transparent");
+        }
+
+        function toggleRemovePasswordRequired(isRemoved) {
+            if (isRemoved) {
+
+                $("input[name=Password]").prop({
+                    required: false
+                });
+
+                $("input[name=ConfirmPassword]").prop({
+                    required: false
+                });
+
+            }
+            else {
+                $("input[name=Password]").prop({
+                    required: true
+                });
+
+                $("input[name=ConfirmPassword]").prop({
+                    required: true
+                });
+            }
+        }
+
+        function toggleDisablePassword(isDisabled) {
+            $("input[name=Password]").attr("disabled", isDisabled);
+            $("input[name=ConfirmPassword]").attr("disabled", isDisabled);
+
+            $("input[name=Password]").css("background-color", isDisabled ? "LightGray" : "transparent");
+            $("input[name=ConfirmPassword]").css("background-color", isDisabled ? "LightGray" : "transparent");
+        }
+
+        function onlineStatus(email) {
+
+            if ($.inArray(email, onlineUsers) != -1) { //if not found then return value is -1
+                return "<span style='color:#00ff00'>Online</span>";
+            }
+            else {
+                return "<span style='color:#ff1919'>Offline</span>";
+            }
+        }
+
+        function gridFilterParams() {
+            return {
+                username: $("#txtUserName").val()              
+            }
+        }
+        function onSearchButtonClick(e) {
+            e.preventDefault();
+            gridData.dataSource.query({ page: 1, pageSize: 20 });
+        }
+        function onResetButtonClick(e) {
+            e.preventDefault();
+            $("#txtUserName").val(""); 
+            gridData.dataSource.read();
+        }
+
+
+        function ajaxUpdateUser(strUsername, action) {
+
+            var urlAction = action;
+
+            $.ajax({
+                type: "POST",
+                url: urlAction,
+                data: AddAntiForgeryToken({ username: strUsername }),
+                dataType: "json",
+                async: false,
+                beforeSend: function (xhr) {
+                    //show progress bar
+                    kendo.ui.progress($("#progressIndicator"), true);
+                },
+                success: function (result, status, xhr) {
+                    if (result.isError) {
+                        notification.show({
+                            message: result.message
+                        }, "error");
+                    }
+                    else {
+
+                        kendo.ui.progress($("#progressIndicator"), false);
+                        gridData.dataSource.read();
+
+                        notification.show({
+                            message: result.message
+                        }, "success");
+
+
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert("An error occured: " + xhr.status + " " + xhr.statusText);
+                },
+                complete: function (xhr, status) {
+                    kendo.ui.progress($("#progressIndicator"), false);
+                }
+            });
+        }
+
+        function canManageUserInformation() {
+            if ('@canManageUserInformation' == 'True') {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+    </script>
+}

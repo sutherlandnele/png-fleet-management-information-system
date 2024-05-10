@@ -1,0 +1,559 @@
+﻿@using FMS.Web.ViewModels
+@using FMS.Common
+@model FMS.Web.ViewModels.VehicleRefuelEditViewModel
+
+@{
+
+    ViewBag.Title = "Step 2: Create Vehicle Refuel Details - Select Fuel Usage Information and Save Changes";
+
+    var canManageVehicleRefuel = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionManageVehicleFuelRegister"];
+}
+
+<script type="text/javascript">
+    var mCenterId = '@Model.CenterId';
+    var mRefuelDate = '@Model.Date';
+    var mIsBowserFuel = '@Model.IsBowserFuel';
+    var mFuelDistributorId = '@Model.FuelDistributorId';
+    var mBowserNumber = '@Model.BowserNumber';
+    var mUnitCost = '@Model.UnitCost';
+</script>
+
+<div class="container-fluid">
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-2">
+            <div class="panel panel-info">
+                <div class="panel-heading">Step 1: Selections</div>
+                <div class="panel-body">
+                    <strong>Center</strong>
+                    <p id="rCenter">@ViewBag.Center</p>
+
+                    <strong>Refuel Date</strong>
+                    <p id="rDate">@(((DateTime)(Model.Date)).ToString("dd/MM/yyyy"))</p>
+
+                    <strong>Is Bowser Fuel</strong>
+                    <p id="rIsBowserFuel">
+                        @{if ((bool)Model.IsBowserFuel)
+                            {
+                                @Html.Raw("Yes")
+                            }
+                            else
+                            {
+                                @Html.Raw("No")
+                            }
+                        }
+
+                    </p>
+                    @{
+                        if ((bool)Model.IsBowserFuel)
+                        {
+                            <strong>Tank #</strong>
+                            <p id="rBowserNumber">@Model.BowserNumber</p>
+                        }
+                        else
+                        {
+                            <strong>Fuel Distributor</strong>
+                            <p id="rFuelDistributor">@ViewBag.FuelDistributor</p>
+                        }
+                    }
+
+                    <strong>Unit Cost (Kina)</strong>
+                    <p id="rUnitCost">@Model.UnitCost</p>
+
+
+                </div>
+            </div>
+        </div>
+        <div class="col-md-10">
+            @(Html.Kendo().Grid<FMS.Web.ViewModels.VehicleRefuelEditViewModel>()
+                                                                                              .Name("gridVehicleRefuelsBatchCreate")
+                                                                                              .Columns(columns =>
+                                                                                              {
+                                                                                                  columns.Bound(vm => vm.VoucherNumber).Title("Voucher #").Media("(min-width: 544px)").Width(110);
+                                                                                                  columns.Bound(vm => vm.FuelUsageCategory).ClientTemplate("#=FuelUsageCategory.Text#").Title("Fuel Usage Category").Width(175).Media("(min-width: 544px)");
+                                                                                                  columns.Bound(vm => vm.VehicleByCenterSecurity).ClientTemplate("#=VehicleByCenterSecurity.Text#").Title("Vehicle").Width(175).Media("(min-width: 544px)");
+                                                                                                  columns.Bound(vm => vm.Driver).ClientTemplate("#=Driver.Text#").Title("Driver").Width(175).Media("(min-width: 544px)");
+                                                                                                  columns.Bound(vm => vm.Mileage).Title("Refuel Mileage").Media("(min-width: 544px)").Width(130);
+                                                                                                  columns.Bound(vm => vm.FuelType).ClientTemplate("#=FuelType.Text#").Title("Fuel Type").Width(180).Media("(min-width: 544px)");
+                                                                                                  columns.Bound(vm => vm.Liters).Title("Quantity in Litres").Media("(min-width: 544px)").Width(120);
+                                                                                                  columns.Bound(vm => vm.TotalCost).Title("Total Cost (Kina)").Media("(min-width: 544px)").Width(130);
+                                                                                                  columns.Bound(vm => vm.FuelUsageCategoryId).Visible(false);
+                                                                                                  columns.Bound(vm => vm.VehicleId).Visible(false);
+                                                                                                  columns.Bound(vm => vm.OperatorId).Visible(false);
+                                                                                                  columns.Bound(vm => vm.FuelTypeId).Visible(false);
+                                                                                                  columns.Bound(vm => vm.CenterId).Visible(false);
+                                                                                                  columns.Bound(vm => vm.Date).Visible(false);
+                                                                                                  columns.Bound(vm => vm.IsBowserFuel).Visible(false);
+                                                                                                  columns.Bound(vm => vm.FuelDistributorId).Visible(false);
+                                                                                                  columns.Bound(vm => vm.BowserNumber).Visible(false);
+                                                                                                  columns.Command(command =>
+                                                                                                  {
+                                                                                                      command.Edit().Text(" ").UpdateText(" ").CancelText(" ").Visible("canManageVehicleRefuel");
+                                                                                                      command.Custom("deleteRefuelRecord").Text(" ").Click("onDeleteDetailsClick").IconClass("fas fa-trash-alt").HtmlAttributes(new { @title = "Delete", @style = "min-width:46px;min-height:26px" }).Visible("canManageVehicleRefuel");
+
+                                                                                                  }).Title("").Width(140);
+                                                                                              })
+                                                                                              .ToolBar(toolBar =>
+                                                                                              {
+                                                                                                  toolBar.Template(@<text>
+
+                                                                                                    @if (canManageVehicleRefuel)
+                                                                                                    {
+
+                                                                                                        <a class='k-button' style="float:left" href="#" onclick="onAddNewVehicleRefuel(event)">
+                                                                                                            <span class='k-icon k-i-add'></span>Add New Record
+                                                                                                        </a>
+                                                                                                    }
+                                                                                                    </text>);
+                                                                                            })
+                                                                                  .Editable(editable => editable.Mode(GridEditMode.InLine).DisplayDeleteConfirmation(false))
+                                                                                  .Pageable()
+                                                                                  .Sortable()
+                                                                                  .AutoBind(false)
+                                                                                  .Scrollable(s => s.Height("auto"))
+                                                                                  .DataSource(dataSource => dataSource
+                                                                                      .Ajax()
+                                                                                      .PageSize(20)
+                                                                                      .Events(events => events
+                                                                                        .Error("onError")
+                                                                                        .RequestEnd("onDataSourceRequestEnd")
+                                                                                      )
+
+
+                                                                                      .Model(model =>
+                                                                                      {
+                                                                                          model.Id(vm => vm.Id);
+                                                                                          model.Field(vm => vm.FuelUsageCategory).DefaultValue(ViewBag.DefaultFuelUsageCategory as ListOfValuesDisplayViewModel);
+                                                                                          model.Field(vm => vm.VehicleByCenterSecurity).DefaultValue(new ListOfValuesDisplayViewModel { Value = null, Text = "Select ..." });
+                                                                                          model.Field(vm => vm.FuelType).DefaultValue(new ListOfValuesDisplayViewModel { Value = null, Text = "Select ..." });
+                                                                                          model.Field(vm => vm.Driver).DefaultValue(new ListOfValuesDisplayViewModel { Value = null, Text = "Select ..." });
+                                                                                          model.Field(vm => vm.VehicleId).DefaultValue(null);
+                                                                                          model.Field(vm => vm.OperatorId).DefaultValue(null);
+                                                                                          model.Field(vm => vm.FuelTypeId).DefaultValue(null);
+                                                                                          model.Field(vm => vm.FuelUsageCategoryId).DefaultValue(((ListOfValuesDisplayViewModel)(ViewBag.DefaultFuelUsageCategory)).Value);
+
+                                                                                      })
+                                                                                          .Create(create => create.Action("CreateVehicleRefuel", "VehicleFuelManagement"))
+                                                                                          .Update(update => update.Action("EditVehicleRefuel", "VehicleFuelManagement"))
+                                                                                          .Destroy(delete => delete.Action("DeleteVehicleRefuel", "VehicleFuelManagement"))
+
+                                                              )
+                                                                  .Events(events => events
+                                                                          .Edit("onGridItemEdit")
+                                                              )
+
+            )
+
+        </div>
+    </div>
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="float: right;margin-right: 50px;padding:10px;">
+        <div class="col-md-12">
+            <div>
+                @(Html.Kendo().Button()
+                                                .Name("btnBottomBack")
+                                                .Content("Back to Step 1")
+                                                .HtmlAttributes(new { type = "button", @class = "k-button" })
+                                                .Icon("undo")
+                )
+                @(Html.Kendo().Button()
+                                                .Name("btnBottomFinish")
+                                                .Icon("cancel")
+                                                .Content("Finish")
+                                                .HtmlAttributes(new { type = "button", @class = "k-button" })
+                )
+
+            </div>
+        </div>
+    </div>
+    <div id="wndDeleteConfirmation"></div>
+    <div id="wndAddNewDriverConfirmation"></div>
+</div>
+<style>
+    .k-grid .field-validation-error {
+        display: none;
+    }
+</style>
+@section scripts{
+    <script type="text/x-kendo-template" id="templateDeleteConfirmation">
+        <div class="modalWindow">
+            <h2>Are you sure you want to delete this vehicle refuel record?</h2>
+            <button id="yes" class="k-button">Yes</button>
+            <button id="no" class="k-button k-primary">No</button>
+        </div>
+    </script>
+
+    <script type="text/x-kendo-template" id="templateAddNewDriverConfirmation">
+        <div class="modalWindow">
+            <h2>Are you sure you want to add new driver?</h2>
+            <button id="yes" class="k-button">Yes</button>
+            <button id="no" class="k-button k-primary">No</button>
+        </div>
+    </script>
+
+    <script id="noDriverDataTemplate" type="text/x-kendo-template">
+        <div>No data found.</div>
+        <br />
+        <button class="k-button" onclick="addNew('#: instance.filterInput.val() #')">Add new driver</button>
+    </script>
+
+
+    <script type="text/javascript">
+
+    var nextVehicleFuelVoucherNumber;
+
+    var windowDeleteConfirmation;
+
+    var templateDeleteConfirmation;
+
+    var templateAddNewConfirmation;
+
+    var wndAddNewDriverConfirmation;
+
+    $(document).ready(function () {
+        //tooltips
+        $("#gridVehicleRefuelsBatchCreate").kendoTooltip({ filter: "a[title]" });
+
+
+        $("#btnBottomBack").click(function (event) {
+            $("#gridVehicleRefuelsBatchCreate").data("kendoGrid").cancelChanges();
+            window.location.href = '/VehicleFuelManagement/GetCreateVehicleRefuelMasterDetails';
+        });
+
+        $("#btnBottomFinish").click(function (event) {
+            $("#gridVehicleRefuelsBatchCreate").data("kendoGrid").cancelChanges();
+            window.location.href = '/VehicleFuelManagement/VehicleRefuels?message=NA&isError=false';
+        });
+
+        //initialize the kendo delete confirmation modal window
+        templateDeleteConfirmation = kendo.template($("#templateDeleteConfirmation").html());
+
+        windowDeleteConfirmation = $("#wndDeleteConfirmation").kendoWindow({
+            title: "Delete Confirmation",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+          //initialize add new driver kendo confirmation modal window
+        templateAddNewConfirmation = kendo.template($("#templateAddNewDriverConfirmation").html());
+        wndAddNewDriverConfirmation = $("#wndAddNewDriverConfirmation").kendoWindow({
+            title: "Add New Confirmation",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+    });
+
+    function addNew(driverName) {
+
+        //wndAddNewDriverConfirmation.content(templateAddNewConfirmation(""));
+
+        //wndAddNewDriverConfirmation.center().open();
+
+        //$("#yes").click(function () {
+        //    //call ajax add
+
+        //    wndAddNewDriverConfirmation.close();
+        //});
+
+        //$("#no").click(function () {
+        //    wndAddNewDriverConfirmation.close();
+        //});
+        contactObj = {};
+        contactObj.ContactName = driverName;
+        contactObj.CenterId = mCenterId;
+        contactObj.IsDriver = true;
+        contactObj.Contacttype = @((int)Parameters.ContactType.Employee);
+
+
+        $.when(ajaxCreateDriver("/OrganisationManagement/CreateContactDetails",contactObj)).done(function (result, statusText, jqXHR) {
+
+            if (statusText == "success") {
+
+                if (result.isError) {
+                    App.notification.show({
+                        message: result.message
+                    }, "error");
+                }
+                else {
+
+                    $.when($("#Driver").data("kendoDropDownList").dataSource.read()).done(function (r2, s2, x2) {
+
+                        $("#Driver").data("kendoDropDownList").value(result.id);
+
+                        $("#Driver").data("kendoDropDownList").trigger("change"); //necessary to set operatorId
+
+                        $("#Mileage").data("kendoNumericTextBox").focus();
+
+                    });
+
+                }
+            }
+            else
+            {
+                App.notification.show({
+                    message: "An error occured: " + jqXHR.status + " " + jqXHR.statusText
+                }, "error");
+            }
+
+        });
+
+
+    }
+
+    function ajaxCreateDriver(action,contactObj) {
+        return $.ajax({
+            type: "POST",
+            url: action,
+            data: AddAntiForgeryToken({ entityViewModel : contactObj }),
+            dataType: "json",
+            async: true,
+            beforeSend: function (xhr) {
+                //show progress bar
+                kendo.ui.progress($("#gridVehicleRefuelsBatchCreate"), true);
+            },
+            complete: function (xhr, status) {
+                kendo.ui.progress($("#gridVehicleRefuelsBatchCreate"), false);
+            }
+        });
+    }
+
+    function intFilter(args) {
+        args.element.kendoNumericTextBox({
+            format: "n0",
+            decimals: 0
+        });
+    }
+
+    function onDataSourceRequestEnd(e) {
+
+        if ((e.type == "create" || e.type == "update" || e.type == "destroy") && (e.response == null || e.response.Errors == null)) {
+            App.notification.show({
+                message: "Changes saved successfully."
+            }, "success");
+        }
+    }
+
+    function onError(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            App.notification.show({
+                message: message
+            }, "error");
+        }
+    }
+
+    function onDeleteDetailsClick(e) {
+
+        e.preventDefault();
+
+        var grid = this;
+
+        var row = $(e.currentTarget).closest("tr");
+        var dataItem = this.dataItem(row);
+
+        windowDeleteConfirmation.content(templateDeleteConfirmation(dataItem));
+
+        windowDeleteConfirmation.center().open();
+
+        $("#yes").click(function () {
+
+            //ajaxDelete(dataItem.Id, "VehicleFuelManagement", "DeleteVehicleRefuelDetails");
+            grid.removeRow(row); //removes row only
+
+            windowDeleteConfirmation.close();
+        });
+
+        $("#no").click(function () {
+            windowDeleteConfirmation.close();
+        });
+    }
+
+    function onGridItemEdit(e) {
+
+        //*** set value of ids when the appropriate dropdown values are set
+        var ddlFuelUsageCategory = e.container.find("input[name=FuelUsageCategory]") ;
+        var ddlVehicleByCenterSecurity = e.container.find("input[name=VehicleByCenterSecurity]");
+        var ddlDriver = e.container.find("input[name=Driver]");
+        var ddlFuelType = e.container.find("input[name=FuelType]");
+
+        disableCellsBasedOnFuelUsage();
+
+        //***** Bind default values - from step 1 selection
+        if (e.model.isNew()) {
+
+            //set CenterId
+            e.model.set("CenterId", mCenterId)
+
+            //set Refuel Date
+            e.model.set("Date", mRefuelDate)
+
+            //set IsBowserRefuel
+            e.model.set("IsBowserFuel", mIsBowserFuel)
+
+            //set FuelDistributorId
+            e.model.set("FuelDistributorId", mFuelDistributorId)
+
+            //set BowserNumber
+            e.model.set("BowserNumber", mBowserNumber)
+
+            //set VoucherNumber
+            e.model.set("VoucherNumber", nextVehicleFuelVoucherNumber)
+
+
+            //set UnitCost
+            e.model.set("UnitCost", mUnitCost)
+
+        }
+
+        var unitCost = e.container.find("input[name=UnitCost]");
+        var litres = e.container.find("input[name=Liters]");
+
+        //make VoucherNumber column readonly
+        $("#VoucherNumber").attr("readonly", true);
+
+        //make totalcost column readonly
+        $("#TotalCost").data("kendoNumericTextBox").readonly(true);
+
+
+        litres.on("keyup", function (ev) {
+            calculateTotalCost(ev.target.value, e.model.get("UnitCost"),e);
+        });
+
+
+        litres.data("kendoNumericTextBox").bind("spin", function () {
+            calculateTotalCost(this.value(), e.model.get("UnitCost"),e);
+        });
+
+
+
+
+        ddlFuelUsageCategory.change(function (ev) {
+            e.model.set("FuelUsageCategoryId", this.value);
+            disableCellsBasedOnFuelUsage();
+        });
+
+        ddlVehicleByCenterSecurity.change(function (ev) {
+            e.model.set("VehicleId", this.value);
+        });
+
+        ddlDriver.change(function (ev) {
+            e.model.set("OperatorId", this.value);
+        });
+
+        ddlFuelType.change(function (ev) {
+            e.model.set("FuelTypeId", this.value);
+        });
+        //**************************
+    }
+
+    function calculateTotalCost(litres, unitCost,e) {
+            e.model.set("TotalCost", Math.round(Number(litres) * Number(unitCost)));
+    }
+
+    function disableCellsBasedOnFuelUsage() {
+        if ($("#FuelUsageCategory").data().kendoDropDownList.value() !== "191") {  //Normal
+
+            //$("#FuelType").data().kendoDropDownList.enable(true);
+            $("#VehicleByCenterSecurity").data().kendoDropDownList.enable(false);
+            $("#Driver").data().kendoDropDownList.enable(false);
+            $("#Mileage").data("kendoNumericTextBox").enable(false);
+        }
+        else {
+            //$("#FuelType").data().kendoDropDownList.enable(false);
+            $("#VehicleByCenterSecurity").data().kendoDropDownList.enable(true);
+            $("#Driver").data().kendoDropDownList.enable(true);
+            $("#Mileage").data("kendoNumericTextBox").enable(true);
+        }
+    }
+
+    function onAddNewVehicleRefuel(e) {
+
+        $.when(getNewFuelVoucherNumber(mCenterId)).done(function () {
+            if (App.canGetNewFuelVoucherNumber) {
+                $("#gridVehicleRefuelsBatchCreate").data("kendoGrid").addRow();
+            }
+        });
+    }
+
+    function getNewFuelVoucherNumber(centerId) {
+            return   $.ajax({
+                type: "POST",
+                url: "/VehicleFuelManagement/GetNewFuelVoucherNumber",
+                data: { centerId: centerId },
+                dataType: "json",
+                async: true,
+                beforeSend: function (xhr) {
+                    //show progress bar
+                    kendo.ui.progress($("#progressIndicator"), true);
+
+                },
+                success: function (result, status, xhr) {
+
+                    nextVehicleFuelVoucherNumber = result.fuelVoucherNumber;
+
+                    App.canGetNewFuelVoucherNumber = true;
+
+                    if (result.isError) {
+
+                        App.getNewFuelVoucherNumberErrorMessage = result.message;
+
+                        App.canGetNewFuelVoucherNumber = false;
+
+                        nextVehicleFuelVoucherNumber = "";
+
+                        App.notification.show({
+                            message: result.message
+                        }, "error");
+                    }
+
+
+                },
+                error: function (xhr, status, error) {
+                    App.notification.show({
+                        message: "An error occured: " + xhr.status + " " + xhr.statusText
+                    }, "error");
+
+                    App.canGetNewFuelVoucherNumber = false;
+
+                    nextVehicleFuelVoucherNumber = "";
+                },
+                complete: function (xhr, status) {
+
+                    kendo.ui.progress($("#progressIndicator"), false);
+
+
+                }
+            });
+        }
+
+    function canManageVehicleRefuel()
+    {
+        var r = '@canManageVehicleRefuel';
+
+        if (r === "True") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    </script>
+    }

@@ -1,0 +1,21 @@
+﻿@model Nullable<System.Int32>
+
+@(Html.Kendo().DropDownListFor(m => m)
+                .Name("CenterId")
+                .OptionLabel(new { Text = "Select ...", Value = "" })
+                .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                .DataTextField("Text")
+                .DataValueField("Value")
+                .Enable(false)
+                .Filter("contains").DataSource(ds =>
+                {
+                    ds.Read(read =>
+                    {
+                        read.Action("GetCentersByRegionId", "DepotManagement")
+                            .Data("editorFilterCenters");
+                    }).ServerFiltering(true);
+                })
+                .ValuePrimitive(true)
+                .CascadeFrom("RegionId")
+
+)

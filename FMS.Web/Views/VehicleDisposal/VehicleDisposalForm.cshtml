@@ -1,0 +1,100 @@
+﻿@using FMS.Web.ViewModels
+@using FMS.Web.CustomHTMLHelpers
+
+@model VehicleDisposalEditViewModel
+
+
+@using (Html.BeginForm("frmVehicleDisposal"))
+{
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="container-fluid" id="FormContainer">
+        <div class="row no-gutters h-100 justify-content-center align-items-center">
+            <div class="col-sm-12">
+                <div class="table-responsive">
+                    <table class="table no-border">
+                        <tr>
+                            <th style="vertical-align:middle">Vehicle Details</th>
+                            <td>
+                                @Html.HiddenFor(model => model.Id)
+                                <div id="details-container">
+                                    <h4>@(Model.VehicleRegoNumber)</h4>
+                                    <em>@(Model.VehicleMake), @(Model.VehicleModel), @(Model.VehicleType) </em>
+                                    <dl>
+                                        <dt>Condition: @(Model.VehicleCondition)</dt>
+                                        <dt>Status : @(Model.VehicleStatus)</dt>
+                                    </dl>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@Html.LabelForRequired(model => model.Date)</th>
+                            <td>
+
+                                @Html.HiddenFor(model => model.VehicleId)
+                                @(Html.Kendo().DatePickerFor(model => model.Date)
+
+                                            .HtmlAttributes(new { style = "width:250px" })
+                                )
+                                <br />@Html.ValidationMessageFor(model => model.Date)
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>@Html.LabelForRequired(model => model.Value)</th>
+                            <td>
+                                @(Html.Kendo().NumericTextBoxFor(model => model.Value)
+                                                        .Name("Value")
+                                                        .Placeholder("Enter a numeric value")
+                                                        .HtmlAttributes(new { style = "width:250px" })
+                                )
+                                <br />@Html.ValidationMessageFor(model => model.Value)
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> @Html.LabelForRequired(model => model.Referance)</th>
+                            <td>
+                                @(Html.Kendo().TextBoxFor(model => model.Referance)
+                                                                .Name("Referance")
+                                                                .HtmlAttributes(new { style = "width:250px" })
+
+                                )
+                                <br />@Html.ValidationMessageFor(model => model.Referance)
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <th>@Html.LabelFor(model => model.CODReport, htmlAttributes: new { @class = "vwLabel" })</th>
+                            <td>
+                                @Html.HiddenFor(model => model.CODReport)
+                                @(Html.Kendo().Upload()
+                                                        .Name("files")
+                                                        .Multiple(false)
+                                                        .Validation(action =>
+                                                        {
+                                                            action.AllowedExtensions(new string[] { ".doc", ".docx", ".pdf" });
+                                                            action.MaxFileSize(3145728);
+                                                        })
+                                                        .Async(a => a
+                                                            .Save("File_Add", "VehicleDisposal")
+                                                            .Remove("File_Remove", "VehicleDisposal")
+                                                            .AutoUpload(true)
+                                                        )
+                                                        .Events(events => events
+                                                            .Upload("onUpload")
+                                                            .Remove("onRemove")
+                                                        )
+
+                                )
+                                <div style="font-style:italic; font-size:12px;">You can only upload<strong> DOC</strong> ,<strong> DOCX</strong> and<strong> PDF</strong> files. Max. file size allowed is <strong>3MB</strong></div>
+                            </td>
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+            <div id="wndProgressIndicator"></div>
+        </div>
+        <div class="row h-100 justify-content-center align-items-center formButtonRow">
+            @Html.Partial("_ModalFormButtons")
+        </div>
+    </div>
+}

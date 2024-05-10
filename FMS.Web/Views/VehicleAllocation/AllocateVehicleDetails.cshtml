@@ -1,0 +1,119 @@
+﻿@using FMS.Web.CustomHTMLHelpers
+@model FMS.Web.ViewModels.VehicleAllocationViewModel
+
+@{
+    ViewBag.Title = "Allocate Vehicle Details";
+}
+
+<div class="container-fluid" style="margin-top:15px">
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters h-100 justify-content-center align-items-center">
+        <div class="col-md-2">
+            <!--Vehicle Info-->
+            @Html.DisplayFor(m => m.VehicleDisplayInfoViewModel, "VehicleInfoDisplay")
+
+        </div>
+        <div class="col-md-7">
+            <!--Allocation Form-->
+            @using (Html.BeginForm("frmAllocateVehicleDetails"))
+            {
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.AntiForgeryToken()
+                <div class="container-fluid" id="FormContainer" style="margin-bottom:15px;">
+                    <div class="row no-gutters h-100 justify-content-center align-items-center">
+                        <div class="col-md-8 col-md-offset-2">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th> @Html.LabelForRequired(m => m.OperatorId)</th>
+                                        <td>
+                                            @Html.HiddenFor(m => m.Id)
+                                            @Html.HiddenFor(m => m.VehicleId)
+                                            @(Html.Kendo().DropDownListFor(m => m.OperatorId)
+                                                                .Name("OperatorId")
+                                                                .DataValueField("Value")
+                                                                .DataTextField("Text")
+                                                                .OptionLabel(new { Text = "Select Driver/Custodian...", Value = "" })
+                                                                .Filter(FilterType.Contains)
+                                                                .ValuePrimitive(true)
+                                                                .HtmlAttributes(new { style = "width:250px" })
+                                                                .BindTo((System.Collections.IEnumerable)ViewBag.Operators)
+                                                                .Events(e => e.Change("drpOperatorOnChange"))
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="OperatorId"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th> @Html.LabelForRequired(m => m.StartDate)</th>
+                                        <td>
+                                            @(Html.Kendo().DatePickerFor(m => m.StartDate)
+                                                                .Name("StartDate")
+                                                                .HtmlAttributes(new { style = "width:250px" })
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="StartDate"></span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters h-100 justify-content-center align-items-center">
+                        <div class="col-md-8 col-md-offset-2">
+                            <div>
+                                @(Html.Kendo().Button()
+                                                        .Name("btnBottomSave")
+                                                        .Icon("save")
+                                                        .Content("Save")
+                                                        .HtmlAttributes(new { type = "submit", @class = "k-button k-primary" })
+                                )
+                                @(Html.Kendo().Button()
+                                                        .Name("btnBottomCancel")
+                                                        .Content("Back")
+                                                        .HtmlAttributes(new { type = "button", @class = "k-button" })
+                                                        .Icon("undo")
+                                )
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-md-3">
+            <!--Selected Operator Info-->
+            @Html.DisplayFor(m => m.OperatorDisplayInfoViewModel, "OperatorInfoDisplay")
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+    <script>
+
+        $(document).ready(function () {
+            $("#btnBottomCancel").click(function (event) {
+                var newSrc = "NA";
+                window.location.href = document.referrer.replace(/(message=).*?(&)/, '$1' + newSrc + '$2');
+            });
+        });
+
+        function drpOperatorOnChange(e) {
+            var dataItem = e.sender.dataItem();
+            populateOperatorInfoBox(dataItem.Value);
+        }
+
+
+
+        //********************* Form Related ***********************
+        $("#frmAllocateVehicleDetails").submit(function (event) {
+            event.preventDefault();
+            ajaxCreateUpdate(this, $("#Id").val(), "VehicleAllocation", "AllocateVehicle", "EndVehicleAllocation", "VehicleAllocationMain", "");
+        });
+            //***********************************************************
+    </script>
+    }

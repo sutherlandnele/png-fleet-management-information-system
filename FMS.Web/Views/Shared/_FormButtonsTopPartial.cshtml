@@ -1,0 +1,24 @@
+﻿<div class="col-md-6">
+    <div class="formHeadingRegion">
+        <h4>@ViewBag.Title</h4>
+    </div>
+</div>
+<div class="col-md-6">
+    <div class="formButtonRegion">
+    @(Html.Kendo().Button()
+                .Name("btnTopSave")
+                .Icon("save")
+                .Content("Save")                
+                .HtmlAttributes(new {type="submit", @class = "k-button k-primary" })
+    )
+    @(Html.Kendo().Button()
+                .Name("btnTopCancel")
+                .Content("Cancel")
+                .HtmlAttributes(new { type = "button", @class = "k-button" })
+                .Icon("cancel")                
+    )
+    </div>
+</div>
+
+
+       

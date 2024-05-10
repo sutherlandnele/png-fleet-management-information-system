@@ -1,0 +1,491 @@
+﻿@{
+
+    ViewBag.Title = "Vehicle Refuels";
+
+    //set UI visibility permissions   
+    var canManageVehicleRefuel = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionManageVehicleFuelRegister"];
+    var canViewVehicleRefuel = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionViewVehicleFuelRegister"];
+    var canAcquitVehicleRefuel = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionAcquitFuelVoucher"];
+
+}
+
+<div class="container-fluid">
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            <fieldset id="fldsGridSearch">
+                <legend>Search</legend>
+
+                @(Html.Kendo().DropDownList()
+                                                                .Name("drpFuelType")
+                                                                .DataValueField("Value")
+                                                                .DataTextField("Text")
+                                                                .OptionLabel(new { Text = "Select Fuel Type...", Value = "" })
+                                                                .Filter(FilterType.Contains)
+                                                                .ValuePrimitive(true)
+                                                                .HtmlAttributes(new { style = "width:170px" })
+                                                                .BindTo((System.Collections.IEnumerable)ViewBag.FuelTypes)
+                )
+
+                <!--Center Dropdownlist-->
+                @(Html.Kendo().DropDownList()
+                                                                .Name("drpCenter")
+                                                                .DataValueField("Value")
+                                                                .DataTextField("Text")
+                                                                .Filter(FilterType.Contains)
+                                                                .ValuePrimitive(true)
+                                                                .HtmlAttributes(new { style = "width:170px" })
+                                                                .BindTo((System.Collections.IEnumerable)ViewBag.Centers)
+                                                                .Events(events => events
+                                                                    .DataBound("onDrpCenterDataBound")
+                                                                    .Change("onDrpCenterChange")
+                                                                ))
+
+                @(Html.Kendo().MaskedTextBox()
+                                                            .Name("txtFuelVoucherNumber")
+                                                            .HtmlAttributes(new { @placeholder = "Enter Fuel Voucher #...", style = "width:180px;" })
+                )
+
+                @(Html.Kendo().MaskedTextBox()
+                                                            .Name("txtTankNumber")
+                                                            .HtmlAttributes(new { @placeholder = "Tank #...", style = "width:180px;" })
+                )
+
+
+                <!-- Checkboxes -->
+                <div style="display:inline-block;font-family: 'Roboto'">
+
+                    @(Html.Kendo().CheckBox()
+                                                            .Name("chkbxVouchersNotAcquitted")
+                                                            .Label("Show Vouchers Not Acquitted")
+                    )
+
+                </div>
+
+                @(Html.Kendo().Button()
+                                                            .Name("btnSearch")
+                                                            .HtmlAttributes(new { type = "button", @class = "k-primary" })
+                                                             .Content("<span class='k-icon' title='Search'></span>")
+                                                            .Icon("search")
+                                                            .Events(events =>
+                                                            {
+                                                                events.Click("onSearchClick");
+                                                            })
+                )
+
+                @(Html.Kendo().Button()
+                                                            .Name("btnReset")
+                                                            .Tag("em")
+                                                            .Icon("refresh")
+                                                            .Content("<span class='k-icon' title='Refresh'></span>")
+                                                            .HtmlAttributes(new { @title = "Reset" })
+                                                            .Events(events =>
+                                                            {
+                                                                events.Click("onResetClick");
+                                                            })
+                )
+            </fieldset>
+
+        </div>
+    </div>
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            @(Html.Kendo().Grid<FMS.Web.ViewModels.VehicleRefuelDisplayViewModel>()
+                                                                    .Name("gridVehicleRefuels")
+                                                                    .Columns(columns =>
+                                                                    {
+                                                                        columns.Bound(vm => vm.VoucherNumber).Title("Fuel Voucher #").Media("(min-width: 768px)");
+                                                                        columns.Bound(vm => vm.Center).Title("Center").Media("(min-width: 544px)");
+                                                                        columns.Bound(vm => vm.BowserNumber).Title("Tank #").Media("(min-width: 544px)");
+                                                                        columns.Bound(vm => vm.FuelType).Title("Fuel Type").Media("(min-width: 544px)");
+                                                                        columns.Bound(vm => vm.Date).Title("Date").Media("(min-width: 544px)");
+                                                                        columns.Bound(vm => vm.VehicleRegistrationNumber).Title("Vehicle Rego #").Media("(min-width: 544px)");
+                                                                        columns.Bound(vm => vm.Mileage).Title("Mileage").Media("(min-width: 992px)");
+                                                                        columns.Bound(vm => vm.Litres).Title("Litres").Media("(min-width: 544px)");
+                                                                        columns.Bound(vm => vm.UnitCost).Title("Unit Cost (Kina)").Media("(min-width: 544px)");
+                                                                        columns.Bound(vm => vm.TotalCost).Title("Total Cost (Kina)").Media("(min-width: 544px)");
+                                                                        columns.Bound(vm => vm.IsVoucherAcquitted).Title("Is Voucher Acquitted?").Media("(min-width: 544px)")
+                                                                        .ClientTemplate(
+                                                                        "# if (IsVoucherAcquitted == true ) { #" +
+                                                                            "<span><i title='Fuel Voucher has been acquitted.' class='fas fa-check' style='font-size:24px;color:\\#00ff00;'></i></span>" +
+                                                                            "# } else { #" +
+                                                                            "<input type='button' title='Fuel Voucher has NOT been acquitted. Please acquit to allow continuous voucher processing.' class='k-button' onclick='onAcquitVoucherClick(this)' value='Acquit' />" +
+                                                                            "# } #"
+                                                                        ).Visible(canAcquitVehicleRefuel);
+                                                                        columns.Template(@<text></text>).ClientTemplate("#=resColTemplate(data)#").Title("Items").Media("(max-width: 544px)");
+                                                                        columns.Command(command =>
+                                                                        {
+                                                                            command.Custom("view").Text(" ").Click("onViewDetailsClick").IconClass("far fa-eye").HtmlAttributes(new { @title = "View" }).Visible("canViewVehicleRefuel");
+                                                                            command.Custom("edit").Text(" ").Click("onEditDetailsClick").IconClass("fas fa-edit").HtmlAttributes(new { @title = "Edit" }).Visible("canManageVehicleRefuel");
+                                                                            command.Custom("delete").Text(" ").Click("onDeleteDetailsClick").IconClass("fas fa-trash-alt").HtmlAttributes(new { @title = "Delete" }).Visible("canManageVehicleRefuel");
+                                                                        }).Title("").Width(210);
+                                                                    })
+                                                                        .ToolBar(toolBar =>
+                                                                        {
+                                                                            toolBar.Template(@<text>
+
+                                                                                @if (canManageVehicleRefuel)
+                                                                                {
+                                                                                    <a class='k-button' style="float:left" href="#" onclick="onAddNewDetailsClick(event)">
+                                                                                        <span class='k-icon k-i-add'></span>Batch Create New Vehicle Refuels
+                                                                                    </a>
+                                                                                }
+                                                                            </text>);
+                                                                        })
+                                                                .Pageable()
+                                                                .Sortable()
+                                                                .Scrollable(s => s.Height("auto"))
+                                                                .DataSource(dataSource => dataSource
+                                                                    .Ajax()
+                                                                    .ServerOperation(true)
+                                                                    .PageSize(20)
+                                                                    .Events(events => events.Error("error_handler"))
+                                                                    .Model(model => model.Id(vm => vm.Id))
+                                                                    .Read(read => read.Action("GetVehicleRefuelsList", "VehicleFuelManagement").Data("GridFilterParams"))
+                                                                )
+
+
+            )
+            <div id="wndDeleteConfirmation"></div>
+            <div id="wndVehicleRefuel"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+</style>
+@section scripts{
+    <script type="text/x-kendo-template" id="templateDeleteConfirmation">
+        <div class="modalWindow">
+            <h2>Are you sure you want to delete this vehicle refuel record?</h2>
+            <button id="yes" class="k-button">Yes</button>
+            <button id="no" class="k-button k-primary">No</button>
+        </div>
+    </script>
+
+
+    <script id="templateResponsiveColumn" type="text/x-kendo-template">
+
+        <strong>Fuel Voucher Number</strong>
+        <p class="col-template-val">#=data.VoucherNumber#</p>
+
+        <strong>Center</strong>
+        <p class="col-template-val">#=data.Center#</p>
+
+        <strong>Bowser Number</strong>
+        <p class="col-template-val">#=data.BowserNumber#</p>
+
+        <strong>Fuel Type</strong>
+        <p class="col-template-val">#=data.FuelType#</p>
+
+        <strong>Date</strong>
+        <p class="col-template-val">#=data.Date#</p>
+
+        <strong>Vehicle Rego Number</strong>
+        <p class="col-template-val">#=data.VehicleRegistrationNumber#</p>
+
+        <strong>Mileage</strong>
+        <p class="col-template-val">#=data.Mileage#</p>
+
+        <strong>Litres</strong>
+        <p class="col-template-val">#=data.Litres#</p>
+
+        <strong>Unit Cost</strong>
+        <p class="col-template-val">#=data.UnitCost#</p>
+
+        <strong>Total Cost</strong>
+        <p class="col-template-val">#=data.TotalCost#</p>
+
+    </script>
+
+    <script type="text/javascript">
+
+    //Global Variables
+    var windowDeleteConfirmation;
+    var windowVehicleRefuel;
+    var defaultCenterNumber;
+
+       
+    var gridData;
+    var rowAcquit;
+
+    var resColTemplate = kendo.template($("#templateResponsiveColumn").html());
+
+
+    $(document).ready(function () {
+
+        if (typeof (Storage) !== "undefined" && sessionStorage.vr01selectedCenter) {
+            $("#drpCenter").data("kendoDropDownList").value(sessionStorage.vr01selectedCenter);           
+        }
+
+        gridData = $("#gridVehicleRefuels").data("kendoGrid");
+
+        templateDeleteConfirmation = kendo.template($("#templateDeleteConfirmation").html());
+
+        //tooltips
+        $("#gridVehicleRefuels").kendoTooltip({ filter: "a[title]" });
+        $("#gridVehicleRefuels").kendoTooltip({ filter: "span>i.fas.fa-check[title]" });
+        $("#gridVehicleRefuels").kendoTooltip({ filter: "input[title]" });
+
+        $("#btnReset").kendoTooltip({ content: "Reset" });
+
+
+        //initialize the kendo delete confirmation modal window
+        windowDeleteConfirmation = $("#wndDeleteConfirmation").kendoWindow({
+            title: "Delete Confirmation",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+
+        setGridFormSubmitNotification();
+
+
+        //initialize the kendo vehicle disposal modal window
+        windowVehicleRefuel = $("#wndVehicleRefuel").kendoWindow({
+            title: "Acquit Vehicle Refuel",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 540
+        }).data("kendoWindow");
+
+        //because you are loading a view through an action, use the bind to the "refresh" function
+        windowVehicleRefuel.bind("refresh", function (e) {
+
+            initializeVehicleRefuelAcquitalModalWindow();
+            //NB: need to put the center open window in the refresh method coz if you put it outside the center window fires b4 content is loaded and messes up the UI
+            windowVehicleRefuel.center().open();
+
+        });
+
+        //refresh/re-read grid data when the modal window closes
+        windowVehicleRefuel.bind("close", function (e) {
+            gridData.dataSource.read();
+        });
+    });
+
+
+    function initializeVehicleRefuelAcquitalModalWindow() {
+
+        $("#frmVehicleRefuelAcquital").submit(function (event) {
+            event.preventDefault();
+            ajaxCreateUpdate(this, $("#frmVehicleRefuelAcquital #Id").val(), "VehicleFuelManagement", "", "UpdateVehicleRefuelAcquitalDetails", "", windowVehicleRefuel);
+        });
+
+
+        $("#btnClose").click(function (e) {
+            e.preventDefault();
+            windowVehicleRefuel.close();
+        });
+
+        //disable Voucher Receipt Number initially
+        $("#VoucherReceiptNumber").attr("readonly", true);
+        $("#btnSave").data().kendoButton.enable(false);
+
+        $("#IsVoucherAcquitted").change(function (e) {
+            if (this.checked) {
+                $("#VoucherReceiptNumber").attr("readonly", false);
+                $("#VoucherReceiptNumber").css("background-color", "white");
+                $("#btnSave").data().kendoButton.enable(true);
+            }
+            else {
+                $("#VoucherReceiptNumber").attr("readonly", true);
+                $("#VoucherReceiptNumber").css("background-color", "#e6e6e6");
+                $("#btnSave").data().kendoButton.enable(false);
+            }
+        });
+
+    }
+
+    function onAcquitVoucherClick(e) {
+        rowAcquit = $(e).closest("tr");
+        var dataItem = gridData.dataItem(rowAcquit);
+        var vehicleRefuelId = dataItem.Id;
+
+        //the bound refresh method of the window object is fired here
+        windowVehicleRefuel.refresh({
+            url: "/VehicleFuelManagement/GetVehicleRefuelDetails",
+            data: { vehicleRefuelId: vehicleRefuelId },
+            beforeSend: function (xhr) {
+                //show progress bar
+                kendo.ui.progress($("#progressIndicator"), true);
+            },
+            complete: function (xhr, status) {
+                kendo.ui.progress($("#progressIndicator"), false);
+            }
+        });
+
+    }
+
+    function onDrpCenterDataBound(e) {
+
+    }            
+
+    function onDrpCenterChange(e) {
+        if (typeof (Storage) !== "undefined") {
+           
+                sessionStorage.vr01selectedCenter = e.sender.value();
+           
+        }            
+    }
+
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            App.notification.show({
+                message: message
+            }, "error");
+        }
+    }
+
+    function GridFilterParams() {
+
+        var vStatus = $("#chkbxVouchersNotAcquitted").prop('checked');
+        var c;
+        if (typeof (Storage) !== "undefined" && sessionStorage.vr01selectedCenter) {
+            c = sessionStorage.vr01selectedCenter;
+        }
+        else {
+            c = $("#drpCenter").val();
+        }
+
+
+        return {
+            showVouchersNotAcquitted: vStatus,
+            fuelVoucherNumber: $("#txtFuelVoucherNumber").val(),
+            tankNumber: $("#txtTankNumber").val(),
+            center: c,
+            fuelType: (Number($("#drpFuelType").val()) == 0) ? -1 : Number($("#drpFuelType").val())
+        }
+    }
+
+    function onSearchClick(e) {
+        e.preventDefault();
+        var gridData = $("#gridVehicleRefuels").data("kendoGrid");
+        gridData.dataSource.query({ page: 1, pageSize: 20 });
+
+    }
+
+    function onResetClick(e) {
+        e.preventDefault();
+
+        var c;
+        if (typeof (Storage) !== "undefined" && sessionStorage.vr01selectedCenter) {
+            c = sessionStorage.vr01selectedCenter;
+        }
+
+        $("#chkbxVouchersNotAcquitted").prop('checked', false);
+        $("#txtFuelVoucherNumber").val("");
+        $("#txtTankNumber").val("");
+        $("#drpCenter").data("kendoDropDownList").value(c);
+        $("#drpFuelType").data("kendoDropDownList").value("");
+
+        gridData.dataSource.read();
+    }
+
+    function onViewDetailsClick(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var id = dataItem.Id;
+        window.location.href = '@Url.Action("ViewVehicleRefuelDetails", "VehicleFuelManagement")?id=' + id;
+    }
+
+    function onEditDetailsClick(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var id = dataItem.Id;
+        window.location.href = '@Url.Action("EditVehicleRefuelDetails", "VehicleFuelManagement")?vehicleRefuelId=' + id;
+    }
+
+    function onAddNewDetailsClick(e) {
+        e.preventDefault();
+        window.location.href = '@Url.Action("GetCreateVehicleRefuelMasterDetails", "VehicleFuelManagement")';
+    }
+
+    function onDeleteDetailsClick(e) {
+
+        e.preventDefault();
+
+        var grid = this;
+
+        var row = $(e.currentTarget).closest("tr");
+
+        var dataItem = this.dataItem(row);
+
+        windowDeleteConfirmation.content(templateDeleteConfirmation(dataItem));
+
+        windowDeleteConfirmation.center().open();
+
+        $("#yes").click(function () {
+
+            ajaxDelete(dataItem.Id, "VehicleFuelManagement", "DeleteVehicleRefuelDetails");
+
+            grid.removeRow(row); //removes row only
+
+            windowDeleteConfirmation.close();
+        });
+
+        $("#no").click(function () {
+            windowDeleteConfirmation.close();
+        });
+    }
+
+
+    function canManageVehicleRefuel()
+    {
+        var r = '@canManageVehicleRefuel';
+
+        if (r === "True") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    function canViewVehicleRefuel()
+    {
+        var r = '@canViewVehicleRefuel';
+
+        if (r === "True") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    function canAcquitVehicleRefuel()
+    {
+        var r = '@canAcquitVehicleRefuel';
+
+        if (r === "True") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    </script>
+}

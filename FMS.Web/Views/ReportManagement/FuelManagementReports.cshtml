@@ -1,0 +1,278 @@
+﻿@model FMS.Web.ViewModels.FuelManagementReportParameterViewModel
+@{
+
+    ViewBag.Title = "Fuel Management Reports";
+    //set UI visibility permissions   
+    var canExecuteTankDailyUsageReport = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionRunBowserDailyUsageReport"];
+    var canExecuteFuelTankStatusReport = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionRunBowserFuelStatusReport"];
+    var canExecuteMonthlyVehicleFuelConsumptionReport = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionRunMonthlyVehicleFuelConsumptionReport"];
+ 
+}
+<div class="container-fluid">
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            @using (Html.BeginForm("ExecuteFuelManagementReport", "ReportManagement", FormMethod.Post, new { target = "_blank", id = "frmFuelManagementReportParameter", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <fieldset id="fldsVehicleRegistryReportParameter">
+
+                    <legend>Select Report Parameters</legend>
+                    <div class="row h-100 justify-content-center align-items-center">
+                        <div class="col-md-12">
+
+                            @(Html.Kendo().Button()
+                                                                                                .Name("btnReset")
+                                                                                                .Tag("em")
+                                                                                                .Icon("refresh")
+                                                                                                .Content("<span class='k-icon'></span>")
+                                                                                                .HtmlAttributes(new { style = "float:right", @title = "Reset Parameter Fields" })
+                                                                                                .Events(events =>
+                                                                                                {
+                                                                                                    events.Click("onResetClick");
+                                                                                                })
+                            )
+
+                        </div>
+                    </div>
+                    <div class="row h-100 justify-content-center align-items-center">
+                        <div class="col-md-4">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.BusinessUnit)</th>
+                                        <td>
+                                            @Html.HiddenFor(m => m.ReportType)
+                                            @(Html.Kendo().DropDownListFor(m => m.BusinessUnit)
+                                                                                        .DataValueField("Value")
+                                                                                        .DataTextField("Text")
+                                                                                        .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                        .Filter(FilterType.Contains)
+                                                                                        .ValuePrimitive(true)
+                                                                                        .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                                                                        .BindTo((System.Collections.IEnumerable)ViewBag.BusinessUnits)
+                                            )
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.LabelFor(model => model.RefuelDateFrom)</th>
+                                        <td>
+                                            @(Html.Kendo().DatePickerFor(model => model.RefuelDateFrom)
+                                                                        .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                            )
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>@Html.LabelFor(model => model.TankRefuelDateFrom)</th>
+                                        <td>
+                                            @(Html.Kendo().DatePickerFor(model => model.TankRefuelDateFrom)
+                                                                        .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                            )
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.BusinessGroup)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.BusinessGroup)
+                                                                                                .DataValueField("Value")
+                                                                                                .DataTextField("Text")
+                                                                                                .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                                .Filter(FilterType.Contains)
+                                                                                                .ValuePrimitive(true)
+                                                                                                .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                                                                                .BindTo((System.Collections.IEnumerable)ViewBag.BusinessGroups)
+                                            )
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.LabelFor(model => model.RefuelDateTo)</th>
+                                        <td>
+                                            @(Html.Kendo().DatePickerFor(model => model.RefuelDateTo)
+                                                                                .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                            )
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>@Html.LabelFor(model => model.TankRefuelDateTo)</th>
+                                        <td>
+                                            @(Html.Kendo().DatePickerFor(model => model.TankRefuelDateTo)
+                                                                                .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                            )
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.Center)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.Center)
+                                                                                        .DataValueField("Value")
+                                                                                        .DataTextField("Text")
+                                                                                        .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                        .Filter(FilterType.Contains)
+                                                                                        .ValuePrimitive(true)
+                                                                                        .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                                                                        .BindTo((System.Collections.IEnumerable)ViewBag.Centers)
+                                            )
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.FuelUsageGroup)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.FuelUsageGroup)
+                                                                                        .DataValueField("Value")
+                                                                                        .DataTextField("Text")
+                                                                                        .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                        .Filter(FilterType.Contains)
+                                                                                        .ValuePrimitive(true)
+                                                                                        .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                                                                        .BindTo((System.Collections.IEnumerable)ViewBag.FuelUsageGroups)
+                                            )
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.RegistrationNumber)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.RegistrationNumber)
+                                                                                .DataValueField("Value")
+                                                                                .DataTextField("Text")
+                                                                                .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                .Filter(FilterType.Contains)
+                                                                                .ValuePrimitive(true)
+                                                                                .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                                                                .BindTo((System.Collections.IEnumerable)ViewBag.Vehicles)
+                                            )
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </fieldset>
+
+                <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-md-12">
+
+                        <fieldset style="text-align:center" id="fldsFuelManagementReportExecution">
+
+                            <legend>Execute Report</legend>
+
+                            <div class="fa-box-link">
+
+                                <ul>
+                                    @if (canExecuteTankDailyUsageReport)
+                                    {
+                                        <li>
+                                            <a href="#" id="Tank-Daily-Usage" rel="nofollow">
+                                                <i class="fas fa-chart-line"></i>
+                                                <span>Tank Daily Usage Report</span>
+                                            </a>
+                                        </li>
+                                    }
+
+                                    @if (canExecuteFuelTankStatusReport)
+                                    {
+
+                                        <li>
+                                            <a href="#" id="Fuel-Tank-Status" rel="nofollow">
+                                                <i class="fas fa-chart-pie"></i>
+                                                <span>Fuel Tank Status Report</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    @if (canExecuteMonthlyVehicleFuelConsumptionReport)
+                                    {
+                                        <li>
+                                            <a href="#" id="Monthly-Vehicle-Fuel-Consumption" rel="nofollow">
+                                                <i class="fas fa-chart-area"></i>
+                                                <span>Monthly Vehicle Fuel Consumption Report</span>
+                                            </a>
+                                        </li>
+                                    }
+
+
+                                    </ul>
+                            </div>
+                        </fieldset>
+
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            //tooltips
+            $("#btnReset").kendoTooltip({ content: "Reset" });
+
+            //execute report actions
+            $("#Tank-Daily-Usage").click(function (e) {
+                $("#ReportType").val("700");
+                $("#frmFuelManagementReportParameter").submit();
+            });
+
+            $("#Fuel-Tank-Status").click(function (e) {
+                $("#ReportType").val("701");
+                $("#frmFuelManagementReportParameter").submit();
+            });
+
+            $("#Monthly-Vehicle-Fuel-Consumption").click(function (e) {
+                $("#ReportType").val("702");
+                $("#frmFuelManagementReportParameter").submit();
+            });
+
+        });
+
+        function onResetClick(e) {
+            e.preventDefault();
+
+            $("#ReportType").val("");
+            $("#RefuelDateFrom").data("kendoDatePicker").value("");
+            $("#RefuelDateTo").data("kendoDatePicker").value("");
+            $("#TankRefuelDateFrom").data("kendoDatePicker").value("");
+            $("#TankRefuelDateTo").data("kendoDatePicker").value("");
+            $("#FuelUsageGroup").data("kendoDropDownList").value("");
+            $("#BusinessUnit").data("kendoDropDownList").value("");
+            $("#BusinessGroup").data("kendoDropDownList").value("");
+            $("#Center").data("kendoDropDownList").value("");
+            $("#RegistrationNumber").data("kendoDropDownList").value("");
+
+
+        }
+
+
+
+
+    </script>
+    }

@@ -1,0 +1,129 @@
+﻿@using FMS.Web.CustomHTMLHelpers
+@model FMS.Web.ViewModels.VehicleTransferViewModel
+
+@{
+    ViewBag.Title = "Transfer Vehicle Details";
+}
+
+<div class="container-fluid" style="margin-top:15px">
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters h-100 justify-content-center align-items-center">
+        <div class="col-md-2">
+            <!--Vehicle Info-->
+            @Html.DisplayFor(m => m.VehicleDisplayInfoViewModel, "VehicleInfoDisplay")
+        </div>
+        <div class="col-md-7">
+            <!--Allocation Form-->
+            @using (Html.BeginForm("frmTransferVehicleDetails"))
+            {
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.AntiForgeryToken()
+                <div class="container-fluid" id="FormContainer" style="margin-bottom:15px;">
+                    <div class="row no-gutters h-100 justify-content-center align-items-center">
+                        <div class="col-md-8 col-md-offset-2">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th> @Html.LabelForRequired(m => m.BusinessGroupId)</th>
+                                        <td>
+                                            @Html.HiddenFor(m => m.Id)
+                                            @Html.HiddenFor(m => m.VehicleId)
+                                            @(Html.Kendo().DropDownListFor(m => m.BusinessGroupId)
+                                                            .Name("BusinessGroupId")
+                                                            .DataValueField("Value")
+                                                            .DataTextField("Text")
+                                                            .OptionLabel(new { Text = "Select Business Group...", Value = "" })
+                                                            .Filter(FilterType.Contains)
+                                                            .ValuePrimitive(true)
+                                                            .HtmlAttributes(new { style = "width:250px" })
+                                                            .BindTo((System.Collections.IEnumerable)ViewBag.BusinessGroups)
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="BusinessGroupId"></span>
+
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <th> @Html.LabelForRequired(m => m.CenterId)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.CenterId)
+                                                            .Name("CenterId")
+                                                            .DataValueField("Value")
+                                                            .DataTextField("Text")
+                                                            .OptionLabel(new { Text = "Select Center...", Value = "" })
+                                                            .Filter(FilterType.Contains)
+                                                            .ValuePrimitive(true)
+                                                            .HtmlAttributes(new { style = "width:250px" })
+                                                            .BindTo((System.Collections.IEnumerable)ViewBag.Centers)
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="CenterId"></span>
+
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <th> @Html.LabelForRequired(m => m.Date)</th>
+                                        <td>
+                                            @(Html.Kendo().DatePickerFor(m => m.Date)
+                                                            .Name("Date")
+                                                            .HtmlAttributes(new { style = "width:250px" })
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="Date"></span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters h-100 justify-content-center align-items-center">
+                        <div class="col-md-8 col-md-offset-2">
+                            <div>
+                                @(Html.Kendo().Button()
+                                                                .Name("btnBottomSave")
+                                                                .Icon("save")
+                                                                .Content("Save")
+                                                                .HtmlAttributes(new { type = "submit", @class = "k-button k-primary" })
+                                )
+                                @(Html.Kendo().Button()
+                                                                .Name("btnBottomCancel")
+                                                                .Content("Back")
+                                                                .HtmlAttributes(new { type = "button", @class = "k-button" })
+                                                                .Icon("undo")
+                                )
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
+
+@section scripts{
+
+    <script>
+
+        $(document).ready(function () {
+            $("#btnBottomCancel").click(function (event) {
+                var newSrc = "NA";
+                window.location.href = document.referrer.replace(/(message=).*?(&)/, '$1' + newSrc + '$2');
+            });
+        });
+
+
+
+        //********************* Form Related ***********************
+        $("#frmTransferVehicleDetails").submit(function (event) {
+            event.preventDefault();
+            ajaxCreateUpdate(this, $("#Id").val(), "VehicleAllocation", "TransferVehicle", "", "VehicleAllocationMain", "");
+        });
+            //***********************************************************
+    </script>
+    }

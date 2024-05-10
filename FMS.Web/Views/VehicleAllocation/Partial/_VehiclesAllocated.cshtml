@@ -1,0 +1,80 @@
+﻿
+<h4>Vehicles Allocated</h4>
+<fieldset id="fldsVehicleSearch">
+    <legend>Search</legend>
+    <!--Business Units Dropdownlist-->
+    @(Html.Kendo().ComboBox()
+            .Name("cbxRegistionNumberAllocVeh")
+            .Placeholder("Select Registration Number...")
+            .DataTextField("Text")
+            .DataValueField("Value")
+            .Filter(FilterType.Contains)
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                {
+                    read.Action("GetVehicles", "VehicleManagement");
+                });
+            })
+            .HtmlAttributes(new { style = "width:180px" })
+    )
+
+    @(Html.Kendo().Button()
+            .Name("btnSearchAllocVeh")
+            .HtmlAttributes(new { type = "button", @class = "k-primary" })
+            .Content("Search")
+            .Icon("search")
+            .Events(events =>
+            {
+                events.Click("onAllocVehSearchClick");
+            })
+    )
+
+    @(Html.Kendo().Button()
+                .Name("btnResetAllocVeh")
+                .Tag("em")
+                .Icon("refresh")
+                .Content("<span class='k-icon' title='Refresh'></span>")
+                .HtmlAttributes(new { @title = "Reset" })
+                .Events(events =>
+                {
+                    events.Click("onAllocVehResetClick");
+                })
+    )
+</fieldset>
+
+@(Html.Kendo().Grid<FMS.Web.ViewModels.VehicleAllocationViewModel>()
+                .Name("gridAllocatedVehicles")
+                .Columns(columns =>
+                {               
+                columns.Bound(vm => vm.VehicleDisplayInfoViewModel.VehicleRegistrationNumber).Title("Rego #").Media("(min-width: 544px)");
+                columns.Bound(vm => vm.VehicleDisplayInfoViewModel.VehicleStatus).Title("Status").Media("(min-width: 544px)");
+                columns.Bound(vm => vm.VehicleDisplayInfoViewModel.VehicleCondition).Title("Condition").Media("(min-width: 768px)");
+                columns.Bound(vm => vm.VehicleDisplayInfoViewModel.VehicleMake).Title("Make").Media("(min-width: 544px)");
+                columns.Bound(vm => vm.VehicleDisplayInfoViewModel.VehicleModel).Title("Model").Media("(min-width: 544px)");
+                columns.Bound(vm => vm.OperatorDisplayInfoViewModel.DriverName).Title("Driver Name").Media("(min-width: 992px)");
+                columns.Bound(vm => vm.OperatorDisplayInfoViewModel.DriverMobile).Title("Mobile").Media("(min-width: 768px)");
+                columns.Bound(vm => vm.StartDate).Title("Start Date").Media("(min-width: 768px)").Format("{0:dd/MM/yyyy}");
+                columns.Template(@<text></text>).ClientTemplate("#=resColTemplateAllocVeh(data)#").Title("Items").Media("(max-width: 544px)");
+                    columns.Command(command =>
+                    {
+                        command.Custom("end-vehicle-allocation").Text(" ").Click("onEndVehicleAllocationClick").IconClass("far fa-stop-circle").HtmlAttributes(new { @title = "End Vehicle Allocation" });
+                    }).Title("End Allocation").Width(70);
+                })
+                .Pageable()
+                .Sortable()
+                .Scrollable(s => s.Height("auto"))
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .PageSize(20)
+                    .ServerOperation(true)
+                    .Events(events => events.Error("error_handler"))
+                    .Model(model => model.Id(vm => vm.Id))                    
+                    .Read(read => read.Action("Get_Allocated_Vehicles", "VehicleAllocation").Data("GridFilterParamsAllocVeh")
+
+                    )
+                )
+                .Events(events => events
+                    .DataBound("onDataBound")
+                )
+)

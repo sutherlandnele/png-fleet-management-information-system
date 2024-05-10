@@ -1,0 +1,146 @@
+﻿@using FMS.Common
+
+@model FMS.Web.ViewModels.VehicleDisplayViewModel
+
+@{
+    ViewBag.Title = "Vehicle Information";
+
+    FileInfo codRptFileInfo = null, bosRptFileInfo = null;
+
+    if (!string.IsNullOrEmpty(Model.BosReport))
+    {
+        var fileNameBOSRpt = Server.MapPath(Parameters.AppConstant.BOSRPT_PATH + "/" + Model.BosReport);
+
+        if (System.IO.File.Exists(fileNameBOSRpt))
+        {
+            bosRptFileInfo = new System.IO.FileInfo(fileNameBOSRpt);
+        }
+    }
+
+
+    if (!string.IsNullOrEmpty(Model.CODReport))
+    {
+        var fileNameCODRpt = Server.MapPath(Parameters.AppConstant.CODRPT_PATH + "/" + Model.CODReport);
+
+        if (System.IO.File.Exists(fileNameCODRpt))
+        {
+            codRptFileInfo = new System.IO.FileInfo(fileNameCODRpt);
+        }
+    }
+
+
+
+}
+<div class="container-fluid" id="view-details">
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-6">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="formButtonRegion">
+                @(Html.Kendo().Button()
+                    .Name("btnBack")
+                    .Content("Back")
+                    .HtmlAttributes(new { type = "button", @class = "k-button", style = "float:right;margin:10px;" })
+                    .Icon("undo")
+                )
+            </div>
+        </div>
+    </div>
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+            <div class="k-content">
+                @(Html.Kendo().TabStrip()
+                                                            .Name("tbsVehicle")
+                                                            .HtmlAttributes(new { style = "clear:both" })
+                                                            .Animation(animation =>
+                                                                animation.Open(effect =>
+                                                                    effect.Fade(FadeDirection.In)))
+                                                            .Items(tabstrip =>
+                                                            {
+                                                                tabstrip.Add().Text("Asset Information")
+                                                                    .Selected(true)
+                                                                    .Content(@<text>
+                                                                        @Html.Partial("~/Views/VehicleManagement/Partial/_VehicleAssetInformationViewPartial.cshtml", Model, new ViewDataDictionary { { "bosRptFileInfo", bosRptFileInfo } })
+                                                                    </text>);
+                                                                tabstrip.Add().Text("Vehicle Expiry Date")
+                                                                    .Content(vm => Html.Partial("~/Views/VehicleManagement/Partial/_VehicleExpiryDateViewPartial.cshtml", vm));
+
+                                                                tabstrip.Add().Text("Vehicle Current Status")
+                                                                    .Content(vm => Html.Partial("~/Views/VehicleManagement/Partial/_VehicleCurrentStatusViewPartial.cshtml", vm));
+
+                                                                tabstrip.Add().Text("Disposal Information")
+                                                                    .Content(@<text>
+                                                                        @Html.Partial("~/Views/VehicleManagement/Partial/_VehicleDisposalViewPartial.cshtml", Model, new ViewDataDictionary { { "codRptFileInfo", codRptFileInfo } })
+                                                                    </text>);
+
+                                                                tabstrip.Add().Text("Audit Details")
+                                                                    .Content(vm => Html.Partial("~/Views/VehicleManagement/Partial/_VehicleAuditViewPartial.cshtml", vm));
+                                                            })
+                )
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    #tbsVehicle > .k-content {
+        overflow: visible;
+    }
+</style>
+@section scripts{
+    <script type="text/javascript">
+
+
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+
+    function onBOSRptDownloadClick(e) {
+        e.preventDefault();
+
+        @if (bosRptFileInfo != null) {
+            <text>
+                window.location.href = '@Url.Action("DownloadFile", "VehicleManagement")?fileName=@bosRptFileInfo.Name';
+            </text>
+        }
+    }
+
+
+    function onCODRptDownloadClick(e) {
+        e.preventDefault();
+
+        @if (codRptFileInfo != null) {
+            <text>
+                window.location.href = '@Url.Action("DownloadFile", "VehicleDisposal")?fileName=@codRptFileInfo.Name';
+            </text>
+        }
+    }
+
+
+
+
+    $(document).ready(function () {
+
+
+
+        $("#btnBack").click(function (event) {
+            var newSrc = "NA";
+            window.location.href = document.referrer.replace(/(message=).*?(&)/, '$1' + newSrc + '$2');
+        });
+
+    });
+
+    </script>
+    }

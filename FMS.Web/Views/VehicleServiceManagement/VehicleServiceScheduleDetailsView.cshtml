@@ -1,0 +1,111 @@
+﻿@using FMS.Web.CustomHTMLHelpers
+@model FMS.Web.ViewModels.VehicleServiceScheduleDisplayViewModel
+
+@{
+    ViewBag.Title = "Vehicle Service Schedule Details";
+}
+
+<div class="container-fluid" style="margin-top:15px">
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters h-100 justify-content-center align-items-center">
+        @{
+            if (Model.VehicleServiceDisplayViewModel.Id > 0)
+            {
+                <div class="col-md-2">
+                    @Html.DisplayFor(m => m.VehicleServiceDisplayViewModel, "VehicleServiceInfoDisplay")
+                </div>
+            }
+        }
+        <div class="col-md-8">
+
+
+            <div class="container-fluid" id="FormContainer" style="margin-bottom:15px;">
+                <div class="row no-gutters h-100 justify-content-center align-items-center">
+                    <div class="col-md-6">
+                        <div class="table-responsive">
+                            <table class="table no-border">
+                                <tr>
+                                    <th> @Html.LabelForRequired(m => m.VehicleRegistration)</th>
+                                    <td>
+                                        @Html.HiddenFor(m => m.Id)
+                                        @Html.DisplayFor(m => m.VehicleRegistration)
+                                    </td>
+                                </tr>
+
+                                <tr>
+
+                                    <th> @Html.LabelForRequired(m => m.ScheduleServiceType)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.ScheduleServiceType)
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="table-responsive">
+                            <table class="table no-border">
+                                <tr>
+                                    <th>@Html.LabelForRequired(m => m.ServiceAlertMileage)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.ServiceAlertMileage)
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th>@Html.LabelForRequired(m => m.ServiceAlertDate)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.ServiceAlertDate)
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters h-100 justify-content-center align-items-center">
+                    <div class="col-md-12" style="margin-bottom: -10px;margin-top: -30px;">
+                        <hr />
+                    </div>
+                </div>
+                <div class="row no-gutters h-100 justify-content-center align-items-center" style="float: right;margin-right: 50px;">
+                    <div class="col-md-12">
+                        <div>
+                            @(Html.Kendo().Button()
+                                        .Name("btnBottomCancel")
+                                        .Content("Back")
+                                        .HtmlAttributes(new { type = "button", @class = "k-button" })
+                                        .Icon("undo")
+                            )
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <!--Vehicle Info-->
+            @Html.DisplayFor(m => m.VehicleDisplayInfoViewModel, "VehicleInfoDisplay")
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+
+
+        $(document).ready(function () {
+            $("#btnBottomCancel").click(function (event) {
+                var newSrc = "NA";
+                window.location.href = document.referrer.replace(/(message=).*?(&)/, '$1' + newSrc + '$2');
+            });
+
+        });
+
+
+
+    </script>
+    }

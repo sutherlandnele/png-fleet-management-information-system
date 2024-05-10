@@ -1,0 +1,233 @@
+﻿@using FMS.Web.CustomHTMLHelpers
+@model FMS.Web.ViewModels.VehicleRefuelEditViewModel
+
+@{
+    ViewBag.Title = "Step 1: Create Vehicle Refuel Details - Select Center, Refuel Date and Tank/Fuel Distributor";
+}
+
+<div class="container-fluid" style="margin-top:15px">
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+            @using (Html.BeginForm("CreateVehicleRefuelMasterDetails", "VehicleFuelManagement", FormMethod.Post, new { id="frmCreateVehicleRefuelMasterDetails" }))
+            {
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.AntiForgeryToken()
+                <div class="container-fluid" id="FormContainer" style="margin-bottom:15px;">
+                    <div class="row no-gutters h-100 justify-content-center align-items-center">
+                        <div class="col-md-4">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th> @Html.LabelForRequired(m => m.CenterId)</th>
+                                        <td>
+                                            @Html.HiddenFor(m => m.Id)
+                                            @(Html.Kendo().DropDownListFor(m => m.CenterId)
+                                                                                                        .Name("CenterId")
+                                                                                                        .DataValueField("Value")
+                                                                                                        .DataTextField("Text")
+                                                                                                        .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                                        .Filter(FilterType.Contains)
+                                                                                                        .ValuePrimitive(true)
+                                                                                                        .HtmlAttributes(new { style = "width:170px" })
+                                                                                                        .BindTo((System.Collections.IEnumerable)ViewBag.Centers)
+                                                                                                        .Events(events => events.Change("onCenterChange"))
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="CenterId"></span>
+                                        </td>
+                                    </tr>
+
+
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th>@Html.LabelForRequired(m => m.Date)</th>
+                                        <td>
+                                            @(Html.Kendo().DatePickerFor(m => m.Date)
+                                                                                                                .Name("Date")
+                                                                                                                .HtmlAttributes(new { style = "width:170px" })
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="Date"></span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th>&nbsp;</th>
+                                        <td>
+                                            <div style="display:inline-block;font-family: 'Roboto'">
+                                                @(Html.Kendo().CheckBoxFor(m => m.IsBowserFuel)
+                                                                                                    .Name("IsBowserFuel")
+                                                )
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters h-100 justify-content-center align-items-center">
+                        <div class="col-md-12" style="margin-bottom: -10px;margin-top: -30px;">
+                            <hr />
+                        </div>
+                    </div>
+                    <div class="row no-gutters h-100 justify-content-center align-items-center">
+                        <div class="col-md-4">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th>@Html.LabelForRequired(m => m.FuelDistributorId)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.FuelDistributorId)
+                                                                                            .Name("FuelDistributorId")
+                                                                                            .DataValueField("Value")
+                                                                                            .DataTextField("Text")
+                                                                                            .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                            .Filter(FilterType.Contains)
+                                                                                            .ValuePrimitive(true)
+                                                                                            .HtmlAttributes(new { style = "width:170px" })
+                                                                                            .BindTo((System.Collections.IEnumerable)ViewBag.FuelDistributors)
+                                            )
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th>@Html.LabelForRequired(m => m.BowserNumber)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.BowserNumber)
+                                                                                            .Name("BowserNumber")
+                                                                                            .DataValueField("Value")
+                                                                                            .DataTextField("Text")
+                                                                                            .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                            .Filter(FilterType.Contains)
+                                                                                            .ValuePrimitive(true)
+                                                                                            .HtmlAttributes(new { style = "width:170px" })
+                                                                                            .BindTo((System.Collections.IEnumerable)ViewBag.FuelTanks)
+                                            )
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th>@Html.LabelForRequired(m => m.UnitCost)</th>
+                                        <td>
+                                            @Html.EditorFor(m => m.UnitCost)
+                                            <br /><span class="k-invalid-msg" data-for="UnitCost"></span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="row no-gutters h-100 justify-content-center align-items-center">
+                        <div class="col-md-12" style="margin-bottom: -10px;margin-top: -30px;">
+                            <hr />
+                        </div>
+                    </div>
+                    <div class="row no-gutters h-100 justify-content-center align-items-center" style="float: right;margin-right: 50px;">
+                        <div class="col-md-12">
+                            <div>
+                                @(Html.Kendo().Button()
+                                                                            .Name("btnBottomNext")
+                                                                            .Icon("arrow-end-right")
+                                                                            .Content("Next")
+                                                                            .HtmlAttributes(new { type = "submit", @class = "k-button k-primary" })
+                                )
+                                @(Html.Kendo().Button()
+                                                                            .Name("btnBottomCancel")
+                                                                            .Content("back")
+                                                                            .HtmlAttributes(new { type = "button", @class = "k-button" })
+                                                                            .Icon("undo")
+                                )
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
+@section scripts{
+    <script>
+
+
+        $(document).ready(function () {
+
+            if (typeof (Storage) !== "undefined" && sessionStorage.vr01selectedCenter) {                
+                    $("#CenterId").data("kendoDropDownList").value(sessionStorage.vr01selectedCenter); //pass value from previous view                
+            }
+
+            $("#btnBottomCancel").click(function (event) {
+                window.location.href = "/VehicleFuelManagement/VehicleRefuels?message=NA&isError=false";
+            });
+
+
+
+            $("#IsBowserFuel").change(function () {
+                if (this.checked) {
+                    $("#BowserNumber").data().kendoDropDownList.enable(true);
+                    $("#FuelDistributorId").data().kendoDropDownList.enable(false);
+                }
+                else {
+                    $("#BowserNumber").data().kendoDropDownList.enable(false);
+                    $("#FuelDistributorId").data().kendoDropDownList.enable(true);
+                }
+            });
+
+            if ($("#IsBowserFuel").prop("checked")) {
+                $("#BowserNumber").data().kendoDropDownList.enable(true);
+                $("#FuelDistributorId").data().kendoDropDownList.enable(false);
+            }
+            else {
+                $("#BowserNumber").data().kendoDropDownList.enable(false);
+                $("#FuelDistributorId").data().kendoDropDownList.enable(true);
+            }
+        });
+
+        function onCenterChange(e) {
+            if (typeof (Storage) !== "undefined") {
+                    sessionStorage.vr01selectedCenter = e.sender.value();
+            }    
+        }
+
+        $("#frmCreateVehicleRefuelMasterDetails").submit(function (event) {
+
+            var validator = $(this).kendoValidator().data("kendoValidator");
+
+            if (!validator.validate()) {
+                event.preventDefault();
+            }  
+
+
+        });
+
+
+    </script>
+    }

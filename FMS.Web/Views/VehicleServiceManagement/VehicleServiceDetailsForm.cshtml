@@ -1,0 +1,445 @@
+﻿@using FMS.Web.CustomHTMLHelpers
+@model FMS.Web.ViewModels.VehicleServiceEditViewModel
+
+@{
+    ViewBag.Title = "Vehicle Service Details";
+}
+
+<div class="container-fluid" style="margin-top:15px">
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters h-100 justify-content-center align-items-center">
+
+        <div class="col-md-10">
+
+            @using (Html.BeginForm("frmVehicleServiceDetails"))
+            {
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.AntiForgeryToken()
+                <div class="container-fluid" id="FormContainer" style="margin-bottom:15px;">
+                    <div class="row no-gutters h-100 justify-content-center align-items-center">
+                        <div class="col-md-4">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th> @Html.LabelForRequired(m => m.ServiceTypeId)</th>
+                                        <td>
+                                            @Html.HiddenFor(m => m.Id)
+                                            @Html.HiddenFor(m => m.CenterId)
+                                            @Html.HiddenFor(m => m.BusinessGroupId)
+                                            @Html.HiddenFor(m => m.ScheduleServiceId)
+                                            @Html.HiddenFor(m => m.ServiceJobNumber)
+                                            @Html.HiddenFor(model => model.CreatedBy)
+                                            @Html.HiddenFor(model => model.CreatedDate)
+                                            @(Html.Kendo().DropDownListFor(m => m.ServiceTypeId)
+                                                                                    .Name("ServiceTypeId")
+                                                                                    .DataValueField("Value")
+                                                                                    .DataTextField("Text")
+                                                                                    .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                    .Filter(FilterType.Contains)
+                                                                                    .ValuePrimitive(true)
+                                                                                    .HtmlAttributes(new { style = "width:170px" })
+                                                                                    .BindTo((System.Collections.IEnumerable)ViewBag.ServiceTypes)
+                                                                                    .Events(e => e.Change("onServiceTypeChange"))
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="ServiceTypeId"></span>
+
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th style="float:right;">@Html.LabelFor(m => m.ScheduleServiceTypeId)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.ScheduleServiceTypeId)
+                                                                                                .Name("ScheduleServiceTypeId")
+                                                                                                .DataValueField("Value")
+                                                                                                .DataTextField("Text")
+                                                                                                .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                                .Filter(FilterType.Contains)
+                                                                                                .ValuePrimitive(true)
+                                                                                                .HtmlAttributes(new { style = "width:170px" })
+                                                                                                .BindTo((System.Collections.IEnumerable)ViewBag.ScheduleServiceTypes)
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="ScheduleServiceTypeId"></span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th style="float:right;">@Html.LabelFor(m => m.IncidentId)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.IncidentId)
+                                                                                                .Name("IncidentId")
+                                                                                                .DataValueField("Value")
+                                                                                                .DataTextField("Text")
+                                                                                                .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                                .Filter(FilterType.Contains)
+                                                                                                .ValuePrimitive(true)
+                                                                                                .HtmlAttributes(new { style = "width:170px" })
+                                                                                                .BindTo((System.Collections.IEnumerable)ViewBag.IncidentServices)
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="IncidentId"></span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters h-100 justify-content-center align-items-center">
+                        <div class="col-md-12" style="margin-bottom: -10px;margin-top: -30px;">
+                            <hr />
+                        </div>
+                    </div>
+                    <div class="row no-gutters h-100 justify-content-center align-items-center">
+                        <div class="col-md-6">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.ServiceJobNumber)</th>
+                                        <td>
+                                            @Html.DisplayFor(m => m.ServiceJobNumber)
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+
+                                        <th> @Html.LabelFor(m => m.ServiceMechanic)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.ServiceMechanic)
+                                                                                                .Name("ServiceMechanic")
+                                                                                                .DataValueField("Value")
+                                                                                                .DataTextField("Text")
+                                                                                                .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                                .Filter(FilterType.Contains)
+                                                                                                .ValuePrimitive(true)
+                                                                                                .HtmlAttributes(new { style = "width:170px" })
+                                                                                                .BindTo((System.Collections.IEnumerable)ViewBag.ServiceMechanics)
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="ServiceMechanic"></span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.Cost)</th>
+                                        <td>
+                                            @(Html.Kendo().NumericTextBoxFor(m => m.Cost)
+                                                                                                                .Name("Cost")
+                                                                                                                .Placeholder("Enter a numeric value")
+                                                                                                                .HtmlAttributes(new { style = "width:170px" })
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="Cost"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th> @Html.LabelFor(m => m.ProviderId)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.ProviderId)
+                                                                                                .Name("ProviderId")
+                                                                                                .DataValueField("Value")
+                                                                                                .DataTextField("Text")
+                                                                                                .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                                .Filter(FilterType.Contains)
+                                                                                                .ValuePrimitive(true)
+                                                                                                .HtmlAttributes(new { style = "width:170px" })
+                                                                                                .BindTo((System.Collections.IEnumerable)ViewBag.ServiceProviders)
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="ProviderId"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.Description)</th>
+                                        <td colspan="2">
+                                            @Html.TextAreaFor(model => model.Description, htmlAttributes: new { @class = "k-textbox", id = "Comments", style = "resize:none;width:300px;height:100px;" })
+                                            <br />@Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+
+                                    <tr>
+                                        <th>@Html.LabelForRequired(m => m.StartDate)</th>
+                                        <td>
+                                            @(Html.Kendo().DatePickerFor(m => m.StartDate)
+                                                                                                .Name("StartDate")
+                                                                                                .HtmlAttributes(new { style = "width:170px" })
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="StartDate"></span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.EndDate)</th>
+                                        <td>
+                                            @(Html.Kendo().DatePickerFor(m => m.EndDate)
+                                                                                                                                .Name("EndDate")
+                                                                                                                                .HtmlAttributes(new { style = "width:170px" })
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="EndDate"></span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th> @Html.LabelForRequired(m => m.VehicleId)</th>
+                                        <td>
+                                            @{
+                                                if (Model.Id > 0)
+                                                {
+                                                    @Html.HiddenFor(m => m.VehicleId)
+                                                    @Html.DisplayFor(m => m.VehicleDisplayInfoViewModel.VehicleRegistrationNumber)
+
+                                                }
+                                                else
+                                                {
+                                                    @(Html.Kendo().DropDownListFor(m => m.VehicleId)
+                                                                                                                                    .Name("VehicleId")
+                                                                                                                                    .DataValueField("Value")
+                                                                                                                                    .DataTextField("Text")
+                                                                                                                                    .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                                                                    .Filter(FilterType.Contains)
+                                                                                                                                    .ValuePrimitive(true)
+                                                                                                                                    .HtmlAttributes(new { style = "width:170px" })
+                                                                                                                                    .BindTo((System.Collections.IEnumerable)ViewBag.Vehicles)
+                                                                                                                                    .Events(e => e.Change("onVehicleChange"))
+                                                    )
+                                                    <br /><span class="k-invalid-msg" data-for="VehicleId"></span>
+                                                }
+                                            }
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.PoReference)</th>
+                                        <td>
+                                            @(Html.Kendo().TextBoxFor(m => m.PoReference)
+                                                                                                                                                                                    .Name("PoReference")
+                                                                                                                                                                                    .HtmlAttributes(new { style = "width:170px" })
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="PoReference"></span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+
+                                        <th> @Html.LabelFor(m => m.CurrentMileage)</th>
+                                        <td>
+                                            @(Html.Kendo().NumericTextBoxFor(m => m.CurrentMileage)
+                                                                                                                                                                                    .HtmlAttributes(new { style = "width:170px" })
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="CurrentMileage"></span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th> @Html.LabelFor(model => model.CreatedByDisplay, htmlAttributes: new { @class = "vwLabel" })</th>
+                                        <td>
+                                            <span>@Html.DisplayFor(model => model.CreatedByDisplay)</span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th> @Html.LabelFor(model => model.CreatedDateDisplay, htmlAttributes: new { @class = "vwLabel" })</th>
+                                        <td>
+                                            <span>@Html.DisplayFor(model => model.CreatedDateDisplay)</span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th> @Html.LabelFor(model => model.LastUpdatedBy, htmlAttributes: new { @class = "vwLabel" })</th>
+                                        <td>
+                                            <span>@Html.DisplayFor(model => model.LastUpdatedBy)</span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th> @Html.LabelFor(model => model.LastUpdatedDate, htmlAttributes: new { @class = "vwLabel" })</th>
+                                        <td>
+                                            <span>@Html.DisplayFor(model => model.LastUpdatedDate)</span>
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters h-100 justify-content-center align-items-center">
+                        <div class="col-md-12" style="margin-bottom: -10px;margin-top: -30px;">
+                            <hr />
+                        </div>
+                    </div>
+                    <div class="row no-gutters h-100 justify-content-center align-items-center" style="float: right;margin-right: 50px;">
+                        <div class="col-md-12">
+                            <div>
+                                @(Html.Kendo().Button()
+                                            .Name("btnBottomSave")
+                                            .Icon("save")
+                                            .Content("Save")
+                                            .HtmlAttributes(new { type = "submit", @class = "k-button k-primary" })
+                                )
+                                @(Html.Kendo().Button()
+                                            .Name("btnBottomCancel")
+                                            .Content("Back")
+                                            .HtmlAttributes(new { type = "button", @class = "k-button" })
+                                            .Icon("undo")
+                                )
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-md-2">
+            <!--Vehicle Info-->
+            @Html.DisplayFor(m => m.VehicleDisplayInfoViewModel, "VehicleInfoDisplay")
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+
+        var nextVehicleServiceJobNumber;
+
+        var drpScheduleServiceType;
+        var drpIncident;
+
+
+
+        $(document).ready(function () {
+            $("#btnBottomCancel").click(function (event) {
+                var newSrc = "NA";
+                window.location.href = document.referrer.replace(/(message=).*?(&)/, '$1' + newSrc + '$2');
+            });
+
+            drpScheduleServiceType = $("#ScheduleServiceTypeId").data("kendoDropDownList");
+            drpIncident = $("#IncidentId").data("kendoDropDownList");
+            toggleServiceTypeDropDownLists();
+
+            if ($("#VehicleId").data("kendoDropDownList").value()) {
+                $("#VehicleId").data("kendoDropDownList").trigger("change");
+            }
+
+        });
+
+        function toggleServiceTypeDropDownLists() {
+
+            var serviceTypeText = $("#ServiceTypeId").data("kendoDropDownList").text().trim().toUpperCase();
+
+            switch (serviceTypeText) {
+                case "INCIDENT MAINTENANCE":
+                    drpScheduleServiceType.enable(false);
+                    drpIncident.enable(true);
+                    break;
+                case "OTHER MAINTENANCE":
+                    drpScheduleServiceType.enable(false);
+                    drpIncident.enable(false);
+                    break;
+                case "SCHEDULE MAINTENANCE":
+                    drpScheduleServiceType.enable(true);
+                    drpIncident.enable(false);
+                    break;
+                case "ADDITIONAL REPAIRS":
+                    drpScheduleServiceType.enable(true);
+                    drpIncident.enable(true);
+                    break;
+                default:
+                    drpScheduleServiceType.enable(false);
+                    drpIncident.enable(false);
+                    break;
+            }
+
+        }
+
+        function onServiceTypeChange(e) {
+            var dataItem = e.sender.dataItem();
+            toggleServiceTypeDropDownLists();
+        }
+
+        function onVehicleChange(e) {
+            var dataItem = e.sender.dataItem();
+            getNewServiceJobNumber(dataItem.Value);
+            populateVehicleInfoBox(dataItem.Value);
+        }
+
+        function getNewServiceJobNumber(vehicleId) {
+            if (vehicleId) {
+                $.ajax({
+                    type: "POST",
+                    url: "/VehicleServiceManagement/GetNewServiceJobNumber",
+                    data: { vehicleId: vehicleId },
+                    dataType: "json",
+                    async: true,
+                    beforeSend: function (xhr) {
+                        $("#btnBottomSave").data().kendoButton.enable(false);
+                        kendo.ui.progress($("#progressIndicator"), true);
+
+                    },
+                    success: function (result, status, xhr) {
+
+                        nextVehicleServiceJobNumber = result.serviceJobNumber;
+                        $("#ServiceJobNumber").val(nextVehicleServiceJobNumber);
+                        $("#eId").text(nextVehicleServiceJobNumber);
+                        App.canGetNewServiceJobNumber = true;
+
+                        if (result.isError) {
+
+                            App.getNewServiceJobNumberErrorMessage = result.message;
+                            App.canGetNewServiceJobNumber = false;
+
+                            App.notification.show({
+                                message: result.message
+                            }, "error");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        App.notification.show({
+                            message: "An error occured: " + xhr.status + " " + xhr.statusText
+                        }, "error");
+                        App.canGetNewServiceJobNumber = false;
+                        $("#eId").text("");
+                    },
+                    complete: function (xhr, status) {
+                        $("#btnBottomSave").data().kendoButton.enable(true);
+                        kendo.ui.progress($("#progressIndicator"), false);
+                    }
+                });
+            }
+            else {
+                $("#eId").text("");
+            }
+        }
+
+        $("#frmVehicleServiceDetails").submit(function (event) {
+
+            event.preventDefault();
+
+            if (App.canGetNewServiceJobNumber) {
+                ajaxCreateUpdate(this, $("#Id").val(), "VehicleServiceManagement", "CreateVehicleServiceDetails", "UpdateVehicleServiceDetails", "VehicleServices", "");
+            }
+            else {
+                App.notification.show({
+                    message: App.getNewServiceJobNumberErrorMessage
+                }, "error");
+            }
+
+        });
+
+    </script>
+    }

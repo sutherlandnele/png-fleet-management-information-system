@@ -1,0 +1,75 @@
+﻿@model FMS.Web.ViewModels.OrganisationReportParameterViewModel
+@{
+
+    ViewBag.Title = "Vehicle Organisation Reports";
+    var canExecuteDriverInformationReport = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionRunDriverInformationReport"];
+
+}
+<div class="container-fluid">
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            @using (Html.BeginForm("ExecuteOrganisationReport", "ReportManagement", FormMethod.Post, new { target = "_blank", id = "frmOrganisationReportParameter", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-md-12">
+
+                        <fieldset id="fldsOrganisationReportExecution">
+
+                            <legend>Execute Report</legend>
+
+                            <div class="fa-box-link">
+
+                                <ul>
+                                    @if (canExecuteDriverInformationReport)
+                                    {
+                                        <li>
+                                            @Html.HiddenFor(m => m.ReportType)
+                                            <a href="#" id="Driver-Information-Report" rel="nofollow">
+                                                <i class="fas fa-chart-area"></i>
+                                                <span>Driver Information Report</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    </ul>
+                            </div>
+                        </fieldset>
+
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+</div>
+@section scripts{
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            //execute report actions
+            $("#Driver-Information-Report").click(function (e) {
+                $("#ReportType").val("601");
+                $("#frmOrganisationReportParameter").submit();
+            });
+
+
+
+        });
+
+
+
+
+    </script>
+    }

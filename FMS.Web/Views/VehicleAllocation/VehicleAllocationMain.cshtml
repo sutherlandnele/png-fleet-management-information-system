@@ -1,0 +1,334 @@
+﻿@{
+    ViewBag.Title = "Vehicle Allocation";
+}
+<div class="container-fluid">
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            <div class="k-content">
+                @(Html.Kendo().TabStrip()
+                                        .Name("tbsVehicleAllocation")
+                                        .HtmlAttributes(new { style = "clear:both" })
+                                        .Animation(animation =>
+                                            animation.Open(effect =>
+                                                effect.Fade(FadeDirection.In)))
+                                        .Items(tabstrip =>
+                                        {
+                                            tabstrip.Add().Text("Unallocated Vehicles")
+                                                .Selected(true)
+                                                    .Content(@<text>
+                                                        @Html.Partial("~/Views/VehicleAllocation/Partial/_VehiclesUnallocated.cshtml")
+                                                    </text>);
+                                        tabstrip.Add().Text("Allocated Vehicles")
+                                            .Content(@<text>
+                                                @Html.Partial("~/Views/VehicleAllocation/Partial/_VehiclesAllocated.cshtml")
+                                            </text>);
+                                        tabstrip.Add().Text("Vehicles Allocation History")
+                                            .Content(@<text>
+                                                @Html.Partial("~/Views/VehicleAllocation/Partial/_VehicleAllocationHistory.cshtml")
+                                            </text>);
+                                            tabstrip.Add().Text("Vehicles Transfer History")
+                                                    .Content(@<text>
+                                                        @Html.Partial("~/Views/VehicleAllocation/Partial/_VehicleTransferHistory.cshtml")
+                                                    </text>);
+                                            })
+                )
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<style>
+    #tbsVehicle > .k-content {
+        overflow: visible;
+    }
+</style>
+
+@section scripts{
+    <script id="templateResponsiveColumnUnallVeh" type="text/x-kendo-template">
+
+        <strong>Rego No.</strong>
+        <p class="col-template-val">#=data.RegistrationNumber#</p>
+
+        <strong>Type</strong>
+        <p class="col-template-val">#=data.VehicleType#</p>
+
+        <strong>Make</strong>
+        <p class="col-template-val">#=data.Make#</p>
+
+        <strong>Model</strong>
+        <p class="col-template-val">#=data.Model#</p>
+
+        <strong>Business Group</strong>
+        <p class="col-template-val">#=data.BusinessGroup#</p>
+
+        <strong>Center</strong>
+        <p class="col-template-val">#=data.Center#</p>
+
+        <strong>Condition</strong>
+        <p class="col-template-val">#=data.Condition#</p>
+
+        <strong>Status</strong>
+        <p class="col-template-val">#=data.Status#</p>
+
+    </script>
+
+    <script id="templateResponsiveColumnAllocVeh" type="text/x-kendo-template">
+
+        <strong>Rego No.</strong>
+        <p class="col-template-val">#=data.VehicleRegistrationNumber#</p>
+
+        <strong>Status</strong>
+        <p class="col-template-val">#=data.VehicleStatus#</p>
+
+        <strong>Type</strong>
+        <p class="col-template-val">#=data.VehicleCondition#</p>
+
+        <strong>Make</strong>
+        <p class="col-template-val">#=data.VehicleMake#</p>
+
+        <strong>Model</strong>
+        <p class="col-template-val">#=data.VehicleModel#</p>
+
+        <strong>Driver Name</strong>
+        <p class="col-template-val">#=data.DriverName#</p>
+
+        <strong>Mobile</strong>
+        <p class="col-template-val">#=data.DriverMobile#</p>
+
+        <strong>Start Date</strong>
+        <p class="col-template-val">#=data.StartDate#</p>
+
+    </script>
+
+    <script id="templateResponsiveColumnAllocHist" type="text/x-kendo-template">
+
+        <strong>Rego No.</strong>
+        <p class="col-template-val">#=data.VehicleRegistrationNumber#</p>
+
+        <strong>Status</strong>
+        <p class="col-template-val">#=data.VehicleStatus#</p>
+
+        <strong>Type</strong>
+        <p class="col-template-val">#=data.VehicleCondition#</p>
+
+        <strong>Make</strong>
+        <p class="col-template-val">#=data.VehicleMake#</p>
+
+        <strong>Model</strong>
+        <p class="col-template-val">#=data.VehicleModel#</p>
+
+        <strong>Driver Name</strong>
+        <p class="col-template-val">#=data.DriverName#</p>
+
+        <strong>Mobile</strong>
+        <p class="col-template-val">#=data.DriverMobile#</p>
+
+        <strong>Start Date</strong>
+        <p class="col-template-val">#=data.StartDate#</p>
+
+        <strong>End Date</strong>
+        <p class="col-template-val">#=data.EndDate#</p>
+
+    </script>
+
+    <script id="templateResponsiveColumnTransHist" type="text/x-kendo-template">
+
+        <strong>Rego No.</strong>
+        <p class="col-template-val">#=data.VehicleRegistrationNumber#</p>
+
+        <strong>Start Date</strong>
+        <p class="col-template-val">#=data.Date#</p>
+
+        <strong>Business Group</strong>
+        <p class="col-template-val">#=data.BusinessGroup#</p>
+
+        <strong>Center</strong>
+        <p class="col-template-val">#=data.Center#</p>
+
+    </script>
+
+    <script type="text/javascript">
+
+
+    //#region Global functions and variables
+    //fyi, resColTemplateUnallVeh variable is used in the grid column defintion
+    var resColTemplateUnallVeh = kendo.template($("#templateResponsiveColumnUnallVeh").html());
+
+    var resColTemplateAllocVeh = kendo.template($("#templateResponsiveColumnAllocVeh").html());
+
+    var resColTemplateAllocHist = kendo.template($("#templateResponsiveColumnAllocHist").html());
+
+    var resColTemplateTransHist = kendo.template($("#templateResponsiveColumnTransHist").html());
+
+
+    $(document).ready(function () {
+
+        //tooltips
+        $("#gridUnallocatedVehicles").kendoTooltip({ filter: "a[title]"});
+        $("#gridAllocatedVehicles").kendoTooltip({ filter: "a[title]" });
+
+
+        $("#btnResetUnallocVeh").kendoTooltip({ content: "Reset" });
+        $("#btnResetAllocVeh").kendoTooltip({ content: "Reset" });
+        $("#btnResetAllocHist").kendoTooltip({ content: "Reset" });
+        $("#btnResetTransHist").kendoTooltip({ content: "Reset" });
+
+        setGridFormSubmitNotification();
+
+    });
+
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            App.notification.show({
+                message: message
+            }, "success");
+        }
+    }
+
+    function onDataBound(e) {
+
+    }
+    //#endregion
+
+    //#region Unallocated vehicles related
+
+    function GridFilterParamsUnallocVeh() {
+
+        return {
+            vehicleId: (Number($("#cbxRegistionNumberUnallocVeh").val()) == 0) ? -1 : Number($("#cbxRegistionNumberUnallocVeh").val())
+        }
+    }
+
+    function onUnallocVehSearchClick(e) {
+        e.preventDefault();
+        var gridData = $("#gridUnallocatedVehicles").data("kendoGrid");
+        gridData.dataSource.query({ page: 1, pageSize: 20 });
+    }
+
+    function onUnallocVehResetClick(e) {
+        e.preventDefault();
+        var gridData = $("#gridUnallocatedVehicles").data("kendoGrid");
+        $("#cbxRegistionNumberUnallocVeh").data("kendoComboBox").value("");
+        gridData.dataSource.read();
+    }
+
+
+   function onAllocateVehicleClick(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var vehicleId = dataItem.Id;
+       window.location.href = '@Url.Action("AllocateVehicleDetails", "VehicleAllocation")?vehicleId=' + vehicleId;
+    }
+
+
+    function onTransferVehicleClick(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var vehicleId = dataItem.Id;
+        window.location.href = '@Url.Action("TransferVehicleDetails", "VehicleAllocation")?vehicleId=' + vehicleId;
+    }
+    //#endregion
+
+    //#region Allocated vehicles related
+
+    function GridFilterParamsAllocVeh() {
+
+        return {
+            vehicleId: (Number($("#cbxRegistionNumberAllocVeh").val()) == 0) ? -1 : Number($("#cbxRegistionNumberAllocVeh").val())
+        }
+    }
+
+
+    function onEndVehicleAllocationClick(e) {
+       e.preventDefault();
+       var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var vehId = dataItem.VehicleId;
+        window.location.href = '@Url.Action("AllocateVehicleDetails", "VehicleAllocation")?vehicleId=' + vehId;
+    }
+
+    function onAllocVehSearchClick(e) {
+        e.preventDefault();
+        var gridData = $("#gridAllocatedVehicles").data("kendoGrid");
+        gridData.dataSource.query({ page: 1, pageSize: 20 });
+    }
+    function onAllocVehResetClick(e) {
+        e.preventDefault();
+        var gridData = $("#gridAllocatedVehicles").data("kendoGrid");
+        $("#cbxRegistionNumberAllocVeh").data("kendoComboBox").value("");
+        gridData.dataSource.read();
+    }
+
+
+
+    //#endregion
+
+
+    //#region Vehicle Allocation History related
+    function GridFilterParamsAllocHist() {
+
+        return {
+            vehicleId: (Number($("#cbxRegistionNumberAllocHist").val()) == 0) ? -1 : Number($("#cbxRegistionNumberAllocHist").val())
+        }
+    }
+
+    function onAllocHistSearchClick(e) {
+        e.preventDefault();
+        var gridData = $("#gridAllocHist").data("kendoGrid");
+        gridData.dataSource.query({ page: 1, pageSize: 20 });
+    }
+    function onAllocHistResetClick(e) {
+        e.preventDefault();
+        var gridData = $("#gridAllocHist").data("kendoGrid");
+        $("#cbxRegistionNumberAllocHist").data("kendoComboBox").value("");
+        gridData.dataSource.read();
+    }
+
+    //#endregion
+
+
+    //#region Vehicle Transfer History related
+    function GridFilterParamsTransHist() {
+
+        return {
+            vehicleId: (Number($("#cbxRegistionNumberTransHist").val()) == 0) ? -1 : Number($("#cbxRegistionNumberTransHist").val())
+        }
+    }
+
+    function onTransHistSearchClick(e) {
+        e.preventDefault();
+        var gridData = $("#gridTransHist").data("kendoGrid");
+        gridData.dataSource.query({ page: 1, pageSize: 20 });
+    }
+    function onTransHistResetClick(e) {
+        e.preventDefault();
+        var gridData = $("#gridTransHist").data("kendoGrid");
+        $("#cbxRegistionNumberTransHist").data("kendoComboBox").value("");
+        gridData.dataSource.read();
+    }
+
+    //#endregion
+
+
+
+
+    </script>
+}

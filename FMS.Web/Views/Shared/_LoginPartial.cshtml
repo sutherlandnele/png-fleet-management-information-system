@@ -1,0 +1,20 @@
+﻿@using Microsoft.AspNet.Identity
+
+@if (Request.IsAuthenticated)
+{
+    using (Html.BeginForm("LogOff", "Security", FormMethod.Post, new { id = "logoutForm" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="profile-photo">
+            @User.Identity.GetUserName().ToUpper().Substring(0, 1)
+        </div>
+        <div><h4>@User.Identity.GetUserName()</h4></div>
+
+        <div>
+            <a href="/Security/MyResetPassword?username=@User.Identity.GetUserName()" id="reset-password-link">Reset Password</a> | <a href="#" id="sign-out-link">Sign Out</a>
+        </div>
+
+
+    }
+}

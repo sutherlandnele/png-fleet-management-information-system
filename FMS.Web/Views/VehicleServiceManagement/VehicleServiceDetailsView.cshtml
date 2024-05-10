@@ -1,0 +1,234 @@
+﻿@using FMS.Web.CustomHTMLHelpers
+@model FMS.Web.ViewModels.VehicleServiceDisplayViewModel
+
+@{
+    ViewBag.Title = "Vehicle Service Details";
+}
+
+<div id="view-details" class="container-fluid" style="margin-top:15px">
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters h-100 justify-content-center align-items-center">
+        <div class="col-md-10">
+            <div class="container-fluid" id="FormContainer" style="margin-bottom:15px;">
+                <div class="row no-gutters h-100 justify-content-center align-items-center">
+                    <div class="col-md-4">
+                        <div class="table-responsive">
+                            <table class="table no-border">
+                                <tr>
+                                    <th> @Html.LabelForRequired(m => m.ServiceType)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.ServiceType)
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="table-responsive">
+                            <table class="table no-border">
+                                <tr>
+                                    <th style="float:right;">@Html.LabelFor(m => m.ScheduleServiceType)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.ScheduleServiceType)
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="table-responsive">
+                            <table class="table no-border">
+                                <tr>
+                                    <th style="float:right;">@Html.LabelFor(m => m.Incident)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.Incident)
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters h-100 justify-content-center align-items-center">
+                    <div class="col-md-12" style="margin-bottom: -10px;margin-top: -30px;">
+                        <hr />
+                    </div>
+                </div>
+                <div class="row no-gutters h-100 justify-content-center align-items-center">
+                    <div class="col-md-6">
+                        <div class="table-responsive">
+                            <table class="table no-border">
+
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.ServiceJobNumber)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.ServiceJobNumber)
+                                    </td>
+                                </tr>
+
+                                <tr>
+
+                                    <th> @Html.LabelFor(m => m.ServiceMechanic)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.ServiceMechanic)
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.Cost)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.Cost)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th> @Html.LabelFor(m => m.Provider)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.Provider)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th> @Html.LabelFor(m => m.IsAmountPaid)</th>
+                                    <td>
+                                        @{if (Model.IsAmountPaid)
+                                            { @Html.Raw("Yes") }
+                                        else
+                                        { @Html.Raw("No") } }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.Description)</th>
+                                    <td colspan="2">
+                                        @Html.DisplayFor(m => m.Description)
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th> @Html.LabelFor(model => model.CreatedBy, htmlAttributes: new { @class = "vwLabel" })</th>
+                                    <td>
+                                        <span>@Html.DisplayFor(model => model.CreatedBy)</span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th> @Html.LabelFor(model => model.LastUpdatedBy, htmlAttributes: new { @class = "vwLabel" })</th>
+                                    <td>
+                                        <span>@Html.DisplayFor(model => model.LastUpdatedBy)</span>
+                                    </td>
+                                </tr>
+
+
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="table-responsive">
+                            <table class="table no-border">
+
+                                <tr>
+                                    <th>@Html.LabelForRequired(m => m.StartDate)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.StartDate)
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th>@Html.LabelForRequired(m => m.EndDate)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.EndDate)
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th>@Html.LabelForRequired(m => m.VehicleRegistration)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.VehicleRegistration)
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.PoReference)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.PoReference)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th> @Html.LabelFor(m => m.IsIncidentService)</th>
+                                    <td>
+                                        @{if (Model.IsIncidentService)
+                                            { @Html.Raw("Yes") }
+                                        else
+                                        { @Html.Raw("No") } }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th> @Html.LabelFor(m => m.CurrentMileage)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.CurrentMileage)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th> @Html.LabelFor(model => model.CreatedDate, htmlAttributes: new { @class = "vwLabel" })</th>
+                                    <td>
+                                        <span>@Html.DisplayFor(model => model.CreatedDate)</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th> @Html.LabelFor(model => model.LastUpdatedDate, htmlAttributes: new { @class = "vwLabel" })</th>
+                                    <td>
+                                        <span>@Html.DisplayFor(model => model.LastUpdatedDate)</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters h-100 justify-content-center align-items-center">
+                    <div class="col-md-12" style="margin-bottom: -10px;margin-top: -30px;">
+                        <hr />
+                    </div>
+                </div>
+                <div class="row no-gutters h-100 justify-content-center align-items-center" style="float: right;margin-right: 50px;">
+                    <div class="col-md-12">
+                        <div>
+                            @(Html.Kendo().Button()
+                                                        .Name("btnBottomCancel")
+                                                        .Content("Back")
+                                                        .HtmlAttributes(new { type = "button", @class = "k-button" })
+                                                        .Icon("undo")
+                            )
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-2">
+            <!--Vehicle Info-->
+            @Html.DisplayFor(m => m.VehicleDisplayInfoViewModel, "VehicleInfoDisplay")
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+
+
+        $(document).ready(function () {
+            $("#btnBottomCancel").click(function (event) {
+                var newSrc = "NA";
+                window.location.href = document.referrer.replace(/(message=).*?(&)/, '$1' + newSrc + '$2');
+            });
+
+
+        });
+
+
+
+
+       //***********************************************************
+    </script>
+    }

@@ -1,0 +1,365 @@
+﻿@using FMS.Web.ViewModels;
+
+
+@{
+    ViewBag.Title = "Registration Register";
+    //set UI visibility permissions   
+    var canManageComplianceEntries = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionManageComplianceEntries"];
+
+}
+
+
+<div class="container-fluid">
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row h-100 justify-content-center align-items-center">
+
+
+        <fieldset id="fldsDepotDailyMeasurementSearch">
+            <legend>Search</legend>
+
+            <!--Vehicle Dropdownlist-->
+            @(Html.Kendo().DropDownList()
+                        .Name("drpVehicle")
+                        .OptionLabel(new { Text = "Select ...", Value = "" })
+                        .DataValueField("Value")
+                        .DataTextField("Text")
+                        .Filter(FilterType.Contains)
+                        .ValuePrimitive(true)
+                        .HtmlAttributes(new { style = "width:170px" })
+                        .BindTo((System.Collections.IEnumerable)ViewBag.Vehicles)
+                        .Events(events =>
+                        {
+                            events.Change("onDrpVehicleChange");
+                        })
+            )
+
+
+
+            @(Html.Kendo().Button()
+                        .Name("btnSearch")
+                        .HtmlAttributes(new { type = "button", @class = "k-primary", style = "display:none;" })
+                         .Content("<span class='k-icon' title='Search'></span>")
+                        .Icon("search")
+                        .Events(events =>
+                        {
+                            events.Click("onSearchClick");
+                        })
+            )
+
+            @(Html.Kendo().Button()
+                        .Name("btnReset")
+                        .Tag("em")
+                        .Icon("refresh")
+                        .Content("<span class='k-icon' title='Refresh'></span>")
+                        .HtmlAttributes(new { @title = "Reset" })
+                        .Events(events =>
+                        {
+                            events.Click("onResetClick");
+                        })
+            )
+
+        </fieldset>
+
+        <div class="col-md-12">
+            @(Html.Kendo().Grid<ComplianceEditViewModel>()
+                                                            .Name("gridVehicleRegistration")
+                                                            .Columns(columns =>
+                                                            {
+                                                                columns.Bound(vm => vm.RegistrationNumber).ClientTemplate("<div class=\"auditTooltip\">#:VehicleRegoDisplay==null?'Processing...':VehicleRegoDisplay#</div>").Width(100);
+                                                                columns.Bound(vm => vm.TPIAmount).Width(100);
+                                                                columns.Bound(vm => vm.RegistrationAmount).Width(100);
+                                                                columns.Bound(vm => vm.Amount).Width(100);
+                                                                columns.Bound(vm => vm.ComplianceDate).ClientTemplate("#= kendo.toString(ComplianceDate,'dd/MM/yyyy')#").Width(175).Media("(min-width: 544px)");
+                                                                columns.Bound(vm => vm.NextExpiryDate).ClientTemplate("#= kendo.toString(NextExpiryDate,'dd/MM/yyyy')#").Width(175).Media("(min-width: 544px)");
+                                                                columns.Bound(vm => vm.Comment).Width(100).HtmlAttributes(new { @class = "overiddePadding" });
+                                                                columns.Command(command =>
+                                                                {
+                                                                    command.Edit().Text(" ").UpdateText(" ").CancelText(" ").Visible("canManageComplianceEntries");
+                                                                    command.Custom("deleteVehicleRegistration").Text(" ").Click("onDeleteDetailsClick").IconClass("fas fa-trash-alt").HtmlAttributes(new { @title = "Delete", @style = "min-width:46px;min-height:26px" }).Visible("canManageComplianceEntries");
+
+                                                                }).Title("").Width(140);
+                                                            })
+                                                            .ToolBar(toolBar =>
+                                                            {
+                                                                toolBar.Template(@<text>
+                                                                    @if (canManageComplianceEntries)
+                                                                        {
+                                                                        <a class='k-button' style="float:left" href="#" onclick="onAddNewVehicleRegistration(event)">
+                                                                            <span class='k-icon k-i-add'></span>Add New Registration
+                                                                        </a>
+                                                                        }
+
+                                                                </text>);
+                                                            })
+                                                    .Editable(editable => editable.Mode(GridEditMode.InLine).DisplayDeleteConfirmation(false))
+                                                    .Pageable()
+                                                    .Sortable()
+                                                    .Scrollable(s => s.Height("auto"))
+                                                    .DataSource(dataSource => dataSource
+                                                        .Ajax()
+                                                        .PageSize(20)
+                                                        .Events(events => events
+                                                            .Error("onError")
+                                                            .RequestEnd("onDataSourceRequestEnd")
+                                                        )
+                                                        .Model(model =>
+                                                        {
+
+                                                            model.Id(vm => vm.ComplianceNumber);
+                                                        })
+                                                            .Read(read => read.Action("GetVehicleRegistrationList", "VehicleComplianceManagement").Data("gridFilterParams"))
+                                                            .Create(create => create.Action("CreateVehicleRegistration", "VehicleComplianceManagement"))
+                                                            .Update(update => update.Action("UpdateVehicleRegistration", "VehicleComplianceManagement"))
+                                                            .Destroy(delete => delete.Action("DeleteVehicleRegistration", "VehicleComplianceManagement"))
+
+                                    )
+                                        .Events(events => events
+                                                .Edit("onGridItemEdit")
+                                    )
+
+            )
+
+            @(Html.Kendo().Tooltip()
+                                        .For("#gridVehicleRegistration")
+                                        .Filter(".auditTooltip")
+                                        .ContentHandler("getAuditToolTip")
+                                        .Position(TooltipPosition.Right)
+                                        .AutoHide(true)
+            )
+
+        </div>
+    </div>
+
+    <div id="wndDeleteConfirmation"></div>
+</div>
+<style>
+    .k-grid .field-validation-error {
+        display: none;
+    }
+
+    span#dtEntryDate_validationMessage {
+        z-index: 2;
+        position: absolute;
+        margin-top: 30px;
+        margin-left: -130px;
+    }
+
+    .auditTooltip {
+        width: 100%;
+        height: 100%;
+        padding: .929em 1.286em;
+    }
+
+    td.overiddePadding {
+        padding: 0;
+    }
+</style>
+@section scripts{
+    <script type="text/x-kendo-template" id="templateDeleteConfirmation">
+        <div class="modalWindow">
+            <h2>Are you sure you want to delete this record?</h2>
+            <button id="yes" class="k-button">Yes</button>
+            <button id="no" class="k-button k-primary">No</button>
+        </div>
+    </script>
+
+    <script type="text/x-kendo-template" id="templateAuditTooltip">
+        <div style="display:block;text-align:left">
+            Created By: <strong>#=(CreatedBy==null)?'':CreatedBy#</strong><br />
+            Created Date: <strong>#=(CreatedDate==null)?'':kendo.toString(CreatedDate,"dd/MM/yyyy hh:mm ss tt")#</strong> <br />
+            Last Updated By: <strong>#=(LastUpdatedBy==null)?'':LastUpdatedBy#</strong> <br />
+            Last Updated Date: <strong>#=(LastUpdatedDate==null)?'':kendo.toString(LastUpdatedDate,"dd/MM/yyyy hh:mm ss tt")#</strong>
+        </div>
+    </script>
+
+
+    <script type="text/javascript">
+
+    var nextVehicleFuelVoucherNumber;
+    var gridData;
+    var defaultCenterNumber;
+    var templateAuditTooltip;
+
+    $(document).ready(function () {
+        //tooltips
+        $("#gridVehicleRegistration").kendoTooltip({ filter: "a[title]" });
+
+        //initialize the kendo delete confirmation modal window
+        templateDeleteConfirmation = kendo.template($("#templateDeleteConfirmation").html());
+        templateAuditTooltip = kendo.template($("#templateAuditTooltip").html());
+
+        windowDeleteConfirmation = $("#wndDeleteConfirmation").kendoWindow({
+            title: "Delete Confirmation",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+        gridData = $("#gridVehicleRegistration").data("kendoGrid");
+
+
+      
+
+        });
+
+        function getAuditToolTip(e) {
+            var dataItem = gridData.dataItem(e.target.closest("tr"));
+            return templateAuditTooltip(dataItem);
+        }
+
+    function onDrpVehicleChange(e) {
+        $("#btnSearch").trigger("click");
+    }
+
+    function onSearchClick(e) {
+        gridData.dataSource.read();
+    }
+
+    function onResetClick(e) {
+
+        e.preventDefault();
+
+        $("#drpVehicle").data("kendoDropDownList").value("");
+
+        gridData.dataSource.read();
+
+    }
+
+
+
+
+
+    function gridFilterParams() {
+
+        return {
+            vehicleId: (Number($("#drpVehicle").val()) == 0) ? -1 : Number($("#drpVehicle").val())
+        }
+    }
+
+    function onDataSourceRequestEnd(e) {
+
+        if ((e.type == "create" || e.type == "update" || e.type == "destroy") && !e.response.Errors) {            
+            App.notification.show({
+                message: "Changes saved successfully."
+            }, "success");
+
+            e.sender.read();         
+        }
+    }
+
+    function onError(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            App.notification.show({
+                message: message
+            }, "error");
+        }
+    }
+
+    function onDeleteDetailsClick(e) {
+
+        e.preventDefault();
+
+        var grid = this;
+
+        var row = $(e.currentTarget).closest("tr");
+        var dataItem = this.dataItem(row);
+
+        windowDeleteConfirmation.content(templateDeleteConfirmation(dataItem));
+
+        windowDeleteConfirmation.center().open();
+
+        $("#yes").click(function () {
+            grid.removeRow(row); //removes row only
+            windowDeleteConfirmation.close();
+        });
+
+        $("#no").click(function () {
+            windowDeleteConfirmation.close();
+        });
+    }
+
+    function onGridItemEdit(e) {
+
+        $("#Amount").data("kendoNumericTextBox").readonly(true);
+        $("#NextExpiryDate").data("kendoDatePicker").readonly(true);
+
+
+        $("#ComplianceDate").data("kendoDatePicker").bind("change",function (ev) {
+
+            e.model.set("NextExpiryDate", addYears(ev.sender.value(),1));
+        });
+
+        if (e.model.isNew()) {
+            e.model.set("ComplianceType",@((int)FMS.Common.Parameters.ComplianceType.Registration));
+        }
+
+
+        if (!e.model.isNew()) {
+
+        }
+
+        var txtTPIAmount = e.container.find("input[name=TPIAmount]");
+        var txtRegistrationAmount = e.container.find("input[name=RegistrationAmount]");
+
+        txtTPIAmount.on("keyup", function (ev) {
+            calculateTotalAmount(ev.target.value, e.model.get("RegistrationAmount"), e);
+        });
+
+        txtTPIAmount.data("kendoNumericTextBox").bind("spin", function () {
+            calculateTotalAmount(this.value(), e.model.get("RegistrationAmount"), e);
+        });
+
+
+        txtRegistrationAmount.on("keyup", function (ev) {
+            calculateTotalAmount(e.model.get("TPIAmount"),ev.target.value, e);
+        });
+
+        txtRegistrationAmount.data("kendoNumericTextBox").bind("spin", function () {
+            calculateTotalAmount(e.model.get("TPIAmount"), this.value(), e);
+        });
+    }
+
+    function onAddNewVehicleRegistration(e) {
+        gridData.addRow();
+    }
+
+    function calculateTotalAmount(TPIAmount, registrationAmount, e) {
+
+        e.model.set("Amount", ((Number(TPIAmount) + Number(registrationAmount))*100/100));
+    }
+
+    function addYears(dt, n) {
+        return new Date(dt.setFullYear(dt.getFullYear() + n));
+    }
+
+    function canManageComplianceEntries()
+    {
+        var r = '@canManageComplianceEntries';
+
+        if (r === "True") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    </script>
+}

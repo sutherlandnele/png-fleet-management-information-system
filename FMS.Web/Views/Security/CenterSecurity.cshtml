@@ -1,0 +1,402 @@
+﻿
+@{
+    ViewBag.Title = "Manage Center Security";
+    //set UI visibility permissions   
+    var canManageCenterSecurity = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionManageCenterSecurity"];
+    var canViewCenterSecurity = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionViewCenterSecurity"];
+
+}
+<script type="text/javascript">
+    var canManageCenterSecurity = '@canManageCenterSecurity';
+</script>
+<div class="container-fluid">
+    
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            <fieldset id="fldsUserDetailsSearch">
+                <legend>Search</legend>
+                @Html.Label("Selected User", new {style= "font-weight: normal" })
+                @(Html.Kendo().DropDownList()
+                        .Name("txtUserName")
+                        .DataValueField("Value")
+                        .DataTextField("Text")
+                        .Filter(FilterType.Contains)
+                        .ValuePrimitive(true)
+                        .HtmlAttributes(new { style = "width:100%; max-width:240px" })
+                        .BindTo((System.Collections.IEnumerable)ViewBag.Users)
+                        .Events(events => {
+                            events.Change("onUserNameChange");
+                        })
+                )
+
+
+                @(Html.Kendo().Button()
+                                                .Name("btnSearch")
+                                                .HtmlAttributes(new { type = "button", @class = "k-primary", style = "display:none" })
+                                                    .Content("<span class='k-icon' title='Search'></span>")
+                                                .Icon("search")
+                                                .Events(events =>
+                                                {
+                                                    events.Click("onSearchButtonClick");
+                                                })
+                )
+                @if (canManageCenterSecurity && canViewCenterSecurity)
+                {
+
+                    @(Html.Kendo().Button()
+                        .Name("btnGrantAll")
+                        .HtmlAttributes(new { type = "button" })
+                        .Content("<span class='k-icon'></span>Grant All")
+                        .Icon("check-outline")
+                        .Events(events =>
+                        {
+                            events.Click("onGrantAllClick");
+                        })
+                    )
+
+                    @(Html.Kendo().Button()
+                        .Name("btnRevokeAll")
+                        .HtmlAttributes(new { type = "button", style= "margin-left: 4px;" })
+                        .Content("<span class='k-icon'></span>Revoke All")
+                        .Icon("close-outline")
+                        .Events(events =>
+                        {
+                            events.Click("onRevokeAllClick");
+                        })
+                    )
+                }
+
+            </fieldset>
+
+            @(Html.Kendo().Grid<FMS.Web.ViewModels.CenterSecurityViewModel>()
+                    .Name("gridCenterSecurity")
+                    .Columns(columns =>
+                    {
+                        columns.Bound(vm => vm.Center).Title("Center").Width(150);
+                        columns.Bound(vm => vm.HasAccess).Title("Access Status (Click to Grant/Revoke Center Access)").Width(60)
+                            .ClientTemplate(
+                            "# if (!HasAccess) { #" +
+                                "<span><a href='\\#' " +
+                                "# if (canManageCenterSecurity == 'True') { #" +
+                                    "onclick='onGrantCenterAccessClick(event)' " +
+                                "# } else { #" +
+                                    "class='disabled'" +
+                                "# } #" +
+                                "id='lnkGrantCenterAccess'><i " +
+                                "# if (canManageCenterSecurity == 'True') { #" +
+                                    "title='User does not have access. Click to grant user center access' " +
+                                "# } else { #" +
+                                    "title='You do not have permission to modify center security' " +
+                                "# } #" +
+                                "class='fa fa-lock' style='font-size:24px;color:\\#ff1919;'></i></a></span>" +
+                                "# } else { #" +
+                                    "<span><a href='\\#' " +
+                                    "# if (canManageCenterSecurity == 'True') { #" +
+                                        "onclick='onRevokeCenterAccessClick(event)'" +
+                                    "# } else { #" +
+                                       "class='disabled'" +
+                                    "# } #" +
+                                    "id='lnkRevokeCenterAccess'><i " +
+                                    "# if (canManageCenterSecurity == 'True') { #" +
+                                        "title='User has access. Click to revoke user center access.' " +
+                                    "# } else { #" +
+                                        "title='You do not have permission to modify center security' " +
+                                    "# } #" +
+                                    "class='fa fa-unlock' style='font-size:24px;color:\\#00ff00;'></i></a></span>" +
+                                "# } #"
+                            ).Visible(canViewCenterSecurity);
+                    })
+
+                        .Pageable()
+                        .Sortable()
+                        .Scrollable(s => s.Height("auto"))
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                                .PageSize(100)
+                                .Events(events => events.Error("onError"))
+                                .Model(model =>
+                                {
+                                    model.Id(vm => vm.CenterId);
+                                })
+                                .Read(read => read.Action("GetCenterSecurityList", "Security").Data("gridFilterParams"))
+                            )
+
+
+
+            )
+
+        </div>
+    </div>
+
+</div>
+<style>
+    a.disabled {
+        
+        cursor: default;
+    }
+</style>
+
+
+@section scripts{
+
+
+    <script type="text/javascript">
+
+        //global documument variables
+        var gridData;
+
+
+
+        $(document).ready(function () {
+
+
+            //tooltips
+            $("#gridCenterSecurity").kendoTooltip({ filter: "a[title]" });
+            $("#btnSearch").kendoTooltip({ content: "Search" });
+            $("#gridCenterSecurity").kendoTooltip({ filter: "span>a>i.fa.fa-lock[title]" });
+            $("#gridCenterSecurity").kendoTooltip({ filter: "span>a>i.fa.fa-unlock[title]" });
+
+
+            gridData = $("#gridCenterSecurity").data("kendoGrid");
+           
+            
+
+        });
+
+        function onUserNameChange(e) {
+            $("#btnSearch").trigger("click");
+        }
+
+        function onGrantCenterAccessClick(e) {
+            e.preventDefault();
+
+            var row = $(e.currentTarget).closest("tr");
+            var dataItem = gridData.dataItem(row);
+            var strUsername = dataItem.UserId;
+            var centerId = dataItem.CenterId;
+
+            $.when(ajaxUpdateCenterSecurity("/Security/GrantCenterAccess", strUsername, centerId)).done(function (data, statusText, jqXHR) {
+
+
+                $.when(gridData.dataSource.read()).done(function (data2, statusText2, jqXHR2) {
+
+                    if (statusText == "success") {
+
+                        if (data.isError) {
+                            App.notification.show({
+                                message: data.message
+                            }, "error");
+                        }
+                        else {
+
+                            App.notification.show({
+                                message: data.message
+                            }, "success");
+                        }
+                    }
+
+                });
+
+            });
+        } 
+
+        function onRevokeCenterAccessClick(e) {
+            e.preventDefault();
+
+            var row = $(e.currentTarget).closest("tr");
+            var dataItem = gridData.dataItem(row);
+            var strUsername = dataItem.UserId;
+            var centerId = dataItem.CenterId;
+
+            $.when(ajaxUpdateCenterSecurity("/Security/RevokeCenterAccess", strUsername, centerId)).done(function (data,statusText, jqXHR) {     
+
+
+                $.when(gridData.dataSource.read()).done(function (data2, statusText2, jqXHR2) {
+
+                    if (statusText == "success") {
+
+                        if (data.isError) {
+                            App.notification.show({
+                                message: data.message
+                            }, "error");
+                        }
+                        else {
+
+                            App.notification.show({
+                                message: data.message
+                            }, "success");
+                        }
+                    }
+
+                });
+
+            });
+
+
+
+
+        }
+
+        function onGrantAllClick(e) {
+            e.preventDefault();
+
+            var strUsername = $("#txtUserName").data("kendoDropDownList").value();           
+
+            $.when(ajaxUpdateCenterSecurity("/Security/GrantAllCenterAccess", strUsername)).done(function (data, statusText, jqXHR) {
+
+
+                $.when(gridData.dataSource.read()).done(function (data2, statusText2, jqXHR2) {
+
+                    if (statusText == "success") {
+
+                        if (data.isError) {
+                            App.notification.show({
+                                message: data.message
+                            }, "error");
+                        }
+                        else {
+
+                            App.notification.show({
+                                message: data.message
+                            }, "success");
+                        }
+                    }
+
+                });
+
+            });
+        }
+
+        function onRevokeAllClick(e) {
+            e.preventDefault();
+
+            var strUsername = $("#txtUserName").data("kendoDropDownList").value();
+
+            $.when(ajaxUpdateCenterSecurity("/Security/RevokeAllCenterAccess", strUsername)).done(function (data, statusText, jqXHR) {
+
+
+                $.when(gridData.dataSource.read()).done(function (data2, statusText2, jqXHR2) {
+
+                    if (statusText == "success") {
+
+                        if (data.isError) {
+                            App.notification.show({
+                                message: data.message
+                            }, "error");
+                        }
+                        else {
+
+                            App.notification.show({
+                                message: data.message
+                            }, "success");
+                        }
+                    }
+
+                });
+
+            });
+        }
+
+        function onError(e) {
+            if (e.errors) {
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                App.notification.show({
+                    message: message
+                }, "error");
+            }
+        }
+
+        function gridFilterParams() {
+            return {
+                username: $("#txtUserName").val()
+            }
+        }
+
+        function onSearchButtonClick(e) {
+            e.preventDefault();
+            gridData.dataSource.query({ page: 1, pageSize: 20 });
+        }
+
+        function ajaxUpdateCenterSecurity(action, strUsername, centerId) {
+
+            return $.ajax({
+                type: "POST",
+                url: action,
+                data: AddAntiForgeryToken({ username: strUsername, centerId: centerId }),
+                dataType: "json",
+                async: true,
+                beforeSend: function (xhr) {
+                    //show progress bar
+                    kendo.ui.progress($("#gridCenterSecurity .k-grid-content"), true);
+                },
+                success: function (result, status, jqXHR) {
+
+                },
+
+                error: function (xhr, status, error) {
+
+                    App.notification.show({
+                        message: "An error occured: " + xhr.status + " " + xhr.statusText
+                    }, "error");
+
+                },
+                complete: function (xhr, status) {
+
+                    kendo.ui.progress($("#gridCenterSecurity .k-grid-content"), false);
+                   
+
+                }
+            });
+        }
+
+        function ajaxBulkUpdateCenterSecurity(action, strUsername) {
+
+            return $.ajax({
+                type: "POST",
+                url: action,
+                data: AddAntiForgeryToken({ username: strUsername }),
+                dataType: "json",
+                async: true,
+                beforeSend: function (xhr) {
+                    //show progress bar
+                    kendo.ui.progress($("#gridCenterSecurity"), true);
+                },
+                success: function (result, status, jqXHR) {
+
+                },
+
+                error: function (xhr, status, error) {
+
+                    App.notification.show({
+                        message: "An error occured: " + xhr.status + " " + xhr.statusText
+                    }, "error");
+
+                },
+                complete: function (xhr, status) {
+
+                    kendo.ui.progress($("#gridCenterSecurity"), false);
+
+
+                }
+            });
+        }
+
+
+    </script>
+}

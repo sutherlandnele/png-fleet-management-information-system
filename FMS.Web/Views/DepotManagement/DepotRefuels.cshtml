@@ -1,0 +1,421 @@
+﻿@using FMS.Web.ViewModels;
+
+
+@{
+    ViewBag.Title = "Depot Tank Refuel Management";
+
+    //set UI visibility permissions   
+    var canManageBowserRefuel = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionManageTankRefuel"];
+
+}
+
+
+<div class="container-fluid">
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row h-100 justify-content-center align-items-center">
+
+
+        <fieldset id="fldsDepotDailyMeasurementSearch">
+            <legend>Search</legend>
+
+            <!--Center Dropdownlist-->
+            @(Html.Kendo().DropDownList()
+                            .Name("drpCenter")
+                            .OptionLabel(new { Text = "Select ...", Value = "" })
+                            .DataValueField("Value")
+                            .DataTextField("Text")
+                            .Filter(FilterType.Contains)
+                            .ValuePrimitive(true)
+                            .HtmlAttributes(new { style = "width:170px" })
+                            .BindTo((System.Collections.IEnumerable)ViewBag.Centers)
+            )
+
+            <!--Fuel Tank/Bowser Dropdownlist-->
+            @(Html.Kendo().DropDownList()
+                            .Name("drpFuelTank")
+                            .OptionLabel(new { Text = "Select ...", Value = "" })
+                            .HtmlAttributes(new { style = "width:180px" })
+                            .DataTextField("Text")
+                            .DataValueField("Value")
+                            .Enable(false)
+                            .Filter("contains").DataSource(ds =>
+                            {
+                                ds.Read(read =>
+                                {
+                                    read.Action("GetFuelTanksByCenterId", "DepotManagement")
+                                        .Data("filterFuelTanks");
+                                }).ServerFiltering(true);
+                            })
+                            .ValuePrimitive(true)
+                            .CascadeFrom("drpCenter")
+
+            )
+
+
+            @(Html.Kendo().Button()
+                            .Name("btnSearch")
+                            .HtmlAttributes(new { type = "button", @class = "k-primary" })
+                            .Content("<span class='k-icon' title='Search'></span>")
+                            .Icon("search")
+                            .Events(events =>
+                            {
+                                events.Click("onSearchClick");
+                            })
+            )
+
+            @(Html.Kendo().Button()
+                            .Name("btnReset")
+                            .Tag("em")
+                            .Icon("refresh")
+                            .Content("<span class='k-icon' title='Refresh'></span>")
+                            .HtmlAttributes(new { @title = "Reset" })
+                            .Events(events =>
+                            {
+                                events.Click("onResetClick");
+                            })
+            )
+
+        </fieldset>
+
+        <div class="col-md-12">
+            @(Html.Kendo().Grid<DepotRefuelEditViewModel>()
+                                                            .Name("gridDepotRefuel")
+                                                            .Columns(columns =>
+                                                            {
+                                                                columns.Bound(vm => vm.RegionId).ClientTemplate("#:RegionDisplay#").Width(130);
+                                                                columns.Bound(vm => vm.CenterId).ClientTemplate("#:CenterDisplay#").Width(130);
+                                                                columns.Bound(vm => vm.DeportTankId).Width(130);
+                                                                columns.Bound(vm => vm.Date).ClientTemplate("#= kendo.toString(Date,'dd/MM/yyyy')#").Width(90).Media("(min-width: 544px)");
+                                                                columns.Bound(vm => vm.PurchaseVolume).ClientTemplate("#:PurchaseVolumeDisplay#").Media("(min-width: 544px)").Width(80);
+                                                                columns.Bound(vm => vm.CurrentVolume).ClientTemplate("#:CurrentVolumeDisplay#").Media("(min-width: 544px)").Width(80);
+                                                                columns.Bound(vm => vm.PreviousVolume).ClientTemplate("#:PreviousVolumeDisplay#").Media("(min-width: 544px)").Width(80);
+                                                                columns.Bound(vm => vm.MaximumCapacity).Media("(min-width: 544px)").Width(90);
+                                                                columns.Command(command =>
+                                                                {
+                                                                    command.Edit().Text(" ").UpdateText(" ").CancelText(" ").Visible("canManageBowserRefuel");
+                                                                    command.Custom("deleteDepotRefuelRecord").Text(" ").Click("onDeleteDetailsClick").IconClass("fas fa-trash-alt").HtmlAttributes(new { @title = "Delete", @style = "min-width:46px;min-height:26px" }).Visible("canManageBowserRefuel");
+
+                                                                }).Title("").Width(140);
+                                                            })
+                                                            .ToolBar(toolBar =>
+                                                            {
+                                                                toolBar.Template(@<text>
+
+                                                                    @if (canManageBowserRefuel)
+                                                                        {
+                                                                        <a class='k-button' style="float:left" href="#" onclick="onAddNewDepotDailyMeasurement(event)">
+                                                                            <span class='k-icon k-i-add'></span>Add New Reading
+                                                                        </a>
+                                                                        }
+
+                                                                </text>);
+                                                            })
+                                                    .Editable(editable => editable.Mode(GridEditMode.InLine).DisplayDeleteConfirmation(false))
+                                                    .Pageable()
+                                                    .Sortable()
+                                                    .Scrollable(s => s.Height("auto"))
+                                                    .DataSource(dataSource => dataSource
+                                                        .Ajax()
+                                                        .PageSize(20)
+                                                        .Events(events => events
+                                                            .Error("onError")
+                                                            .RequestEnd("onDataSourceRequestEnd")
+                                                        )
+                                                        .Model(model =>
+                                                        {
+                                                            model.Id(vm => vm.Id);
+                                                            model.Field(vm => vm.Date).DefaultValue(DateTime.Today);
+                                                        })
+                                                            .Read(read => read.Action("GetDepotRefuelList", "DepotManagement").Data("gridFilterParams"))
+                                                            .Create(create => create.Action("CreateDepotRefuel", "DepotManagement"))
+                                                            .Update(update => update.Action("UpdateDepotRefuel", "DepotManagement"))
+                                                            .Destroy(delete => delete.Action("DeleteDepotRefuel", "DepotManagement"))
+
+                                    )
+                                        .Events(events => events
+                                                .Edit("onGridItemEdit")
+                                    )
+
+            )
+
+        </div>
+    </div>
+
+    <div id="wndDeleteConfirmation"></div>
+</div>
+<style>
+    .k-grid .field-validation-error {
+        display: none;
+    }
+
+    span#dtEntryDate_validationMessage {
+        z-index: 2;
+        position: absolute;
+        margin-top: 30px;
+        margin-left: -130px;
+    }
+</style>
+@section scripts{
+    <script type="text/x-kendo-template" id="templateDeleteConfirmation">
+        <div class="modalWindow">
+            <h2>Are you sure you want to delete this record?</h2>
+            <button id="yes" class="k-button">Yes</button>
+            <button id="no" class="k-button k-primary">No</button>
+        </div>
+    </script>
+
+
+    <script type="text/javascript">
+
+        var nextVehicleFuelVoucherNumber;
+        var gridData;
+        var defaultCenterNumber;
+        var previousVolume;
+        var maximumCapacity;
+        var currentVolume;
+
+
+
+        $(document).ready(function () {
+            //tooltips
+            $("#gridDepotRefuel").kendoTooltip({ filter: "a[title]" });
+
+            //initialize the kendo delete confirmation modal window
+            templateDeleteConfirmation = kendo.template($("#templateDeleteConfirmation").html());
+
+            windowDeleteConfirmation = $("#wndDeleteConfirmation").kendoWindow({
+                title: "Delete Confirmation",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+            gridData = $("#gridDepotRefuel").data("kendoGrid");
+
+
+        });
+
+        function onDrpCenterDataBound(e) {
+            var defaultItem = e.sender.dataSource.at(0);
+            defaultCenterNumber = defaultItem.Value;
+
+        }
+
+        function onSearchClick(e) {
+            gridData.dataSource.read();
+        }
+
+        function onResetClick(e) {
+
+            e.preventDefault();
+
+
+            $("#drpFuelTank").data("kendoDropDownList").value("");
+            $("#drpCenter").data("kendoDropDownList").value("");
+
+
+            gridData.dataSource.read();
+
+        }
+
+        function editorFilterCenters() {
+            return {
+                regionId: $("#RegionId").data("kendoDropDownList").value(),
+                centerFilter: $("#CenterId").data("kendoDropDownList").filterInput.val()
+            };
+        }
+
+        function editorFilterFuelTanks() {
+            return {
+                centerId: $("#CenterId").data("kendoDropDownList").value(),
+                depotTankFilter: $("#DeportTankId").data("kendoDropDownList").filterInput.val()
+            };
+        }
+
+        function filterFuelTanks() {
+            return {
+
+                centerId: $("#drpCenter").data("kendoDropDownList").value(),
+                depotTankFilter: $("#drpFuelTank").data("kendoDropDownList").filterInput.val()
+            };
+        }
+
+        function gridFilterParams() {
+
+            return {
+                centerId: (Number($("#drpCenter").val()) == 0) ? -1 : Number($("#drpCenter").val()),
+                bowserNumber: $("#drpFuelTank").val()
+            }
+        }
+
+        function onDataSourceRequestEnd(e) {
+
+            if ((e.type == "create" || e.type == "update" || e.type == "destroy") && !e.response.Errors) {
+
+                App.notification.show({
+                    message: "Changes saved successfully."
+                }, "success");
+
+                e.sender.read(); //refresh the datasource
+            }
+        }
+
+        function onError(e) {
+            if (e.errors) {
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                App.notification.show({
+                    message: message
+                }, "error");
+            }
+        }
+
+
+        function onDeleteDetailsClick(e) {
+
+            e.preventDefault();
+
+            var grid = this;
+
+            var row = $(e.currentTarget).closest("tr");
+            var dataItem = this.dataItem(row);
+
+            windowDeleteConfirmation.content(templateDeleteConfirmation(dataItem));
+
+            windowDeleteConfirmation.center().open();
+
+            $("#yes").click(function () {
+                grid.removeRow(row); //removes row only
+                windowDeleteConfirmation.close();
+            });
+
+            $("#no").click(function () {
+                windowDeleteConfirmation.close();
+            });
+        }
+
+        function onGridItemEdit(e) {
+
+
+            $("#MaximumCapacity").data("kendoNumericTextBox").readonly(true);
+            $("#PreviousVolume").data("kendoNumericTextBox").readonly(true);
+            $("#CurrentVolume").data("kendoNumericTextBox").readonly(true);
+
+
+            $("#DeportTankId").change(function (ev) {
+                var bowserNumber = $("#DeportTankId").data("kendoDropDownList").value();
+
+                if (bowserNumber) {
+                    $.when(getDepotTankInfo(bowserNumber)).done(function () {
+                        e.model.set("PreviousVolume", previousVolume);
+                        e.model.set("CurrentVolume", previousVolume);
+                        e.model.set("MaximumCapacity", maximumCapacity);
+                    });
+                }
+            });
+
+            var txtPurchaseVolume = e.container.find("input[name=PurchaseVolume]");
+
+            txtPurchaseVolume.on("keyup", function (ev) {
+                calculateCurrentVolume(parseFloat(ev.target.value), parseFloat(e.model.get("PreviousVolume")), e);
+            });
+
+
+
+        }
+
+        function calculateCurrentVolume(pVol, prVol, e) {
+            if ((pVol && prVol) && (pVol > 0 && prVol > 0)) {
+
+                e.model.set("CurrentVolume", Math.round(pVol + prVol));
+
+            }
+            else if ((pVol) && (pVol > 0)) {
+                //$("#TotalCost").data("kendoNumericTextBox").value(0);
+                e.model.set("CurrentVolume", pVol);
+            }
+            else if ((prVol) && (prVol > 0)) {
+                //$("#TotalCost").data("kendoNumericTextBox").value(0);
+                e.model.set("CurrentVolume", prVol);
+            }
+            else {
+                e.model.set("CurrentVolume", 0);
+            }
+
+
+        }
+
+
+        function onAddNewDepotDailyMeasurement(e) {
+            gridData.addRow();
+        }
+
+
+        function getDepotTankInfo(depotTankId) {
+            return $.ajax({
+                type: "POST",
+                url: "/DepotManagement/GetDepotTankInfo",
+                data: { depotTankId: depotTankId },
+                dataType: "json",
+                async: true,
+                beforeSend: function (xhr) {
+                    //show progress bar
+                    kendo.ui.progress($("#progressIndicator"), true);
+
+                },
+                success: function (result, status, xhr) {
+
+                    previousVolume = result.currentVolume;
+                    maximumCapacity = result.maximumCapacity;
+
+                    if (result.isError) {
+
+                        previousVolume = "";
+                        maximumCapacity = "";
+                    }
+
+
+                },
+                error: function (xhr, status, error) {
+                    App.notification.show({
+                        message: "An error occured: " + xhr.status + " " + xhr.statusText
+                    }, "error");
+
+                    previousVolume = "";
+                    maximumCapacity = "";
+                },
+                complete: function (xhr, status) {
+
+                    kendo.ui.progress($("#progressIndicator"), false);
+
+
+                }
+            });
+        }
+        function canManageBowserRefuel()
+        {
+            var r = '@canManageBowserRefuel';
+
+            if (r === "True") {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+    </script>
+    }

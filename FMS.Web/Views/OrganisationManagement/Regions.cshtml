@@ -1,0 +1,194 @@
+﻿@using FMS.Common;
+@{
+    ViewBag.Title = "Regions";
+    //set UI visibility permissions
+    var canUpdateRegions = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionManageRegions"];
+    var canViewRegions = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionViewRegions"];
+}
+}
+
+<div class="container-fluid">
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            @(Html.Kendo().Grid<FMS.Web.ViewModels.RegionDisplayViewModel>()
+                                                    .Name("gridRegions")
+                                                    .Columns(columns =>
+                                                    {
+                                                        columns.Bound(vm => vm.Name).Title("Name");
+                                                        columns.Bound(vm => vm.Manager).Title("Regional Manager");
+                                                        columns.Command(command =>
+                                                        {
+                                                            command.Custom("view").Text(" ").Click("onViewDetailsClick").IconClass("far fa-eye").HtmlAttributes(new { @title = "View" }).Visible("canViewRegions");
+                                                            command.Custom("edit").Text(" ").Click("onEditDetailsClick").IconClass("fas fa-edit").HtmlAttributes(new { @title = "Edit" }).Visible("canUpdateRegions");
+                                                            command.Custom("delete").Text(" ").Click("onDeleteDetailsClick").IconClass("fas fa-trash-alt").HtmlAttributes(new { @title = "Delete" }).Visible("canUpdateRegions");
+                                                        }).Title("").Width(210);
+                                                    })
+                                                    .ToolBar(toolBar =>
+                                                    {
+                                                        toolBar.Template(@<text>
+
+                                                            @if (canUpdateRegions)
+                                                                {
+                                                                <a class='k-button' style="float:left" href="#" onclick="onAddNewDetailsClick(event)">
+                                                                    <span class='k-icon k-i-add'></span>Add New Region
+                                                                </a>
+                                                                }
+                                                            
+                                                        </text>);
+                                                    })
+                                                    .Pageable()
+                                                    .Sortable()
+                                                    .Scrollable(s => s.Height("auto"))
+                                                    .DataSource(dataSource => dataSource
+                                                        .Ajax()
+                                                        .PageSize(20)
+                                                        .Events(events => events
+                                                            .Error("onError")
+                                                        )
+                                                        .Model(model =>
+                                                        {
+                                                            model.Id(vm => vm.RegionNumber);
+                                                        })
+                                                        .Read(read => read.Action("GetRegionList", "OrganisationManagement"))
+                                                    )
+
+            )
+
+            <div id="wndDeleteConfirmation"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+</style>
+@section scripts{
+
+    <script type="text/x-kendo-template" id="templateDeleteConfirmation">
+        <div class="modalWindow">
+            <h2>Are you sure you want to delete this record?</h2>
+            <button id="yes" class="k-button">Yes</button>
+            <button id="no" class="k-button k-primary">No</button>
+        </div>
+    </script>
+
+    <script type="text/javascript">
+
+    var gridData;
+    var windowDeleteConfirmation;
+
+    $(document).ready(function () {
+        //tooltips
+        $("#gridRegions").kendoTooltip({ filter: "a[title]" });
+
+        gridData = $("#gridRegions").data("kendoGrid");
+
+        templateDeleteConfirmation = kendo.template($("#templateDeleteConfirmation").html());
+
+        setGridFormSubmitNotification();
+
+        //initialize the kendo delete confirmation modal window
+        windowDeleteConfirmation = $("#wndDeleteConfirmation").kendoWindow({
+            title: "Delete Confirmation",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+
+    });
+    function onError(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            e.sender.read(); //refresh the datasource
+            App.notification.show({
+                message: message.length > 100 ? message.substring(0, 100) + "..." : message
+            }, "error");
+        }
+    }
+
+   function onViewDetailsClick(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+       var id = dataItem.RegionNumber;
+        window.location.href = '@Url.Action("GetRegion", "OrganisationManagement")?id=' + id;
+    }
+
+    function onEditDetailsClick(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var id = dataItem.RegionNumber;
+        window.location.href = '@Url.Action("EditRegion", "OrganisationManagement")?id=' + id;
+    }
+
+    function onAddNewDetailsClick(e) {
+        e.preventDefault();
+        window.location.href = '@Url.Action("CreateRegion", "OrganisationManagement")';
+    }
+
+    function onDeleteDetailsClick(e) {
+        e.preventDefault();
+        var grid = this;
+        var row = $(e.currentTarget).closest("tr");
+        var dataItem = this.dataItem(row);
+        windowDeleteConfirmation.content(templateDeleteConfirmation(dataItem));
+        windowDeleteConfirmation.center().open();
+
+        $("#yes").click(function () {
+
+            $.when(ajaxReturnDelete(dataItem.RegionNumber, "OrganisationManagement", "DeleteRegion")).done(function (a1) {
+                grid.removeRow(row); //removes row only
+                gridData.dataSource.read();
+            });
+            windowDeleteConfirmation.close();
+        });
+
+        $("#no").click(function () {
+            windowDeleteConfirmation.close();
+        });
+    }
+
+    function canUpdateRegions() {
+
+        var r = '@canUpdateRegions';
+
+        if (r === "True") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    function canViewRegions() {
+
+        var r = '@canViewRegions';
+
+        if (r === "True") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+
+    </script>
+}

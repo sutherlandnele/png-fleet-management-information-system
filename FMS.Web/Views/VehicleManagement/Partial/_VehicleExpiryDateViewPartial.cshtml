@@ -1,0 +1,21 @@
+﻿@model FMS.Web.ViewModels.VehicleDisplayViewModel
+<div class="row">
+    <div class="col-sm-4">
+        <div class="table-responsive">
+            <table class="table no-border view-only">
+                <tr>
+                    <th>@Html.LabelFor(model => model.RegistrationExpiry, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.RegistrationExpiry, new { htmlAttributes = new { @class = "vwDisplay" } })
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.LabelFor(model => model.SafetyStickyExpiry, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.SafetyStickyExpiry, new { htmlAttributes = new { @class = "vwDisplay" } })
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

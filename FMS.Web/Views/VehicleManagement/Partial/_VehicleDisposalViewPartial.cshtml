@@ -1,0 +1,43 @@
+﻿@model FMS.Web.ViewModels.VehicleDisplayViewModel
+
+<div class="row">
+    <div class="col-sm-4">
+        <div class="table-responsive">
+            <table class="table no-border view-only">
+                <tr>
+                    <th>@Html.LabelFor(model => model.DisposalDate, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.DisposalDate , new { htmlAttributes = new { @class = "vwDisplay" } })
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.LabelFor(model => model.DisposalValue, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.DisposalValue, new { htmlAttributes = new { @class = "vwDisplay" } })
+                    </td>
+                </tr>
+                <tr>
+                    <th>@Html.LabelFor(model => model.DisposalReference, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @Html.DisplayFor(model => model.DisposalReference, new { htmlAttributes = new { @class = "vwDisplay" } })
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>@Html.LabelFor(model => model.CODReport, htmlAttributes: new { @class = "vwLabel" })</th>
+                    <td>
+                        @if (ViewData["codRptFileInfo"] != null)
+                        {
+                            @(Html.Kendo().Button()
+                                                .Name("btnDownloadCODReport")
+                                                .Content("Download Report")
+                                                .HtmlAttributes(new { type = "button", style = "margin-top:5px;" })
+                                                .Events(ev => ev.Click("onCODRptDownloadClick"))
+                            )
+                        }
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

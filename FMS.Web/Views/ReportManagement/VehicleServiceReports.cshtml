@@ -1,0 +1,302 @@
+﻿@model FMS.Web.ViewModels.VehicleServiceReportParameterViewModel
+@{
+
+    ViewBag.Title = "Vehicle Service Reports";
+
+    var canExecuteServiceDetailsReport = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionRunServiceDetailsReport"];
+    var canExecuteServiceMonthlySummaryReport = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionRunServiceMonthlySummaryReport"];
+    var canExecuteVehicleScheduleServiceReport = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionRunVehicleScheduleServiceReport"];
+
+}
+<div class="container-fluid">
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            @using (Html.BeginForm("ExecuteVehicleServiceReport", "ReportManagement", FormMethod.Post, new { target = "_blank", id = "frmVehicleServiceReportParameter", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <fieldset id="fldsVehicleRegistryReportParameter">
+
+                    <legend>Select Report Parameters</legend>
+                    <div class="row h-100 justify-content-center align-items-center">
+                        <div class="col-md-12">
+
+                            @(Html.Kendo().Button()
+                                                    .Name("btnReset")
+                                                    .Tag("em")
+                                                    .Icon("refresh")
+                                                    .Content("<span class='k-icon'></span>")
+                                                    .HtmlAttributes(new { style = "float:right", @title = "Reset Parameter Fields" })
+                                                    .Events(events =>
+                                                    {
+                                                        events.Click("onResetClick");
+                                                    })
+                            )
+
+                        </div>
+                    </div>
+                    <div class="row h-100 justify-content-center align-items-center">
+                        <div class="col-md-4">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.BusinessUnit)</th>
+                                        <td>
+                                            @Html.HiddenFor(m => m.ReportType)
+                                            @(Html.Kendo().DropDownListFor(m => m.BusinessUnit)
+                                                                                                .DataValueField("Value")
+                                                                                                .DataTextField("Text")
+                                                                                                .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                                .Filter(FilterType.Contains)
+                                                                                                .ValuePrimitive(true)
+                                                                                                .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                                                                                .BindTo((System.Collections.IEnumerable)ViewBag.BusinessUnits)
+                                            )
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.RegistrationNumber)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.RegistrationNumber)
+                                                                        .DataValueField("Value")
+                                                                        .DataTextField("Text")
+                                                                        .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                        .Filter(FilterType.Contains)
+                                                                        .ValuePrimitive(true)
+                                                                        .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                                                        .BindTo((System.Collections.IEnumerable)ViewBag.Vehicles)
+                                            )
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>@Html.LabelFor(model => model.ServiceAlertDateFrom)</th>
+                                        <td>
+                                            @(Html.Kendo().DatePickerFor(model => model.ServiceAlertDateFrom)
+                                                                                .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                            )
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.BusinessGroup)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.BusinessGroup)
+                                                                                                                .DataValueField("Value")
+                                                                                                                .DataTextField("Text")
+                                                                                                                .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                                                .Filter(FilterType.Contains)
+                                                                                                                .ValuePrimitive(true)
+                                                                                                                .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                                                                                                .BindTo((System.Collections.IEnumerable)ViewBag.BusinessGroups)
+                                            )
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.ServiceType)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.ServiceType)
+                                                                                        .DataValueField("Value")
+                                                                                        .DataTextField("Text")
+                                                                                        .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                        .Filter(FilterType.Contains)
+                                                                                        .ValuePrimitive(true)
+                                                                                        .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                                                                        .BindTo((System.Collections.IEnumerable)ViewBag.ServiceTypes)
+                                            )
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>@Html.LabelFor(model => model.ServiceAlertDateTo)</th>
+                                        <td>
+                                            @(Html.Kendo().DatePickerFor(model => model.ServiceAlertDateTo)
+                                                                                        .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                            )
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.Center)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.Center)
+                                                                                                        .DataValueField("Value")
+                                                                                                        .DataTextField("Text")
+                                                                                                        .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                                        .Filter(FilterType.Contains)
+                                                                                                        .ValuePrimitive(true)
+                                                                                                        .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                                                                                        .BindTo((System.Collections.IEnumerable)ViewBag.Centers)
+                                            )
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.ServiceProvider)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.ServiceProvider)
+                                                                                                .DataValueField("Value")
+                                                                                                .DataTextField("Text")
+                                                                                                .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                                                .Filter(FilterType.Contains)
+                                                                                                .ValuePrimitive(true)
+                                                                                                .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                                                                                .BindTo((System.Collections.IEnumerable)ViewBag.ServiceProviders)
+                                            )
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.IsInService)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.IsInService)
+                                                                 .DataValueField("Value")
+                                                                 .DataTextField("Text")
+                                                                 .Filter(FilterType.Contains)
+                                                                 .ValuePrimitive(true)
+                                                                 .HtmlAttributes(new { style = "width:100%; max-width:170px" })
+                                                                 .BindTo(new List<SelectListItem>() {
+                                                                                                                    new SelectListItem() {
+                                                                                                                        Text = "Both",
+                                                                                                                        Value = ""
+                                                                                                                    },
+                                                                                                                    new SelectListItem() {
+                                                                                                                        Text = "In Service",
+                                                                                                                        Value = "Yes"
+                                                                                                                    },
+                                                                                                                    new SelectListItem() {
+                                                                                                                        Text = "Not In Service",
+                                                                                                                        Value = "No"
+                                                                                                                    }
+                                                                })
+                                                                .Value("")
+                                            )
+
+
+                                        </td>
+
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </fieldset>
+
+                <div class="row h-100 justify-content-center align-items-center">
+                    <div class="col-md-12">
+
+                        <fieldset style="text-align:center" id="fldsFuelManagementReportExecution">
+
+                            <legend>Execute Report</legend>
+
+                            <div class="fa-box-link">
+
+                                <ul>
+                                    @if (canExecuteServiceDetailsReport)
+                                    {
+                                        <li>
+                                            <a href="#" id="Service-Details-Report" rel="nofollow">
+                                                <i class="fas fa-chart-line"></i>
+                                                <span>Service Details Report</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    @if (canExecuteServiceMonthlySummaryReport)
+                                    {
+                                        <li>
+                                            <a href="#" id="Service-Monthly-Summary" rel="nofollow">
+                                                <i class="fas fa-chart-pie"></i>
+                                                <span>Service Monthly Summary</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    @if (canExecuteVehicleScheduleServiceReport)
+                                    {
+                                        <li>
+                                            <a href="#" id="Vehicle-Schedule-Service-Report" rel="nofollow">
+                                                <i class="fas fa-chart-area"></i>
+                                                <span>Vehicle Schedule Service Report</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    </ul>
+                            </div>
+                        </fieldset>
+
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            //tooltips
+            $("#btnReset").kendoTooltip({ content: "Reset" });
+
+            //execute report actions
+            $("#Service-Details-Report").click(function (e) {
+                $("#ReportType").val("200");
+                $("#frmVehicleServiceReportParameter").submit();
+            });
+
+            $("#Service-Monthly-Summary").click(function (e) {
+                $("#ReportType").val("201");
+                $("#frmVehicleServiceReportParameter").submit();
+            });
+
+            $("#Vehicle-Schedule-Service-Report").click(function (e) {
+                $("#ReportType").val("202");
+                $("#frmVehicleServiceReportParameter").submit();
+            });
+
+        });
+
+        function onResetClick(e) {
+            e.preventDefault();
+
+            $("#ReportType").val("");
+            $("#ServiceAlertDateFrom").data("kendoDatePicker").value("");
+            $("#ServiceAlertDateTo").data("kendoDatePicker").value("");
+            $("#BusinessUnit").data("kendoDropDownList").value("");
+            $("#BusinessGroup").data("kendoDropDownList").value("");
+            $("#Center").data("kendoDropDownList").value("");
+            $("#RegistrationNumber").data("kendoDropDownList").value("");
+            $("#ServiceType").data("kendoDropDownList").value("");
+            $("#ServiceProvider").data("kendoDropDownList").value("");
+            $("#IsInService").data("kendoDropDownList").value("");
+
+
+        }
+
+
+
+
+    </script>
+    }

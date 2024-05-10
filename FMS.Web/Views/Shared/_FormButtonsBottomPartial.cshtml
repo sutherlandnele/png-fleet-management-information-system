@@ -1,0 +1,19 @@
+﻿<div class="col-md-12">
+    <div class="formButtonRegion">
+    @(Html.Kendo().Button()
+                .Name("btnBottomSave")
+                .Icon("save")
+                .Content("Save")                
+                .HtmlAttributes(new { type = "submit", @class = "k-button k-primary" })
+    )
+    @(Html.Kendo().Button()
+                .Name("btnBottomCancel")
+                .Content("Cancel")
+                .HtmlAttributes(new { type = "button", @class = "k-button" })
+                .Icon("cancel")              
+    )
+    </div>
+</div>
+
+
+       

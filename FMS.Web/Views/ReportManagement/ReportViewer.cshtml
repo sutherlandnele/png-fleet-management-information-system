@@ -1,0 +1,543 @@
+@using FMS.Web.Views.ReportManagement
+@using Telerik.Reporting
+@using Telerik.ReportViewer.Mvc
+@using FMS.Report
+@using FMS.Common
+@using FMS.Web.ViewModels
+@model ReportParameterBaseViewModel
+
+@{
+    VehicleRegistryReportParameterViewModel vehicleRegistryReportParameterViewModel = new VehicleRegistryReportParameterViewModel();
+    FuelManagementReportParameterViewModel fuelManagementReportParameterViewModel = new FuelManagementReportParameterViewModel();
+    ComplianceReportParameterViewModel complianceReportParameterViewModel = new ComplianceReportParameterViewModel();
+    VehicleServiceReportParameterViewModel vehicleServiceReportParameterViewModel = new VehicleServiceReportParameterViewModel();
+    ManagementReportParameterViewModel managementReportParameterViewModel = new ManagementReportParameterViewModel();
+    VehicleIncidentReportParameterViewModel vehicleIncidentReportParameterViewModel = new VehicleIncidentReportParameterViewModel();
+    OrganisationReportParameterViewModel organisationReportParameterViewModel = new OrganisationReportParameterViewModel();
+    VehicleAllocationReportParameterViewModel vehicleAllocationReportParameterViewModel = new VehicleAllocationReportParameterViewModel();
+
+
+    if (Model.GetType() == typeof(OrganisationReportParameterViewModel))
+    {
+        organisationReportParameterViewModel = (OrganisationReportParameterViewModel)Model;
+    }
+
+    if (Model.GetType() == typeof(VehicleAllocationReportParameterViewModel))
+    {
+        vehicleAllocationReportParameterViewModel = (VehicleAllocationReportParameterViewModel)Model;
+    }
+
+    if (Model.GetType() == typeof(VehicleRegistryReportParameterViewModel))
+    {
+        vehicleRegistryReportParameterViewModel = (VehicleRegistryReportParameterViewModel)Model;
+    }
+
+    if (Model.GetType() == typeof(FuelManagementReportParameterViewModel))
+    {
+        fuelManagementReportParameterViewModel = (FuelManagementReportParameterViewModel)Model;
+    }
+
+    if (Model.GetType() == typeof(ComplianceReportParameterViewModel))
+    {
+        complianceReportParameterViewModel = (ComplianceReportParameterViewModel)Model;
+    }
+
+    if (Model.GetType() == typeof(VehicleServiceReportParameterViewModel))
+    {
+        vehicleServiceReportParameterViewModel = (VehicleServiceReportParameterViewModel)Model;
+    }
+
+    if (Model.GetType() == typeof(ManagementReportParameterViewModel))
+    {
+        managementReportParameterViewModel = (ManagementReportParameterViewModel)Model;
+    }
+
+    if (Model.GetType() == typeof(VehicleIncidentReportParameterViewModel))
+    {
+        vehicleIncidentReportParameterViewModel = (VehicleIncidentReportParameterViewModel)Model;
+    }
+
+}
+
+
+
+@{
+    Layout = null;
+    var culture = System.Globalization.CultureInfo.CurrentCulture.ToString();
+}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Report Viewer | PPL FMS</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    @Scripts.Render("~/bundles/jquery")
+    @Styles.Render("~/Content/kendo/css")
+
+    <!--kendo.all.min.js can be used as well instead of the following custom Kendo UI subset-->
+    <script src="@Url.Content("~/Scripts/reportviewer/telerikReportViewer.kendo-12.2.18.1129.min.js")"></script>
+
+    <!--Set Culture-->
+    <script src="@Url.Content("~/Scripts/kendo/cultures/kendo.culture." + culture + ".min.js")"></script>
+
+    <script type="text/javascript">
+        kendo.culture("@culture");
+    </script>
+
+    <style>
+        #reportViewer {
+            position: relative;
+            width: 306mm;
+            height: 297mm;
+            font-family: Verdana, Arial;
+        }
+    </style>
+
+    <script src="@Url.Content("~/Scripts/reportviewer/telerikReportViewer-12.2.18.1129.min.js")"></script>
+    <!--For IE that does not take care of the js promise object natively -->
+    <script src="@Url.Content("~/Scripts/reportviewer/polyfill.min.js")"></script>
+
+</head>
+<body>
+
+    @functions
+    {
+
+        private TypeReportSource ProcessRegistryReportFilters(TypeReportSource typeReportSource, VehicleRegistryReportParameterViewModel vehicleRegistryReportParameterViewModel)
+        {
+            if (vehicleRegistryReportParameterViewModel.YearPurchaseFrom != null)
+            {
+                typeReportSource.Parameters.Add("paramPurchaseFromYear", ((DateTime)vehicleRegistryReportParameterViewModel.YearPurchaseFrom).ToString("yyyy"));
+            }
+
+            if (vehicleRegistryReportParameterViewModel.YearPurchaseTo != null)
+            {
+                typeReportSource.Parameters.Add("paramPurchaseToYear", ((DateTime)vehicleRegistryReportParameterViewModel.YearPurchaseTo).ToString("yyyy"));
+            }
+
+            if (!string.IsNullOrEmpty(vehicleRegistryReportParameterViewModel.RegistrationNumber))
+            {
+                typeReportSource.Parameters.Add("paramRegistrationNumber", vehicleRegistryReportParameterViewModel.RegistrationNumber);
+            }
+
+            if (!string.IsNullOrEmpty(vehicleRegistryReportParameterViewModel.Center))
+            {
+                typeReportSource.Parameters.Add("paramCenter", vehicleRegistryReportParameterViewModel.Center);
+            }
+
+            if (!string.IsNullOrEmpty(vehicleRegistryReportParameterViewModel.BusinessUnit))
+            {
+                typeReportSource.Parameters.Add("paramBusinessUnit", vehicleRegistryReportParameterViewModel.BusinessUnit);
+            }
+
+            if (!string.IsNullOrEmpty(vehicleRegistryReportParameterViewModel.Status))
+            {
+                typeReportSource.Parameters.Add("paramVehicleStatus", vehicleRegistryReportParameterViewModel.Status);
+            }
+
+            if (!string.IsNullOrEmpty(vehicleRegistryReportParameterViewModel.Condition))
+            {
+                typeReportSource.Parameters.Add("paramVehicleCondition", vehicleRegistryReportParameterViewModel.Condition);
+            }
+
+            if (!string.IsNullOrEmpty(vehicleRegistryReportParameterViewModel.VehicleType))
+            {
+                typeReportSource.Parameters.Add("paramVehicleType", vehicleRegistryReportParameterViewModel.VehicleType);
+            }
+
+            if (!string.IsNullOrEmpty(vehicleRegistryReportParameterViewModel.FuelType))
+            {
+                typeReportSource.Parameters.Add("paramFuelType", vehicleRegistryReportParameterViewModel.FuelType);
+            }
+
+            if (!string.IsNullOrEmpty(vehicleRegistryReportParameterViewModel.Transmission))
+            {
+                typeReportSource.Parameters.Add("paramTransmission", vehicleRegistryReportParameterViewModel.Transmission);
+            }
+
+            if (vehicleRegistryReportParameterViewModel.BOS_Recommendation != null)
+            {
+                typeReportSource.Parameters.Add("paramBOSRecommendation", vehicleRegistryReportParameterViewModel.BOS_Recommendation);
+            }
+
+            return typeReportSource;
+        }
+
+        private TypeReportSource ProcessFuelReportFilters(TypeReportSource typeReportSource, FuelManagementReportParameterViewModel fuelManagementReportParameterViewModel)
+        {
+            if (fuelManagementReportParameterViewModel.RefuelDateFrom != null)
+            {
+                typeReportSource.Parameters.Add("paramRefuelDateFrom", fuelManagementReportParameterViewModel.RefuelDateFrom);
+            }
+
+            if (fuelManagementReportParameterViewModel.RefuelDateTo != null)
+            {
+                typeReportSource.Parameters.Add("paramRefuelDateTo", fuelManagementReportParameterViewModel.RefuelDateTo);
+            }
+
+            if (fuelManagementReportParameterViewModel.TankRefuelDateFrom != null)
+            {
+                typeReportSource.Parameters.Add("paramTankRefuelDateFrom", fuelManagementReportParameterViewModel.TankRefuelDateFrom);
+            }
+
+            if (fuelManagementReportParameterViewModel.TankRefuelDateTo != null)
+            {
+                typeReportSource.Parameters.Add("paramTankRefuelDateTo", fuelManagementReportParameterViewModel.TankRefuelDateTo);
+            }
+
+            if (!string.IsNullOrEmpty(fuelManagementReportParameterViewModel.BusinessUnit))
+            {
+                typeReportSource.Parameters.Add("paramBusinessUnit", fuelManagementReportParameterViewModel.BusinessUnit);
+            }
+
+            if (!string.IsNullOrEmpty(fuelManagementReportParameterViewModel.BusinessGroup))
+            {
+                typeReportSource.Parameters.Add("paramBusinessGroup", fuelManagementReportParameterViewModel.BusinessGroup);
+            }
+
+            if (!string.IsNullOrEmpty(fuelManagementReportParameterViewModel.Center))
+            {
+                typeReportSource.Parameters.Add("paramCenter", fuelManagementReportParameterViewModel.Center);
+            }
+
+            if (!string.IsNullOrEmpty(fuelManagementReportParameterViewModel.FuelUsageGroup))
+            {
+                typeReportSource.Parameters.Add("paramFuelUsageGroup", fuelManagementReportParameterViewModel.FuelUsageGroup);
+            }
+
+            if (!string.IsNullOrEmpty(fuelManagementReportParameterViewModel.RegistrationNumber))
+            {
+                typeReportSource.Parameters.Add("paramRegistrationNumber", fuelManagementReportParameterViewModel.RegistrationNumber);
+            }
+
+            return typeReportSource;
+        }
+
+        private TypeReportSource ProcessComplianceReportFilters(TypeReportSource typeReportSource, ComplianceReportParameterViewModel complianceReportParameterViewModel)
+        {
+            if (complianceReportParameterViewModel.ExpiryDateFrom != null)
+            {
+                typeReportSource.Parameters.Add("paramExpiryDateFrom", complianceReportParameterViewModel.ExpiryDateFrom);
+            }
+
+            if (complianceReportParameterViewModel.ExpiryDateTo != null)
+            {
+                typeReportSource.Parameters.Add("paramExpiryDateTo", complianceReportParameterViewModel.ExpiryDateTo);
+            }
+
+
+            if (!string.IsNullOrEmpty(complianceReportParameterViewModel.BusinessUnit))
+            {
+                typeReportSource.Parameters.Add("paramBusinessUnit", complianceReportParameterViewModel.BusinessUnit);
+            }
+
+            if (!string.IsNullOrEmpty(complianceReportParameterViewModel.BusinessGroup))
+            {
+                typeReportSource.Parameters.Add("paramBusinessGroup", complianceReportParameterViewModel.BusinessGroup);
+            }
+
+            if (!string.IsNullOrEmpty(complianceReportParameterViewModel.Center))
+            {
+                typeReportSource.Parameters.Add("paramCenter", complianceReportParameterViewModel.Center);
+            }
+
+            return typeReportSource;
+        }
+
+        private TypeReportSource ProcessServiceReportFilters(TypeReportSource typeReportSource, VehicleServiceReportParameterViewModel vehicleServiceReportParameterViewModel)
+        {
+            if (vehicleServiceReportParameterViewModel.ServiceAlertDateFrom != null)
+            {
+                typeReportSource.Parameters.Add("paramServiceAlertDateFrom", vehicleServiceReportParameterViewModel.ServiceAlertDateFrom);
+            }
+
+            if (vehicleServiceReportParameterViewModel.ServiceAlertDateTo != null)
+            {
+                typeReportSource.Parameters.Add("paramServiceAlertDateTo", vehicleServiceReportParameterViewModel.ServiceAlertDateTo);
+            }
+
+
+            if (!string.IsNullOrEmpty(vehicleServiceReportParameterViewModel.RegistrationNumber))
+            {
+                typeReportSource.Parameters.Add("paramRegistrationNumber", vehicleServiceReportParameterViewModel.RegistrationNumber);
+            }
+
+            if (!string.IsNullOrEmpty(vehicleServiceReportParameterViewModel.ServiceType))
+            {
+                typeReportSource.Parameters.Add("paramServiceType", vehicleServiceReportParameterViewModel.ServiceType);
+            }
+
+            if (!string.IsNullOrEmpty(vehicleServiceReportParameterViewModel.ServiceProvider))
+            {
+                typeReportSource.Parameters.Add("paramServiceProvider", vehicleServiceReportParameterViewModel.ServiceProvider);
+            }
+
+            if (!string.IsNullOrEmpty(vehicleServiceReportParameterViewModel.BusinessUnit))
+            {
+                typeReportSource.Parameters.Add("paramBusinessUnit", vehicleServiceReportParameterViewModel.BusinessUnit);
+            }
+
+            if (!string.IsNullOrEmpty(vehicleServiceReportParameterViewModel.IsInService))
+            {
+                typeReportSource.Parameters.Add("paramIsInService", vehicleServiceReportParameterViewModel.IsInService);
+            }
+
+            if (!string.IsNullOrEmpty(vehicleServiceReportParameterViewModel.BusinessGroup))
+            {
+                typeReportSource.Parameters.Add("paramBusinessGroup", vehicleServiceReportParameterViewModel.BusinessGroup);
+            }
+
+            if (!string.IsNullOrEmpty(vehicleServiceReportParameterViewModel.Center))
+            {
+                typeReportSource.Parameters.Add("paramCenter", vehicleServiceReportParameterViewModel.Center);
+            }
+
+            return typeReportSource;
+        }
+
+        private TypeReportSource ProcessManagementReportFilters(TypeReportSource typeReportSource, ManagementReportParameterViewModel managementReportParameterViewModel)
+        {
+            if (managementReportParameterViewModel.PurchaseYearFrom != null)
+            {
+                typeReportSource.Parameters.Add("paramPurchaseYearFrom", ((DateTime)managementReportParameterViewModel.PurchaseYearFrom).ToString("yyyy"));
+            }
+
+            if (managementReportParameterViewModel.PurchaseYearTo != null)
+            {
+                typeReportSource.Parameters.Add("paramPurchaseYearTo", ((DateTime)managementReportParameterViewModel.PurchaseYearTo).ToString("yyyy"));
+            }
+
+
+            if (!string.IsNullOrEmpty(managementReportParameterViewModel.RegistrationNumber))
+            {
+                typeReportSource.Parameters.Add("paramRegistrationNumber", managementReportParameterViewModel.RegistrationNumber);
+            }
+
+
+            if (!string.IsNullOrEmpty(managementReportParameterViewModel.BusinessUnit))
+            {
+                typeReportSource.Parameters.Add("paramBusinessUnit", managementReportParameterViewModel.BusinessUnit);
+            }
+
+
+            if (!string.IsNullOrEmpty(managementReportParameterViewModel.BusinessGroup))
+            {
+                typeReportSource.Parameters.Add("paramBusinessGroup", managementReportParameterViewModel.BusinessGroup);
+            }
+
+            if (!string.IsNullOrEmpty(managementReportParameterViewModel.Center))
+            {
+                typeReportSource.Parameters.Add("paramCenter", managementReportParameterViewModel.Center);
+            }
+
+            return typeReportSource;
+        }
+
+        private TypeReportSource ProcessIncidentReportFilters(TypeReportSource typeReportSource, VehicleIncidentReportParameterViewModel vehicleIncidentReportParameterViewModel)
+        {
+            if (vehicleIncidentReportParameterViewModel.IncidentDateFrom != null)
+            {
+                typeReportSource.Parameters.Add("paramIncidentDateFrom", vehicleIncidentReportParameterViewModel.IncidentDateFrom);
+            }
+
+            if (vehicleIncidentReportParameterViewModel.IncidentDateTo != null)
+            {
+                typeReportSource.Parameters.Add("paramIncidentDateTo", vehicleIncidentReportParameterViewModel.IncidentDateTo);
+            }
+
+
+            if (!string.IsNullOrEmpty(vehicleIncidentReportParameterViewModel.RegistrationNumber))
+            {
+                typeReportSource.Parameters.Add("paramRegistrationNumber", vehicleIncidentReportParameterViewModel.RegistrationNumber);
+            }
+
+            if (!string.IsNullOrEmpty(vehicleIncidentReportParameterViewModel.IncidentType))
+            {
+                typeReportSource.Parameters.Add("paramIncidentType", vehicleIncidentReportParameterViewModel.IncidentType);
+            }
+
+            if (!string.IsNullOrEmpty(vehicleIncidentReportParameterViewModel.IncidentStatus))
+            {
+                typeReportSource.Parameters.Add("paramIncidentStatus", vehicleIncidentReportParameterViewModel.IncidentStatus);
+            }
+
+            if (!string.IsNullOrEmpty(vehicleIncidentReportParameterViewModel.BusinessUnit))
+            {
+                typeReportSource.Parameters.Add("paramBusinessUnit", vehicleIncidentReportParameterViewModel.BusinessUnit);
+            } 
+
+            if (!string.IsNullOrEmpty(vehicleIncidentReportParameterViewModel.BusinessGroup))
+            {
+                typeReportSource.Parameters.Add("paramBusinessGroup", vehicleIncidentReportParameterViewModel.BusinessGroup);
+            }
+
+            if (!string.IsNullOrEmpty(vehicleIncidentReportParameterViewModel.Center))
+            {
+                typeReportSource.Parameters.Add("paramCenter", vehicleIncidentReportParameterViewModel.Center);
+            }
+
+            return typeReportSource;
+        }
+
+
+    }
+
+    @{
+        TypeReportSource typeReportSource = new TypeReportSource();
+
+        switch (Model.ReportType)
+        {
+            //------- Vehicle Registry Reports ----------------
+            case (int)Parameters.ReportType.VehicleInformationReport:
+                typeReportSource.TypeName = typeof(VehicleInformationReport).AssemblyQualifiedName;
+                typeReportSource = ProcessRegistryReportFilters(typeReportSource, vehicleRegistryReportParameterViewModel);
+                break;
+            case (int)Parameters.ReportType.VehicleAcquisitionReport:
+                typeReportSource.TypeName = typeof(VehicleAcquisitionReport).AssemblyQualifiedName;
+                typeReportSource = ProcessRegistryReportFilters(typeReportSource, vehicleRegistryReportParameterViewModel);
+                break;
+            case (int)Parameters.ReportType.DisposedVehiclesListing:
+                typeReportSource.TypeName = typeof(DisposedVehiclesListing).AssemblyQualifiedName;
+                typeReportSource = ProcessRegistryReportFilters(typeReportSource, vehicleRegistryReportParameterViewModel);
+                break;
+
+            //------- Service Management Reports ----------------
+            case (int)Parameters.ReportType.ServiceDetailsReport:
+                typeReportSource.TypeName = typeof(ServiceDetailsReport).AssemblyQualifiedName;
+                typeReportSource = ProcessServiceReportFilters(typeReportSource, vehicleServiceReportParameterViewModel);
+                break;
+            case (int)Parameters.ReportType.ServiceMonthlySummary:
+                typeReportSource.TypeName = typeof(ServiceMonthlySummary).AssemblyQualifiedName;
+                typeReportSource = ProcessServiceReportFilters(typeReportSource, vehicleServiceReportParameterViewModel);
+                break;
+            case (int)Parameters.ReportType.VehicleScheduleServiceReport:
+                typeReportSource.TypeName = typeof(VehicleScheduleServiceReport).AssemblyQualifiedName;
+                typeReportSource = ProcessServiceReportFilters(typeReportSource, vehicleServiceReportParameterViewModel);
+                break;
+
+            //------- Organization Reports ----------------
+
+
+            //------- Vehicle Allocation Reports ----------------
+            case (int)Parameters.ReportType.AllocatedVehiclesReport:
+                typeReportSource.TypeName = typeof(AllocatedVehiclesReport).AssemblyQualifiedName;
+                break;
+            case (int)Parameters.ReportType.UnAllocatedVehiclesReport:
+                typeReportSource.TypeName = typeof(UnAllocatedVehiclesReport).AssemblyQualifiedName;
+                break;
+
+            //------- Management Reports ----------------
+            case (int)Parameters.ReportType.VehicleActivitiesHistory:
+                typeReportSource.TypeName = typeof(VehicleActivitiesHistory).AssemblyQualifiedName;
+                typeReportSource = ProcessManagementReportFilters(typeReportSource, managementReportParameterViewModel);
+                break;
+
+            //------- Compliance Reports ----------------
+            case (int)Parameters.ReportType.RegistrationExpiry:
+                typeReportSource.TypeName = typeof(RegistrationExpiry).AssemblyQualifiedName;
+                typeReportSource = ProcessComplianceReportFilters(typeReportSource, complianceReportParameterViewModel);
+                break;
+
+            case (int)Parameters.ReportType.SafetyStickerExpiry:
+                typeReportSource.TypeName = typeof(SafetyStickerExpiry).AssemblyQualifiedName;
+                typeReportSource = ProcessComplianceReportFilters(typeReportSource, complianceReportParameterViewModel);
+                break;
+
+            case (int)Parameters.ReportType.VehicleScheduleServiceDueNotice:
+                typeReportSource.TypeName = typeof(VehicleScheduleServiceDueNotice).AssemblyQualifiedName;
+                typeReportSource = ProcessComplianceReportFilters(typeReportSource, complianceReportParameterViewModel);
+                break;
+            case (int)Parameters.ReportType.DriverLicenseExpiry:
+                typeReportSource.TypeName = typeof(DriverLicenseExpiry).AssemblyQualifiedName;
+                typeReportSource = ProcessComplianceReportFilters(typeReportSource, complianceReportParameterViewModel);
+                break;
+            case (int)Parameters.ReportType.ComplianceMonthlySummaryReport:
+                typeReportSource.TypeName = typeof(ComplianceMonthlySummaryReport).AssemblyQualifiedName;
+                typeReportSource = ProcessComplianceReportFilters(typeReportSource, complianceReportParameterViewModel);
+                break;
+
+            //------- Vehicle Incident Reports ----------------
+            case (int)Parameters.ReportType.IncidentStatusReport:
+                typeReportSource.TypeName = typeof(IncidentStatusReport).AssemblyQualifiedName;
+                typeReportSource = ProcessIncidentReportFilters(typeReportSource, vehicleIncidentReportParameterViewModel);
+                break;
+
+            case (int)Parameters.ReportType.DriverInformationReport:
+                typeReportSource.TypeName = typeof(DriverInformationReport).AssemblyQualifiedName;
+                typeReportSource = ProcessIncidentReportFilters(typeReportSource, vehicleIncidentReportParameterViewModel);
+                break;
+
+
+            //------- Fuel Management Reports ----------------
+            case (int)Parameters.ReportType.BowserDailyFuelUsageReport:
+                typeReportSource.TypeName = typeof(BowserDailyFuelUsageReport).AssemblyQualifiedName;
+                typeReportSource = ProcessFuelReportFilters(typeReportSource, fuelManagementReportParameterViewModel);
+                break;
+            case (int)Parameters.ReportType.BowserFuelStatusReport:
+                typeReportSource.TypeName = typeof(BowserFuelStatusReport).AssemblyQualifiedName;
+                typeReportSource = ProcessFuelReportFilters(typeReportSource, fuelManagementReportParameterViewModel);
+                break;
+            case (int)Parameters.ReportType.MonthlyFuelConsumption:
+                typeReportSource.TypeName = typeof(MonthlyFuelConsumption).AssemblyQualifiedName;
+                typeReportSource = ProcessFuelReportFilters(typeReportSource, fuelManagementReportParameterViewModel);
+                break;
+
+            //------- Default Report ----------------
+            default:
+                typeReportSource.TypeName = typeof(VehicleInformationReport).AssemblyQualifiedName;
+                break;
+        }
+
+    }
+
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center">
+        <div class="col-mg-12">
+            <center>
+                @(Html.TelerikReporting().ReportViewer()
+                                                                    // Each report viewer must have an id - it will be used by the initialization script
+                                                                    // to find the element and initialize the report viewer.
+                                                                    .Id("reportViewer")
+
+                                                                    // The URL of the service which will serve reports.
+                                                                    // The URL corresponds to the name of the controller class (ReportsController).
+                                                                    // For more information on how to configure the service please check http://www.telerik.com/help/reporting/telerik-reporting-rest-conception.html.
+                                                                    .ServiceUrl(Url.Content("~/api/reports"))
+                                                                    // The URL for custom report viewer template. The template can be edited -
+                                                                    // new functionalities can be added and unneeded ones can be removed.
+                                                                    // For more information please check http://www.telerik.com/help/reporting/html5-report-viewer-templates.html.
+                                                                    // .TemplateUrl(Url.Content("~/ReportViewer/templates/telerikReportViewerTemplate-12.2.18.1129.html"))
+                                                                    // Strongly typed ReportSource - TypeReportSource or UriReportSource.
+                                                                    //.ReportSource(new TypeReportSource() { TypeName = "FMS.Report.VehicleInformationReport, FMS.Report, Version=12.2.18.1129, Culture=neutral, PublicKeyToken=null" })
+                                                                    .ReportSource(typeReportSource)
+                                                                    // Specifies whether the viewer is in interactive or print preview mode.
+                                                                    // PrintPreview - Displays the paginated report as if it is printed on paper. Interactivity is not enabled.
+                                                                    // Interactive - Displays the report in its original width and height with no paging. Additionally interactivity is enabled.
+                                                                    .ViewMode(ViewMode.Interactive)
+                                                                    // Sets the scale mode of the viewer.
+                                                                    // Three modes exist currently:
+                                                                    // FitPage - The whole report will fit on the page (will zoom in or out), regardless of its width and height.
+                                                                    // FitPageWidth - The report will be zoomed in or out so that the width of the screen and the width of the report match.
+                                                                    // Specific - Uses the scale to zoom in and out the report.
+                                                                    .ScaleMode(ScaleMode.Specific)
+                                                                    // Zoom in and out the report using the scale
+                                                                    // 1.0 is equal to 100%, i.e. the original size of the report
+                                                                    .Scale(1.0)
+                                                                    // Sets whether the viewer’s client session to be persisted between the page’s refreshes(ex. postback).
+                                                                    // The session is stored in the browser’s sessionStorage and is available for the duration of the page session.
+                                                                    .PersistSession(false)
+                                                                    // Sets the print mode of the viewer.
+                                                                    .PrintMode(PrintMode.AutoSelect)
+                                                                    //If set to true shows the Send Mail Message toolbar button
+                                                                    .SendEmail(new SendEmail { Enabled = false })
+                                                                    //Switches accessibility mode ON or OFF.
+                                                                    .EnableAccessibility(false)
+
+
+                )
+            </center>
+        </div>
+    </div>
+
+</body>
+</html>

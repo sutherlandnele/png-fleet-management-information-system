@@ -1,0 +1,181 @@
+﻿@using FMS.Web.CustomHTMLHelpers
+@using FMS.Common
+@model FMS.Web.ViewModels.ClientInformationEditViewModel
+
+@{
+    ViewBag.Title = "Company Information";
+}
+
+<div class="container-fluid" style="margin-top:15px">
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters h-100 justify-content-center align-items-center">
+
+        <div class="col-md-12">
+
+            @using (Html.BeginForm("UpdateCompany","OrganisationManagement",FormMethod.Post))
+            {
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.AntiForgeryToken()
+                <div class="container-fluid" id="FormContainer" style="margin-bottom:15px;">
+                    <div class="row no-gutters h-100 justify-content-center align-items-center">
+                        <div class="col-md-6">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.ClientName)</th>
+                                        <td>
+                                            @Html.HiddenFor(m => m.Id)
+                                            @(Html.Kendo().MaskedTextBoxFor(m => m.ClientName)
+                                                                                                .HtmlAttributes(new { style = "width:100%;max-width:170px" })
+                                            )
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.PostalAddress)</th>
+                                        <td>
+                                            @Html.TextAreaFor(m => m.PostalAddress, htmlAttributes: new { @class = "k-textbox", id = "PostalAddress", style = "resize:none;width:100%;max-width:170px;height:100px;" })
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.BusinessAddress)</th>
+                                        <td>
+                                            @Html.TextAreaFor(m => m.BusinessAddress, htmlAttributes: new { @class = "k-textbox", id = "BusinessAddress", style = "resize:none;width:100%;max-width:170px;height:100px;" })
+                                        </td>
+                                    </tr>
+
+
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.Telephone)</th>
+                                        <td>
+                                            @(Html.Kendo().MaskedTextBoxFor(m => m.Telephone)
+                                                                       .HtmlAttributes(new { style = "width:100%;max-width:170px" })
+                                            )
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.Facsimile)</th>
+                                        <td>
+                                            @(Html.Kendo().MaskedTextBoxFor(m => m.Facsimile)
+                                                                                                                        .HtmlAttributes(new { style = "width:100%;max-width:170px" })
+                                            )
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.Logo)</th>
+                                        <td>
+                                            @{
+
+                                                var base64 = Convert.ToBase64String(Model.Logo);
+                                                var imgSrc = String.Format("data:image/gif;base64,{0}", base64);
+
+                                            }
+                                            <div style="width:320px; height:120px;margin: 10px 0px 10px 0px"><img style="max-height:100%;max-width:100%;" src="@imgSrc" /></div>
+
+                                            @Html.HiddenFor(model => model.Logo)
+                                            @(Html.Kendo().Upload()
+                                                                         .Name("logoFiles")
+                                                                         .Multiple(false)
+                                                                         .Validation(action =>
+                                                                         {
+                                                                             action.AllowedExtensions(new string[] { ".jpg", ".gif", ".png" });
+                                                                             action.MaxFileSize(3145728);
+                                                                         }
+                                                                      )
+                                            )
+                                            <div style="font-style:italic; font-size:12px;">You can only upload<strong> GIF</strong> ,<strong> JPG</strong> and<strong> PNG</strong> files. Max. file size allowed is <strong>3MB</strong></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.Slogan)</th>
+                                        <td>
+                                            @(Html.Kendo().TextBoxFor(m => m.Slogan)
+                                                                                .HtmlAttributes(new { style = "width:100%;max-width:170px" })
+                                            )
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.Email)</th>
+                                        <td>
+                                            @(Html.Kendo().TextBoxFor(m => m.Email)
+                                                                                       .HtmlAttributes(new { placeholder = "e.g myname@example.net", style = "width:100%;max-width:170px" })
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="Email"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.Website)</th>
+                                        <td>
+                                            @(Html.Kendo().TextBoxFor(m => m.Website)
+                                                                                                                                .HtmlAttributes(new { style = "width:100%;max-width:170px" })
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="Website"></span>
+                                        </td>
+                                    </tr>
+
+
+
+
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row no-gutters h-100 justify-content-center align-items-center">
+                        <div class="col-md-12" style="margin-bottom: -10px;margin-top: -30px;">
+                            <hr />
+                        </div>
+                    </div>
+                    <div class="row no-gutters h-100 justify-content-center align-items-center" style="float: right;margin-right: 50px;">
+                        <div class="col-md-12">
+                            <div>
+                                @(Html.Kendo().Button()
+                                            .Name("btnBottomSave")
+                                            .Icon("save")
+                                            .Content("Save")
+                                            .HtmlAttributes(new { type = "submit", @class = "k-button k-primary" })
+                                )
+                                @(Html.Kendo().Button()
+                                            .Name("btnBottomCancel")
+                                            .Content("Back")
+                                            .HtmlAttributes(new { type = "button", @class = "k-button" })
+                                            .Icon("undo")
+                                )
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+
+        $("#btnBottomCancel").click(function (event) {
+            var newSrc = "NA";
+            window.location.href = "/Home/Index";
+        });
+
+    });
+
+</script>

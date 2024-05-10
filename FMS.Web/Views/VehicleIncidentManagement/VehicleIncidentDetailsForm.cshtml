@@ -1,0 +1,376 @@
+﻿@using FMS.Web.CustomHTMLHelpers
+@using FMS.Common
+@model FMS.Web.ViewModels.IncidentEditViewModel
+
+@{
+    ViewBag.Title = "Vehicle Incident Details";
+
+
+    FileInfo incidentRptFileInfo = null;
+
+    if (!string.IsNullOrEmpty(Model.IncidentFileName))
+    {
+        var fileNameIncidentRpt = Server.MapPath(Parameters.AppConstant.INCRPT_PATH + "/" + Model.IncidentFileName);
+
+        if (System.IO.File.Exists(fileNameIncidentRpt))
+        {
+            incidentRptFileInfo = new System.IO.FileInfo(fileNameIncidentRpt);
+        }
+    }
+
+
+}
+
+<div class="container-fluid" style="margin-top:15px">
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters h-100 justify-content-center align-items-center">
+
+        <div class="col-md-10">
+
+            @using (Html.BeginForm("frmVehicleIncidentDetails"))
+            {
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.AntiForgeryToken()
+                <div class="container-fluid" id="FormContainer" style="margin-bottom:15px;">
+                    <div class="row no-gutters h-100 justify-content-center align-items-center">
+                        <div class="col-md-6">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th> @Html.LabelForRequired(m => m.IncidentFileNumber)</th>
+                                        <td>
+                                            @Html.HiddenFor(m => m.Id)
+                                            @Html.HiddenFor(model => model.CreatedBy)
+                                            @Html.HiddenFor(model => model.CreatedDate)
+                                            @(Html.Kendo().TextBoxFor(m => m.IncidentFileNumber))
+                                            <br /><span class="k-invalid-msg" data-for="IncidentFileNumber"></span>
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style="float:right;">@Html.LabelForRequired(m => m.IncidentStatusId)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.IncidentStatusId)
+                                                                            .DataValueField("Value")
+                                                                            .DataTextField("Text")
+                                                                            .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                            .Filter(FilterType.Contains)
+                                                                            .ValuePrimitive(true)
+                                                                            .HtmlAttributes(new { style = "width:170px" })
+                                                                            .BindTo((System.Collections.IEnumerable)ViewBag.IncidentStatuses)
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="IncidentStatusId"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style="float:right;">@Html.LabelForRequired(m => m.IncidentTypeId)</th>
+                                        <td>
+                                            @(Html.Kendo().DropDownListFor(m => m.IncidentTypeId)
+                                                                        .DataValueField("Value")
+                                                                        .DataTextField("Text")
+                                                                        .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                        .Filter(FilterType.Contains)
+                                                                        .ValuePrimitive(true)
+                                                                        .HtmlAttributes(new { style = "width:170px" })
+                                                                        .BindTo((System.Collections.IEnumerable)ViewBag.IncidentTypes)
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="IncidentTypeId"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.LabelForRequired(m => m.DateAndTime)</th>
+                                        <td>
+                                            @Html.EditorFor(m => m.DateAndTime)
+                                            <br /><span class="k-invalid-msg" data-for="DateAndTime"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <!--Vehicle dropdown list -->
+                                        <th> @Html.LabelForRequired(m => m.VehicleId)</th>
+                                        <td>
+                                            @Html.EditorFor(m => m.VehicleId)
+                                            <br /><span class="k-invalid-msg" data-for="VehicleId"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <!--Driver dropdown list -->
+                                        <th> @Html.LabelForRequired(m => m.OperatorId)</th>
+                                        <td>
+                                            @Html.EditorFor(m => m.OperatorId)
+                                            <br /><span class="k-invalid-msg" data-for="OperatorId"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.Location)</th>
+                                        <td>
+                                            @(Html.Kendo().TextBoxFor(m => m.Location)
+                                                                                .HtmlAttributes(new { style = "width:170px" })
+                                            )
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.Description)</th>
+                                        <td colspan="2">
+                                            @Html.TextAreaFor(model => model.Description, htmlAttributes: new { @class = "k-textbox", id = "Comments", style = "resize:none;width:300px;height:100px;" })
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+
+                                    <tr>
+
+                                        <td>
+                                            @(Html.Kendo().CheckBoxFor(m => m.RequiredService))
+                                        </td>
+                                    </tr>
+                                    <tr>
+
+                                        <td>
+                                            @(Html.Kendo().CheckBoxFor(m => m.ServiceDone))
+                                        </td>
+                                    </tr>
+                                    <tr>
+
+                                        <td>
+                                            @(Html.Kendo().CheckBoxFor(m => m.HasReport))
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <fieldset id="fldsAccidentReportDetails">
+                                                <legend style="font-size:14px !important">Accident Report Details</legend>
+                                                <div class="table-responsive">
+                                                    <table class="table no-border">
+                                                        <tr>
+                                                            <th>@Html.LabelFor(model => model.IncidentFileName, htmlAttributes: new { @class = "vwLabel" })</th>
+                                                            <td>
+                                                                @Html.HiddenFor(model => model.IncidentFileName)
+                                                                @(Html.Kendo().Upload()
+                                                                                                                .Name("files")
+                                                                                                                .Multiple(false)
+                                                                                                                .Validation(action =>
+                                                                                                                 {
+                                                                                                                     action.AllowedExtensions(new string[] { ".doc", ".docx", ".pdf" });
+                                                                                                                     action.MaxFileSize(3145728);
+                                                                                                                 })
+                                                                                                                .Async(a => a
+                                                                                                                    .Save("File_Add", "VehicleIncidentManagement")
+                                                                                                                    .Remove("File_Remove", "VehicleIncidentManagement")
+                                                                                                                    .AutoUpload(true)
+                                                                                                                )
+                                                                                                                .Events(events => events
+                                                                                                                    .Upload("onUpload")
+                                                                                                                    .Remove("onRemove")
+                                                                                                                )
+                                                                                                                .Files(files =>
+                                                                                                                {
+
+                                                                                                                    if (incidentRptFileInfo != null)
+                                                                                                                    {
+                                                                                                                        files.Add()
+                                                                                                                            .Name(incidentRptFileInfo.Name)
+                                                                                                                            .Extension(incidentRptFileInfo.Extension)
+                                                                                                                            .Size(incidentRptFileInfo.Length);
+                                                                                                                    }
+                                                                                                                }
+                                                                                                                )
+                                                                )
+                                                                <div style="font-style:italic; font-size:12px;">You can only upload<strong> DOC</strong> ,<strong> DOCX</strong> and<strong> PDF</strong> files. Max. file size allowed is <strong>3MB</strong></div>
+                                                                @if (incidentRptFileInfo != null)
+                                                                {
+                                                                    @(Html.Kendo().Button()
+                                                                                                                .Name("btnDownloadReport")
+                                                                                                                .Content("Download Report")
+                                                                                                                .HtmlAttributes(new { type = "button", style = "margin-top:5px;" })
+                                                                                                                .Events(ev => ev.Click("onDownloadClick"))
+                                                                    )
+                                                                }
+
+
+                                                            </td>
+
+
+                                                        </tr>
+
+                                                        <tr>
+                                                            <th>@Html.LabelFor(m => m.DateofAccident, new { style = "font-weight:normal" })</th>
+                                                            <td>
+                                                                @Html.EditorFor(m => m.DateofAccident)
+                                                            </td>
+                                                        </tr>
+
+                                                    </table>
+                                                </div>
+                                            </fieldset>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th> @Html.LabelFor(model => model.CreatedByDisplay, htmlAttributes: new { @class = "vwLabel" })</th>
+                                        <td>
+                                            <span>@Html.DisplayFor(model => model.CreatedByDisplay)</span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th> @Html.LabelFor(model => model.CreatedDateDisplay, htmlAttributes: new { @class = "vwLabel" })</th>
+                                        <td>
+                                            <span>@Html.DisplayFor(model => model.CreatedDateDisplay)</span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th> @Html.LabelFor(model => model.LastUpdatedBy, htmlAttributes: new { @class = "vwLabel" })</th>
+                                        <td>
+                                            <span>@Html.DisplayFor(model => model.LastUpdatedBy)</span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th> @Html.LabelFor(model => model.LastUpdatedDate, htmlAttributes: new { @class = "vwLabel" })</th>
+                                        <td>
+                                            <span>@Html.DisplayFor(model => model.LastUpdatedDate)</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters h-100 justify-content-center align-items-center">
+                        <div class="col-md-12" style="margin-bottom: -10px;margin-top: -30px;">
+                            <hr />
+                        </div>
+                    </div>
+                    <div class="row no-gutters h-100 justify-content-center align-items-center" style="float: right;margin-right: 50px;">
+                        <div class="col-md-12">
+                            <div>
+                                @(Html.Kendo().Button()
+                                            .Name("btnBottomSave")
+                                            .Icon("save")
+                                            .Content("Save")
+                                            .HtmlAttributes(new { type = "submit", @class = "k-button k-primary" })
+                                )
+                                @(Html.Kendo().Button()
+                                            .Name("btnBottomCancel")
+                                            .Content("Back")
+                                            .HtmlAttributes(new { type = "button", @class = "k-button" })
+                                            .Icon("undo")
+                                )
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-md-2">
+            <!--Vehicle Info-->
+            @Html.DisplayFor(m => m.VehicleDisplayInfoViewModel, "VehicleInfoDisplay")
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+
+    var nextVehicleServiceJobNumber;
+
+    var drpScheduleServiceType;
+    var drpIncident;
+
+
+
+    $(document).ready(function () {
+        $("#btnBottomCancel").click(function (event) {
+            var newSrc = "NA";
+            window.location.href = document.referrer.replace(/(message=).*?(&)/, '$1' + newSrc + '$2');
+        });
+
+        drpScheduleServiceType = $("#ScheduleServiceTypeId").data("kendoDropDownList");
+        drpIncident = $("#IncidentId").data("kendoDropDownList");
+
+
+        if ($("#VehicleId").data("kendoDropDownList").value()) {
+            $("#VehicleId").data("kendoDropDownList").trigger("change");
+        }
+
+        checkToggleDisableAccidentReportFieldSet();
+
+        $("#HasReport").change(function () {
+            if (this.checked) {
+                toggleDisableAccidentReportFieldSet(false);
+            }
+            else {
+                toggleDisableAccidentReportFieldSet(true);
+            }
+        });
+
+    });
+
+
+
+    function onDownloadClick(e) {
+        e.preventDefault();
+        @if (incidentRptFileInfo != null) {
+            <text>
+                window.location.href = '@Url.Action("DownloadFile", "VehicleIncidentManagement")?fileName=@incidentRptFileInfo.Name';
+            </text>
+        }
+    }
+
+
+
+    function onUpload(e) {
+        $("#IncidentFileName").val(e.files[0].name);
+        e.data = { fileType: "VehicleIncidentReport" };
+    }
+
+    function onRemove(e) {
+        $("#IncidentFileName").val("");
+        $("#btnDownloadReport").hide();
+    }
+
+    $("#VehicleId").change(function (e) {
+        populateVehicleInfoBox(e.target.value);
+    });
+
+    $("#frmVehicleIncidentDetails").submit(function (event) {
+        event.preventDefault();
+        ajaxCreateUpdate(this, $("#Id").val(), "VehicleIncidentManagement", "CreateVehicleIncidentDetails", "UpdateVehicleIncidentDetails", "VehicleIncidents", "");
+    });
+
+    function toggleDisableAccidentReportFieldSet(isDisable) {
+        if (isDisable) {
+            $("#btnDownloadReport").prop("disabled", true);
+            $("#files").data("kendoUpload").disable();
+            $("#DateofAccident").data("kendoDatePicker").enable(false);
+        }
+        else {
+            $("#btnDownloadReport").prop("disabled", false);
+            $("#files").data("kendoUpload").enable();
+            $("#DateofAccident").data("kendoDatePicker").enable(true);
+        }
+    }
+
+    function checkToggleDisableAccidentReportFieldSet() {
+        if ($("#HasReport").prop('checked')) {
+            toggleDisableAccidentReportFieldSet(false);
+        }
+        else {
+            toggleDisableAccidentReportFieldSet(true);
+        }
+    }
+
+
+
+    </script>
+    }

@@ -1,0 +1,103 @@
+﻿@using FMS.Web.CustomHTMLHelpers
+@using FMS.Common
+@model FMS.Web.ViewModels.BusinessGroupDisplayViewModel
+
+@{
+    ViewBag.Title = "Business Group Details";
+}
+
+<div id="view-details" class="container-fluid" style="margin-top:15px">
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters h-100 justify-content-center align-items-center">
+
+        <div class="col-md-10">
+
+            <div class="container-fluid" id="FormContainer" style="margin-bottom:15px;">
+                <div class="row no-gutters h-100 justify-content-center align-items-center">
+                    <div class="col-md-6">
+                        <div class="table-responsive">
+                            <table class="table no-border">
+
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.GroupName)</th>
+                                    <td>
+                                        @Html.HiddenFor(m => m.GroupNumber)
+                                        @Html.DisplayFor(m => m.GroupName)
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.BusinessUnit)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.BusinessUnit)
+                                    </td>
+                                </tr>
+
+
+
+
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="table-responsive">
+                            <table class="table no-border">
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.Manager)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.Manager)
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters h-100 justify-content-center align-items-center">
+                    <div class="col-md-12" style="margin-bottom: -10px;margin-top: -30px;">
+                        <hr />
+                    </div>
+                </div>
+                <div class="row no-gutters h-100 justify-content-center align-items-center" style="float: right;margin-right: 50px;">
+                    <div class="col-md-12">
+                        <div>
+                            @(Html.Kendo().Button()
+                                                                        .Name("btnBottomCancel")
+                                                                        .Content("Back")
+                                                                        .HtmlAttributes(new { type = "button", @class = "k-button" })
+                                                                        .Icon("undo")
+                            )
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-2">
+            @Html.DisplayFor(m => m.contactDetailDisplayViewModel, "ContactInfoDisplay")
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+
+        $(document).ready(function () {
+
+            $("#btnBottomCancel").click(function (event) {
+                var newSrc = "NA";
+                window.location.href = document.referrer.replace(/(message=).*?(&)/, '$1' + newSrc + '$2');
+            });
+
+        });
+
+
+    </script>
+    }

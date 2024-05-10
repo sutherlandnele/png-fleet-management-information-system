@@ -1,0 +1,248 @@
+﻿@using FMS.Web.ViewModels
+
+@{
+    ViewBag.Title = "Home";
+}
+
+<div class="container-fluid">
+
+    <div class="row">
+
+        <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <!--Fuel Usage Graph-->
+                @(Html.Kendo().Chart<FuelUsageBarChartViewModel>()
+                    .Name("chtFuelUsageByDate")
+                    .Title("Fuel Usage in Litres By Month")
+                    .Legend(legend => legend
+                        .Position(ChartLegendPosition.Top)
+                    )
+                    .DataSource(ds => ds.Read(read =>
+                        read.Action("FuelUsageByDate", "Home").Data("additionalFuelUsageByDateChartData")
+                      )
+                    )
+                    .Series(series =>
+                    {
+                        series.Column(model => model.Litres).Name("Litres").CategoryField("Date").Color("#00FF1D");
+                    })
+                    .CategoryAxis(axis => axis
+                        .Labels(labels => labels.Rotation(-90))
+                        .MajorGridLines(lines => lines.Visible(false))
+
+                    )
+                    .ValueAxis(axis => axis.Numeric()
+                        .Labels(labels => labels.Format("{0:N0}"))
+                        .MajorUnit(5000)
+                        .Line(line => line.Visible(false))
+                    )
+                    .Tooltip(tooltip => tooltip
+                        .Visible(true)
+                        .Format("{0:N0} litres")
+                    )
+                        .Events(events => events
+                        .DataBound("onFuelUsageByDateChartDatabound")
+
+                        )
+
+                )
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <!--Vehicle Status Graph -->
+
+                @(Html.Kendo().Chart<VehicleStatusBarChartViewModel>()
+                        .Name("chtVehicleStatus")
+                        .Title("Vehicle Status Count")
+                        .Legend(legend => legend
+                            .Position(ChartLegendPosition.Top)
+                        )
+                        .DataSource(ds => ds.Read(read =>
+                            read.Action("VehicleStatusCount", "Home").Data("additionalVehicleStatusChartData")
+                          )
+                        )
+                        .Series(series =>
+                        {
+                            series.Column(model => model.Count).Name("Count").CategoryField("Status");
+                        })
+                        .CategoryAxis(axis => axis
+                            .Labels(labels => labels.Rotation(-90))
+                            .MajorGridLines(lines => lines.Visible(false))
+
+                        )
+                        .ValueAxis(axis => axis.Numeric()
+                            .Labels(labels => labels.Format("{0:N0}"))
+                            .MajorUnit(100)
+                            .Line(line => line.Visible(false))
+                        )
+                        .Tooltip(tooltip => tooltip
+                            .Visible(true)
+                            .Format("{0:N0}")
+                        )
+                            .Events(events => events
+                            .DataBound("onVehicleStatusCountChartDatabound")
+
+                            )
+
+                )
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <!--Current Online Users-->
+                <div class="panel panel-info" style="max-width: 360px;">
+                    <div class="panel-heading" id="online-users-heading">Online Users</div>
+                    <div class="panel-body">
+                        <ul id="online-users"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <!--Center Selection checkbox section-->
+                @{if (ViewBag.UserHasCenterAccess)
+                    {
+                        <h4>Center Selection</h4>
+                        @(Html.Kendo().TreeView()
+                                    .Name("tviewCenterSelection")
+                                    .ExpandAll(true)
+                                    .DataTextField("Name")
+                                    .Checkboxes(checkboxes => checkboxes
+                                        .Name("checkedCenters")
+                                        .CheckChildren(true)
+
+                                    )
+                                    .DataSource(dataSource => dataSource
+                                        .Read(read => read
+                                            .Action("GetUserCenters", "Home")
+                                        )
+                                    )
+
+                                        .Events(events => events
+                                        .Check("onTreeViewCheck")
+                                        .DataBound("onTreeViewDatabound")
+
+                                        )
+
+
+                        )
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .k-treeview .k-in.k-state-hover, .k-treeview .k-in.k-state-selected, .k-treeview .k-state-focused {
+        cursor: default;
+        background-color: transparent;
+        border-color: none;
+        box-shadow: none;
+    }
+</style>
+
+@section scripts{
+
+    <script type="text/javascript">
+
+
+        function onSelect(e) {
+
+            e.preventDefault();
+        }
+
+        //global documument variables
+        var tviewCenterSelection;
+        var selectedUserCenterIds = [];
+        var chtVehicleStatus;
+        var isInitialLoad = true;
+
+        $(document).ready(function () {
+
+            tviewCenterSelection = $("#tviewCenterSelection").data("kendoTreeView");
+            chtVehicleStatus = $("#chtVehicleStatus").getKendoChart();
+            chtFuelUsageByDate = $("#chtFuelUsageByDate").getKendoChart();
+
+
+
+            window.hubReady.done(function () {
+
+                //get connected users using SignalR
+                $.connection.comsHub.server.getAllActiveConnections().done(function (connections) {
+                    var count = connections.length;
+
+                    $("#online-users-heading").text("Online Users (" + count + ")");
+
+                    $.map(connections, function (item) {
+                        $("#online-users").append("<li>" + item + "</li>");
+                    });
+                });
+            });
+        });
+
+        function getSelectedCenterIds() {
+
+            var cIds = [];
+            var selectedItems = tviewCenterSelection.getCheckedItems();
+
+            if (selectedItems.length > 0) {
+                //remove root node
+                for (var i = 0; i < selectedItems.length; i++) {
+                    if (selectedItems[i].id === 0) {
+                        selectedItems.splice(i, 1);
+                    }
+                    else {
+
+                        cIds.push(selectedItems[i].id)
+                    }
+                }
+            }
+
+            return cIds;
+
+        }
+
+        function onTreeViewCheck(e) {
+
+            isInitialLoad = false;
+            selectedUserCenterIds = getSelectedCenterIds();
+
+            chtVehicleStatus.dataSource.read();
+            chtFuelUsageByDate.dataSource.read();
+        }
+
+        function onTreeViewDatabound(e) {
+
+            tviewCenterSelection.expand('.k-item');
+
+            tviewCenterSelection.dataSource.view()[0].set("checked", true);
+
+            selectedUserCenterIds = getSelectedCenterIds();
+        }
+
+        function onFuelUsageByDateChartDatabound(e) {
+
+        }
+
+        function onVehicleStatusCountChartDatabound(e) {
+
+        }
+
+        function additionalFuelUsageByDateChartData() {
+            return {
+
+                centerIds: selectedUserCenterIds,
+                isInitialLoad: isInitialLoad
+            }
+        }
+
+        function additionalVehicleStatusChartData() {
+
+            return {
+
+                centerIds: selectedUserCenterIds,
+                isInitialLoad: isInitialLoad
+            }
+        }
+
+    </script>
+    }

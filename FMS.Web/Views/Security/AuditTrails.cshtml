@@ -1,0 +1,268 @@
+﻿
+@{
+    ViewBag.Title = "Audit Trail";
+    //set UI visibility permissions   
+    var canPurgeAuditTrail = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionManageAudit"];
+
+
+}
+<div class="container-fluid">
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            <fieldset id="fldsUserDetailsSearch">
+                <legend>Search</legend>
+                @Html.Label("Start Date", new { style = "font-weight:normal" })
+                @(Html.Kendo().DatePicker()
+                                                    .Name("dtStartDate")
+                                                    .HtmlAttributes(new { style = "width:100%;max-width:170px" })
+                )
+                @Html.Label("End Date", new { style = "font-weight:normal" })
+                @(Html.Kendo().DatePicker()
+                                    .Name("dtEndDate")
+                                    .HtmlAttributes(new { style = "width:100%;max-width:170px" })
+                )
+
+
+                @(Html.Kendo().Button()
+                                                        .Name("btnSearch")
+                                                        .HtmlAttributes(new { type = "button", @class = "k-primary" })
+                                                            .Content("<span class='k-icon' title='Search'></span>")
+                                                        .Icon("search")
+                                                        .Events(events =>
+                                                        {
+                                                            events.Click("onSearchButtonClick");
+                                                        })
+                )
+
+                @(Html.Kendo().Button()
+                                                        .Name("btnReset")
+                                                        .Tag("em")
+                                                        .Icon("refresh")
+                                                        .Content("<span class='k-icon' title='Refresh'></span>")
+                                                        .HtmlAttributes(new { @title = "Reset" })
+                                                        .Events(events =>
+                                                        {
+                                                            events.Click("onResetButtonClick");
+                                                        })
+                )
+
+                @if (canPurgeAuditTrail)
+                {
+                    @(Html.Kendo().Button()
+                        .Name("btnPurge")
+                        .Tag("em")
+                        .Icon("trash")
+                        .Content("<span class='k-icon'></span>Purge All")
+                        .HtmlAttributes(new { style = "float:right;" })
+                        .Events(events =>
+                        {
+                            events.Click("onPurgeAllButtonClick");
+                        })
+                    )
+                }
+            </fieldset>
+
+            @(Html.Kendo().Grid<FMS.Web.ViewModels.SqlAuditViewModel>()
+                .Name("gridAuditTrails")
+                .Columns(columns =>
+                {
+                    columns.Bound(vm => vm.DateAndTime);
+                    columns.Bound(vm => vm.Username).Width(250);
+                    columns.Bound(vm => vm.Role);
+                    columns.Bound(vm => vm.ComputerName);
+                    columns.Bound(vm => vm.SubSystem);
+                    columns.Bound(vm => vm.DatabaseTable);
+                    columns.Bound(vm => vm.DatabaseAction);
+                })
+                    .Pageable()
+                    .Sortable()
+                    .Scrollable(s => s.Height("auto"))
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(20)
+                        .Events(events => events.Error("onError"))
+                        .Model(model =>
+                        {
+                            model.Id(vm => vm.Id);
+                        })
+                        .Read(read => read.Action("GetSqlAuditList", "Security").Data("gridFilterParams"))
+
+                    )
+     )                  
+
+            
+
+        </div>
+    </div>
+    <div id="wndDeleteConfirmation"></div>
+</div>
+
+
+@section scripts{
+
+    <script type="text/x-kendo-template" id="templateDeleteConfirmation">
+        <div class="modalWindow">
+            <h2>Are you sure you want to delete all the audit trail records? Note that it will take a while to purge all the records, depending on the current number of records. During the purging process, the system may be inaccessible. It is recommended that you do the purging in a separate browser tab.</h2>
+            <button id="yes" class="k-button">Yes</button>
+            <button id="no" class="k-button k-primary">No</button>
+        </div>
+    </script>
+
+
+    <script type="text/javascript">
+
+        //global documument variables
+        var gridData;
+        var onlineUsers;
+
+        $(document).ready(function () {
+
+
+            //initialize the kendo delete confirmation modal window
+            templateDeleteConfirmation = kendo.template($("#templateDeleteConfirmation").html());
+
+            windowDeleteConfirmation = $("#wndDeleteConfirmation").kendoWindow({
+                title: "Purge All Confirmation",
+                modal: true,
+                visible: false,
+                resizable: false,
+                width: 300
+            }).data("kendoWindow");
+
+            //tooltips
+            $("#gridAuditTrails").kendoTooltip({ filter: "a[title]" });
+            $("#gridAuditTrails").kendoTooltip({ filter: "span>a>i.fa.fa-lock[title]" });
+            $("#gridAuditTrails").kendoTooltip({ filter: "span>i.fa.fa-unlock[title]" });
+
+            gridData = $("#gridAuditTrails").data("kendoGrid");
+
+        });
+
+        function onError(e) {
+            if (e.errors) {
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                App.notification.show({
+                    message: message
+                }, "error");
+            }
+        }
+
+
+
+        function gridFilterParams() {
+            return {
+                startDate: $("#dtStartDate").data("kendoDatePicker").value(),             
+                endDate: $("#dtEndDate").data("kendoDatePicker").value()      
+            }
+        }
+        function onSearchButtonClick(e) {
+            e.preventDefault();
+            gridData.dataSource.query({ page: 1, pageSize: 20 });
+        }
+        function onResetButtonClick(e) {
+            e.preventDefault();
+            $("#dtStartDate").data("kendoDatePicker").value("");
+            $("#dtEndDate").data("kendoDatePicker").value("");
+            gridData.dataSource.read();
+        }
+
+
+        function onPurgeAllButtonClick(e) {
+
+            e.preventDefault();
+            var dataItem = "";
+            var startDate = $("#dtStartDate").val();
+            var endDate = $("#dtEndDate").val();
+
+            windowDeleteConfirmation.content(templateDeleteConfirmation(dataItem));
+
+            windowDeleteConfirmation.center().open();
+
+            $("#yes").click(function () {
+                windowDeleteConfirmation.close();
+                purgeAll(startDate,endDate);
+            });
+
+            $("#no").click(function () {
+                windowDeleteConfirmation.close();
+            });
+        }
+
+        function purgeAll(startDate,endDate) {
+           
+            $.when(ajaxPurgeAll("/Security/PurgeAll",startDate,endDate)).done(function (data, statusText, jqXHR) {
+
+
+                $.when(gridData.dataSource.read()).done(function (data2, statusText2, jqXHR2) {
+
+                    if (statusText == "success") {
+
+                        if (data.isError) {
+                            App.notification.show({
+                                message: data.message
+                            }, "error");
+                        }
+                        else {
+
+                            App.notification.show({
+                                message: data.message
+                            }, "success");
+                        }
+                    }
+
+                });
+
+            });
+        }
+
+        function ajaxPurgeAll(action, startDate, endDate) {          
+
+            kendo.ui.progress.messages = {
+                loading: "Purging records...Please wait..."
+            };
+            return $.ajax({
+                type: "POST",
+                url: action,
+                data: AddAntiForgeryToken({ startDate: startDate, endDate: endDate}),
+                dataType: "json",
+                async: true,
+                beforeSend: function (xhr) {
+                    //show progress bar
+                    
+                    kendo.ui.progress($("#progressIndicator"), true); //need to render progress indicator dom elements first ...
+                    $("#progressIndicator .k-loading-text").css("display", "inline");    //... then you can refer to it with this...
+                },
+                success: function (result, status, jqXHR) {
+                },
+                error: function (xhr, status, error) {
+                    App.notification.show({
+                        message: "An error occured: " + xhr.status + " " + xhr.statusText
+                    }, "error");
+
+                },
+                complete: function (xhr, status) {
+                    $("#progressIndicator .k-loading-text").css("display", "none");
+                    kendo.ui.progress($("#progressIndicator"), false);                  
+                }
+            });
+        }
+
+    </script>
+}

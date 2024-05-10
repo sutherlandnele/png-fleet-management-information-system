@@ -1,0 +1,254 @@
+﻿@using FMS.Web.CustomHTMLHelpers
+@model FMS.Web.ViewModels.VehicleRefuelDisplayViewModel
+
+@{
+    ViewBag.Title = "View Vehicle Refuel Details";
+}
+
+<div class="container-fluid" id="view-details" style="margin-top:15px">
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+            <div class="container-fluid" style="margin-bottom:15px;">
+                <div class="row no-gutters h-100 justify-content-center align-items-center">
+                    <div class="col-md-3">
+                        <div class="table-responsive">
+                            <table class="table no-border">
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.VoucherNumber)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.VoucherNumber)
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="table-responsive">
+                            <table class="table no-border">
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.Center)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.Center)
+                                    </td>
+                                </tr>
+
+
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="table-responsive">
+                            <table class="table no-border">
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.Date)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.Date)
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="table-responsive">
+                            <table class="table no-border">
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.IsBowserFuel)</th>
+                                    <td>
+                                        @{if (Model.IsBowserFuel == true)
+                                            {
+                                                @Html.Raw("Yes")
+                                            }
+                                            else
+                                            {
+                                                @Html.Raw("No") }
+                                        }
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters h-100 justify-content-center align-items-center">
+                    <div class="col-md-12" style="margin-bottom: -10px;margin-top: -30px;">
+                        <hr />
+                    </div>
+                </div>
+                <div class="row no-gutters h-100 justify-content-center align-items-center">
+                    <div class="col-md-4">
+                        <div class="table-responsive">
+                            <table class="table no-border">
+                                <tr>
+
+                                    @{if (Model.IsBowserFuel == true)
+                                        {
+                                            <th>@Html.LabelFor(m => m.BowserNumber)</th>
+                                            <td>
+                                                @Html.DisplayFor(m => m.BowserNumber)
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <th>@Html.LabelFor(m => m.FuelDistributor)</th>
+                                            <td>
+                                                @Html.DisplayFor(m => m.FuelDistributor)
+                                            </td>
+                                        }
+                                    }
+
+
+                                </tr>
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.VehicleRegistrationNumber)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.VehicleRegistrationNumber)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.Litres)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.Litres)
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.IsVoucherAcquitted)</th>
+                                    <td>
+                                        @{if (Model.IsVoucherAcquitted == true)
+                                            {
+                                                @Html.Raw("Yes")
+                                            }
+                                            else
+                                            {
+                                                @Html.Raw("No") }
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th> @Html.LabelFor(model => model.CreatedDate, htmlAttributes: new { @class = "vwLabel" })</th>
+                                    <td>
+                                        <span>@Html.DisplayFor(model => model.CreatedDate)</span>
+                                    </td>
+                                </tr>
+
+
+
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="table-responsive">
+                            <table class="table no-border">
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.FuelType)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.FuelType)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.Operator)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.Operator)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.UnitCost)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.UnitCost)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.VoucherReceiptNumber)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.VoucherReceiptNumber)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th> @Html.LabelFor(model => model.LastUpdatedBy, htmlAttributes: new { @class = "vwLabel" })</th>
+                                    <td>
+                                        <span>@Html.DisplayFor(model => model.LastUpdatedBy)</span>
+                                    </td>
+                                </tr>
+
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="table-responsive">
+                            <table class="table no-border">
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.FuelUsageCategory)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.FuelUsageCategory)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.Mileage)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.Mileage)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>@Html.LabelFor(m => m.TotalCost)</th>
+                                    <td>
+                                        @Html.DisplayFor(m => m.TotalCost)
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th> @Html.LabelFor(model => model.CreatedBy, htmlAttributes: new { @class = "vwLabel" })</th>
+                                    <td>
+                                        <span>@Html.DisplayFor(model => model.CreatedBy)</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th> @Html.LabelFor(model => model.LastUpdatedDate, htmlAttributes: new { @class = "vwLabel" })</th>
+                                    <td>
+                                        <span>@Html.DisplayFor(model => model.LastUpdatedDate)</span>
+                                    </td>
+                                </tr>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters h-100 justify-content-center align-items-center">
+                    <div class="col-md-12" style="margin-bottom: -10px;margin-top: -30px;">
+                        <hr />
+                    </div>
+                </div>
+                <div class="row no-gutters h-100 justify-content-center align-items-center" style="float: right;margin-right: 50px;">
+                    <div class="col-md-12">
+                        <div>
+                            @(Html.Kendo().Button()
+                                                                .Name("btnBottomCancel")
+                                                                .Content("back")
+                                                                .HtmlAttributes(new { type = "button", @class = "k-button" })
+                                                                .Icon("undo")
+                            )
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+
+
+        $(document).ready(function () {
+
+            $("#btnBottomCancel").click(function (event) {
+                window.location.href = "/VehicleFuelManagement/VehicleRefuels?message=NA&isError=false";
+            });
+        });
+
+    </script>
+    }

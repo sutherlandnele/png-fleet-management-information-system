@@ -1,0 +1,833 @@
+﻿
+
+/** Add hoc styles **/
+
+
+#view-details table tr th {
+    width: 150px;
+}
+#btnReset, #btnSearch {
+    width: 40px;
+}
+form table th {
+    width: 150px;
+}
+.box {
+    display: inline-block;
+    margin: 0 5px 2em 0;    
+    width: 160px;
+    background-color: #FFFFFF;
+    border: 2px solid #297BB6;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.box .heading {
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    background-color: #297BB6;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 8px 0;
+    text-align: center;
+    margin: 0px;
+}
+
+@font-face {
+    font-family: Roboto;
+    src: url('/Content/fonts/roboto-v18-latin-regular.woff');
+}
+
+form#logoutForm {
+    /*position: absolute;
+    width: 54px;
+    height: 54px;
+    right: 30px;
+    top: 50px;*/
+}
+
+.image-wrapper {
+    overflow: hidden;
+}
+
+#logoutForm .image-wrapper {
+    display: inline-block;
+    height: 54px;
+    width: 54px;
+    margin: -10px -5px;
+    border-radius: 50%;
+    background-color: rgba(36, 69, 251, 0.7);
+}
+#logoutForm > .image-wrapper:hover {
+    cursor:pointer;
+}
+#logoutForm .image-wrapper img {
+    width: 120%;
+    margin-left: -10%;
+}
+
+#logoutForm .image-wrapper p {
+    font-size: 48px;
+    color: #fff;
+    margin-left: 12px;
+    font-family: 'Roboto';
+    margin-top: -7px;
+}
+
+k-widget.k-tooltip {
+    font-size: 12px;
+    top: 0;
+}
+
+.k-widget.k-tooltip .k-tooltip-content {
+    padding-right: 0;
+    padding: 0 30px;
+}
+
+.k-widget.k-tooltip .image-wrapper {
+    width: 100px;
+    height: 100px;
+    margin: 25px auto 10px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background-color: rgba(104, 105, 111, 0.7);
+}
+
+.k-widget.k-tooltip .image-wrapper img {
+    width: 102%;
+    margin-top: -5%;
+}
+
+.k-widget.k-tooltip .image-wrapper p{
+    
+    color: #fff;
+    font-size: 72px;
+    margin-top: 40px;
+}
+
+.k-widget.k-tooltip .k-tooltip-content>p{
+    margin:0px;
+}
+
+.k-widget.k-tooltip .k-tooltip-content #reset-password{
+    margin-bottom:5px;
+}
+
+.k-widget.k-tooltip .k-callout-n {
+    top: -9px;
+    border-bottom-color: #fff;
+    border-width: 0 9px 9px 9px;
+    margin-left: -8px;
+}
+
+.k-widget.k-tooltip .name {
+    font-size: 15px;
+    margin: 5px;
+}
+
+.k-widget.k-tooltip #signInButton {
+    margin: 40px 0;
+    padding: 5px 30px;
+    white-space: nowrap;
+    font-size: 14px;
+    background: #1e8edf;
+    border-color: #1e8edf;
+}
+
+
+.modalWindow > h2 {
+    font-size: 14px;
+}
+/*#wndProgressIndicator, #progressIndicator {
+    position: fixed !important;
+    width: 50px !important;
+    height: 50px !important;
+    top: 50% !important;
+    left: 50% !important;
+    z-index: 99 !important;
+}*/
+
+#progressIndicator .k-loading-image, #wndProgressIndicator .k-loading-image {
+    position: fixed !important;
+    width: 50px !important;
+    height: 50px !important;
+    top: 50% !important;
+    left: 50% !important;
+    z-index: 99 !important;
+}
+
+#progressIndicator .k-loading-text {
+    position: fixed !important;
+    width: 220px !important;
+    height: 35px !important;
+    top: 50% !important;
+    left: 50% !important;
+    z-index: 99 !important;
+    text-indent: 0 !important;
+    text-align: inherit !important;
+    padding-top: 15px;
+    padding-left: 55px;
+    background-color: rgba(51,255,6,0.8);
+    display: none;
+}
+
+
+
+
+label{
+    font-size:12px !important;
+}
+.required {   
+    padding-left:5px;
+    color: #f00;
+} 
+.formButtonRow {
+    background-color: #f5fbff;
+    padding: 10px;    
+    margin: 10px 0px 10px 0px;
+}
+.formButtonRegion{
+    float:right;
+    width:200px;
+}
+.formHeadingRegion {
+    float:left;
+}
+.vwLabel {
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.table.no-border.view-only tr td{
+    font-weight:bold;
+}
+
+.table.no-border tr td, .table.no-border tr th {
+    border-width: 0;
+    padding: 3px;
+}
+
+/** Icon Menu Styles **/
+
+.fa-box-link {
+    margin: 0;
+    padding: 0;
+}
+
+    .fa-box-link ul {
+        margin: 0;
+        padding: 5px;
+    }
+
+    .fa-box-link li {
+        text-align: center;
+        width: 31.9%;
+        margin-bottom: 3px !important;
+        background-color: #fff;
+        border: 1px solid #eee;
+        display: inline-block;
+        font-size: 10px;
+        padding: 0;
+    }
+
+    .fa-box-link i {
+        display: block;
+        margin: 0 auto 10px auto;
+        width: 32px;
+        height: 32px;
+        margin: 10px auto 0;
+        line-height: 32px;
+        text-align: center;
+        font-size: 20px;
+        color: #444444;
+        margin-top: 0;
+        padding-top: 5px;
+    }
+
+    .fa-box-link a {
+        text-decoration: none;
+        width: 100%;
+        height: 100%;
+        display: block;
+        margin: 0;
+        padding: 0;
+    }
+
+        .fa-box-link a span {
+            color: black;
+            font-size: 10px;
+            padding: 5px 0 10px 0;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .fa-box-link a:hover i.fa-chart-line {
+            color: #FF0000;
+        }
+
+        .fa-box-link a:hover i.fa-chart-pie {
+            color: #00ABE3;
+        }
+
+        .fa-box-link a:hover i.fa-chart-area {
+            color: #FFD400;
+        }
+
+        .fa-box-link a:hover i.fa-chart-bar {
+            color: #00FF1D;
+        }
+
+        .fa-box-link a:hover i.fa-poll {
+            color: #00FFA5;
+        }
+
+        .fa-box-link a:hover i.fa-tachometer-alt {
+            color: #F900FF;
+        }
+
+/** Layout Shared View Styles**/
+
+.dash-head h1 {
+    margin: 0;
+    padding: 30px 15px;
+    font-size: 32px;
+    font-weight: lighter;
+    background: url('images/menu/headerbg.jpg') no-repeat center center;
+    background-size: cover;
+    height: 30px;
+}
+
+.dash-head h1 img {
+    margin-top: -30px;
+}
+
+.dash-head h1 span#logo-text {
+    display: none;
+}
+
+
+#main-menu-panelbar .k-sprite {
+    height: inherit;
+}
+
+.dash-head {
+    width: 100%;
+    height: 80px;
+    background-color: #222;
+    position: relative;
+}
+
+.dash-foot {
+    width: 100%;
+    height: 80px;
+    background-color: #222;
+    bottom: 0;
+    position: absolute;
+}
+
+.dash-head .k-rpanel-toggle {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    top: 20px;
+    left: 20px;
+}
+
+body {
+    background-color: #f5f5f5;   
+}
+body#layout-body{
+    display:none;
+
+}
+.panel-wrap {
+        max-width: 100%;
+        background-color: #f5f5f5;
+        /*border: 1px solid #e5e5e5;*/
+        position: relative;
+ }
+
+#sidebar {
+    margin: 0;
+    padding: 20px 0 20px 20px;
+    vertical-align: top;
+    
+}
+
+#mobile-menu-toggle {
+    display: none;
+}
+
+
+
+@media (max-width: 1367px) {
+
+    #sidebar {
+        background: #fff;
+        padding: 20px;
+        border-left: 1px solid #e5e5e5;
+        z-index: 99;
+        /*overflow:hidden;*/
+        /* show sidebar in container*/
+        position: absolute;
+        top: 0;
+        bottom: 0;
+    }
+
+    /*#sidebar + * {
+        display: block;
+        clear: both;
+    }*/
+  
+
+    #sidebar.k-rpanel-expanded {
+        box-shadow: 0 0 10px rgba(0,0,0,.3);
+       
+    }
+
+
+    #mobile-menu-toggle{
+        display:block;
+    }
+
+    .dash-head h1#mainHeader img {
+        margin-left: 80px;
+    }
+}
+
+#main-content {
+    overflow: hidden;
+    margin: 0;
+    padding: 20px;
+    min-height: 580px;   
+    height:100%;
+    vertical-align: top;
+}
+
+/* WIDGETS */
+.widget {
+    margin: 0 0 20px;
+    padding: 0;
+    background-color: #ffffff;
+    border: 1px solid #e7e7e7;
+    border-radius: 3px;
+}
+
+.widget #main-menu-panelbar {
+        margin: 20px auto;
+        vertical-align: middle;
+       
+ }
+
+ div#main-menu {
+        margin-bottom: 80px;
+       
+}
+
+.widget > div {
+    padding: 10px;
+    min-height: 50px;
+}
+
+.widget > h3 {
+    font-size: 12px;
+    padding: 8px 10px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #e7e7e7;
+    margin-top:0px;
+}
+
+
+/* PROFILE */
+.profile-photo {
+    width: 80px;
+    height: 80px;
+    margin: 10px auto;
+    border-radius: 100px;
+    border: 1px solid #e7e7e7;
+    font-size: 58px;
+    background-color: #d9edf7;
+    color: #4a5dae;
+}
+
+#profile div {
+    text-align: center;
+}
+
+#profile h4 {
+    width: auto;
+    margin: 0 0 5px;
+    font-size: 1.2em;
+    color: #1f97f7;
+}
+
+#profile {
+    padding-bottom: 20px;
+}
+
+#profile p {
+    margin: 0 0 10px;
+}
+
+/*** Bootstrap 4 Adhoc Styles **/
+.row.no-gutters {
+    margin-right: 0;
+    margin-left: 0;
+}
+
+.row.no-gutters > [class^="col-"],
+.row.no-gutters > [class*=" col-"] {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+/* custom fieldset inside bootstrap/kendo UI styling */
+fieldset {
+    border: 1px solid #ddd !important;
+    padding: 0 1em 1em 1em !important;
+    margin: 0 0 1em 0 !important;
+    -webkit-box-shadow: 0px 0px 0px 0px #000;
+    box-shadow: 0px 0px 0px 0px #000;
+    
+}
+fieldset > *, fieldset > * > input {
+    margin-top: 5px !important;
+}
+legend {
+    font-size: 1.2em !important;   
+    text-align: left !important;
+    width: auto;
+    padding: 0 10px;
+    border-bottom: none;
+    margin-bottom: 0px !important;
+}
+/*  Kendo UI styles */
+/* Nofication related stuff */
+.k-notification {
+    border: 0;
+}
+
+
+/* Info template */
+.k-notification-info{
+    background: rgba(0%,0%,100%,.7) !important;
+    color: #fff !important;
+}
+
+.info-notification {
+    width: 300px;
+    height: 100px;
+}
+
+.info-notification h3 {
+    font-size: 1em;
+    padding: 32px 10px 5px;
+}
+
+.info-notification p {
+    padding-top: 30px;
+    line-height: 16px
+}
+
+.info-notification img {
+    float: left;
+    margin: 30px 15px 30px 30px;
+}
+
+/* Error template */
+.k-notification-error{
+    background: rgba(100%,0%,0%,.7) !important;
+    color: #ffffff !important;
+}
+
+.error-notification {
+    width: 300px;
+    height: 100px;
+}
+
+.error-notification p {
+    padding-top: 30px;
+    line-height: 16px
+}
+
+.error-notification h3 {
+    font-size: 1em;
+    padding: 32px 10px 5px;
+}
+
+.error-notification img {
+        float: left;
+        margin: 30px 15px 30px 30px;
+ }
+
+/* Success template */
+.k-notification-success {
+    background: rgba(0%,60%,0%,.7) !important;
+    color: #fff !important;
+}
+.success-notification {
+
+    width: 300px;
+    height: 100px;
+}
+.success-notification p {
+    padding-top: 30px;
+    line-height: 16px
+}
+
+.success-notification h3 {
+    font-size: 1em;
+    padding: 32px 10px 5px;
+}
+
+.success-notification img {
+    float: left;
+    margin: 30px 15px 30px 30px;
+}
+/*****************************/
+/************** Show button icon only without text - remove whitespace around icon ******************/
+.k-grid .k-grid-toolbar .k-grid-add,
+.k-grid tbody .k-grid-edit,
+.k-grid tbody .k-grid-update,
+.k-grid tbody .k-grid-cancel,
+.k-grid tbody .k-grid-view,
+.k-grid tbody .k-grid-dispose,
+.k-grid tbody .k-grid-download,
+.k-grid tbody .k-grid-allocate-vehicle,
+.k-grid tbody .k-grid-transfer-vehicle,
+.k-grid tbody .k-grid-end-vehicle-allocation,
+.k-grid tbody .k-grid-vehicle-service,
+.k-grid tbody .k-grid-delete {
+    min-width: 0 !important;
+}
+
+    .k-grid .k-grid-toolbar .k-grid-add .k-icon,
+    .k-grid tbody .k-grid-edit .k-icon,
+    .k-grid tbody .k-grid-update .k-icon,
+    .k-grid tbody .k-grid-cancel .k-icon,
+    .k-grid tbody .k-grid-view .k-icon,
+    .k-grid tbody .k-grid-dispose .k-icon,
+    .k-grid tbody .k-grid-allocate-vehicle .k-icon,
+    .k-grid tbody .k-grid-transfer-vehicle .k-icon,
+    .k-grid tbody .k-grid-end-vehicle-allocation .k-icon,
+    .k-grid tbody .k-grid-vehicle-service .k-icon,
+    .k-grid tbody .k-grid-delete .k-icon {
+        margin: 0 !important;
+    }
+
+/**mix fontawesome icon buttons with default edit and delete telerik mvc kendo grid icon buttons**/
+.k-grid tbody .k-grid-disable-account{
+    min-height:26px;
+    min-width:46px !important;
+}
+
+
+.k-grid-header .k-header {
+    overflow: visible !important;
+    white-space: normal !important;    
+}
+.k-grid-header {
+    padding-right: 17px !important;
+}
+
+.k-readonly {
+    color: gray !important;
+}
+
+.k-grid-content {
+    min-height: 100px !important;
+    max-height: 600px !important;
+}
+
+.k-grid .k-grid-header .k-header .k-link {
+    height: auto !important;
+}
+
+.k-grid .k-grid-header .k-header {
+    white-space: normal !important;
+}
+/*******************************************/
+
+.k-edit-form-container{
+    width:100% !important;
+}
+
+.k-grid, #menu, .k-dropdown, .k-input, .k-textbox, .k-maskedtextbox, .k-widget, .k-button, k-checkbox {
+    font-size: 12px !important;
+    line-height: 2em !important;
+}
+
+.k-checkbox-label {
+    color: #00435e;
+    font-weight: normal;
+}
+
+.k-sprite {
+    text-indent: 0;
+    font-size: 1em !important;  
+    line-height: inherit !important;
+}
+
+
+/* reset everything to the default box model */
+
+*, :before, :after {
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+}
+
+/* set a border-box model only to elements that need it */
+/* if this class is applied to a Kendo UI widget, its layout may change */
+.form-control,
+.container,
+.container-fluid,
+.row,
+.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1,
+.col-xs-2, .col-sm-2, .col-md-2, .col-lg-2,
+.col-xs-3, .col-sm-3, .col-md-3, .col-lg-3,
+.col-xs-4, .col-sm-4, .col-md-4, .col-lg-4,
+.col-xs-5, .col-sm-5, .col-md-5, .col-lg-5,
+.col-xs-6, .col-sm-6, .col-md-6, .col-lg-6,
+.col-xs-7, .col-sm-7, .col-md-7, .col-lg-7,
+.col-xs-8, .col-sm-8, .col-md-8, .col-lg-8,
+.col-xs-9, .col-sm-9, .col-md-9, .col-lg-9,
+.col-xs-10, .col-sm-10, .col-md-10, .col-lg-10,
+.col-xs-11, .col-sm-11, .col-md-11, .col-lg-11,
+.col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+
+/* Sticky footer styles
+    -------------------------------------------------- */
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 60px;
+    background-color: #f5f5f5;
+}
+
+.container-fluid .text-muted {
+    margin: 20px 0;
+    font-family:"Roboto";
+}
+
+.placeholders {
+    margin: 30px auto;
+}
+
+.placeholder img {
+    display: inline-block;
+}
+
+p .k-button {
+    margin: 0 15px 0 0;
+}
+
+.btn-toggle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-shadow: none;
+    height: 48px;
+}
+
+    .btn-toggle .k-icon {
+        opacity: 1;
+    }
+
+    .btn-toggle,
+    .k-primary.btn-toggle:hover,
+    .btn-toggle:focus:active:not(.k-state-disabled):not([disabled]),
+    .btn-toggle:focus:not(.k-state-disabled):not([disabled]) {
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+        .btn-toggle .k-i-hbars,
+        .k-primary.btn-toggle:hover .k-i-hbars,
+        .btn-toggle:focus:active:not(.k-state-disabled):not([disabled]) .k-i-hbars,
+        .btn-toggle:focus:not(.k-state-disabled):not([disabled]) .k-i-hbars {
+            background-position: -80px -32px;
+        }
+
+/*BEGIN -- custom media screen queries */
+
+@media (max-width: 768px) {
+    .k-item {
+        display: block;
+        clear: both;
+        float: none;
+        width: 100%;
+    }
+
+         
+}
+@media screen and (min-width: 768px) and (max-width:992px) {
+ 
+}
+
+@media screen and (min-width: 768px) and (max-width:1204px) {
+}
+
+
+@media screen and (min-width: 768px) and (max-width: 831px) {
+  
+}
+
+@media screen and (min-width: 768px) and (max-width: 863px) {
+
+}
+
+@media screen and (max-width:960px) {
+
+}
+
+
+
+@media screen and (min-width: 863px) and (max-width:1040px) {
+}
+
+@media screen and (max-width: 505px) {
+
+}
+
+@media screen and (max-width: 1096px) {
+
+}
+
+@media screen and (max-width: 1160px) {
+
+}
+
+@media screen and (max-width: 1196px) {
+
+}
+
+@media screen and (min-width: 1092px) and (max-width: 1570px) {
+
+}
+/*END -- custom media screen queries */
+
+

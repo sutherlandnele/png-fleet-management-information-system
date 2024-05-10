@@ -1,0 +1,317 @@
+﻿@using FMS.Common
+
+@{
+    ViewBag.Title = "Board of Survey Vehicle Registry";
+    //set UI visibility permissions   
+    var canViewBOSVehicleDetails = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionViewBOSVehicles"];
+
+}
+<div class="container-fluid">
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            <fieldset id="fldsVehicleSearch">
+                <legend>Search</legend>
+                <!--Business Units Dropdownlist-->
+                @(Html.Kendo().ComboBox()
+                                .Name("cbxBusinessUnit")
+                                .Placeholder("Select Business Unit...")
+                                .DataTextField("Text")
+                                .DataValueField("Value")
+                                .Filter(FilterType.Contains)
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetBusinessUnits", "VehicleManagement");
+                                    });
+                                })
+                                .HtmlAttributes(new { style = "width:180px" })
+                )
+
+                <!--Business Groups Cascading Dropdownlist-->
+                @(Html.Kendo().ComboBox()
+                                .Name("cbxBusinessGroup")
+                                .Placeholder("Select Business Group...")
+                                .DataTextField("Text")
+                                .DataValueField("Value")
+                                .Filter(FilterType.Contains)
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetBusinessGroupsByBusinessUnitId", "VehicleManagement")
+                                            .Data("filterBusinessGroups");
+                                    }).ServerFiltering(true);
+                                })
+                                .Enable(false)
+                                .AutoBind(false)
+                                .CascadeFrom("cbxBusinessUnit")
+                                .HtmlAttributes(new { style = "width:180px" })
+                )
+
+                <!--Center Dropdownlist-->
+                @(Html.Kendo().DropDownList()
+                                                                .Name("drpCenter")
+                                                                .DataValueField("Value")
+                                                                .DataTextField("Text")
+                                                                .OptionLabel(new { Text = "Select ...", Value = "" })
+                                                                .Filter(FilterType.Contains)
+                                                                .ValuePrimitive(true)
+                                                                .HtmlAttributes(new { style = "width:170px" })
+                                                                .BindTo((System.Collections.IEnumerable)ViewBag.Centers)
+                                                                .Events(events => events.DataBound("onDrpCenterDataBound"))
+                )
+
+                @(Html.Kendo().MaskedTextBox()
+                                                                        .Name("registrationNumber")
+                                                                        .HtmlAttributes(new { @placeholder = "Enter Rego #..." })
+                )
+
+
+                @(Html.Kendo().MaskedTextBox()
+                                                                                                .Name("assetNumber")
+                                                                                                .HtmlAttributes(new { @placeholder = "Enter Asset #..." })
+                )
+
+                @(Html.Kendo().Button()
+                                                                                                .Name("btnSearch")
+                                                                                                .HtmlAttributes(new { type = "button", @class = "k-primary" })
+                                                                                                .Content("<span class='k-icon' title='Search'></span>")
+                                                                                                .Icon("search")
+                                                                                                .Events(events =>
+                                                                                                {
+                                                                                                    events.Click("onSearch");
+                                                                                                })
+                )
+
+                @(Html.Kendo().Button()
+                                                                                                .Name("btnReset")
+                                                                                                .Tag("em")
+                                                                                                .Icon("refresh")
+                                                                                                .Content("<span class='k-icon' title='Refresh'></span>")
+                                                                                                .HtmlAttributes(new { @title = "Reset" })
+                                                                                                .Events(events =>
+                                                                                                {
+                                                                                                    events.Click("onReset");
+                                                                                                })
+                )
+            </fieldset>
+
+            @(Html.Kendo().Grid<FMS.Web.ViewModels.VehicleBOSDisplayViewModel>()
+                                                        .Name("gridBOSVehicles")
+                                                        .Columns(columns =>
+                                                        {
+
+                                                            columns.Bound(vm => vm.RegistrationNumber).Title("Rego #").Media("(min-width: 544px)").Width(80);
+                                                            columns.Bound(vm => vm.VehicleType).Title("Type").Media("(min-width: 768px)");
+                                                            columns.Bound(vm => vm.Center).Title("Center").Media("(min-width: 768px)");
+                                                            columns.Bound(vm => vm.Condition).Title("Condition").Media("(min-width: 768px)");
+                                                            columns.Bound(vm => vm.Status).Title("Status").Media("(min-width: 544px)");
+                                                            columns.Bound(vm => vm.CurrentMileage).Title("Mileage").Media("(min-width: 992px)")
+                                                        .ClientTemplate(
+                                                                "# if (IsMileageBOS == true ) { #" +
+                                                                    "<span title='BOS Reason: Mileage is greater than the allowed limit for vehicle type' style='background-color:yellow;color:red;padding:5px;'>#=CurrentMileage#</span>" +
+                                                                    "# } else { #" +
+                                                                    "<span>#=CurrentMileage#</span>" +
+                                                                    "# } #"
+
+                                                                );
+
+                                                            columns.Bound(vm => vm.Age).Media("(min-width: 992px)")
+                                                        .ClientTemplate(
+                                                                "# if (IsAgeBOS == true ) { #" +
+                                                                    "<span title='BOS Reason: Age is greater than the allowed limit for vehicle type' style='background-color:yellow;color:red;padding:5px;'>#=Age#</span>" +
+                                                                    "# } else { #" +
+                                                                    "<span>#=Age#</span>" +
+                                                                    "# } #"
+
+                                                        );
+                                                            columns.Bound(vm => vm.Condition).Media("(min-width: 992px)")
+                                                        .ClientTemplate(
+                                                            "# if (IsConditionBOS == true ) { #" +
+                                                                "<span title='BOS Reason: Vehicle condition is Beyond Repair' style='background-color:yellow;color:red;padding:5px;'>#=Condition#</span>" +
+                                                                "# } else { #" +
+                                                                "<span>#=Condition#</span>" +
+                                                                "# } #"
+
+                                                        );
+                                                            columns.Bound(vm => vm.Status).Media("(min-width: 992px)")
+                                                        .ClientTemplate(
+                                                            "# if (IsOperationalStatusBOS == true ) { #" +
+                                                                "<span  title='BOS Reason: Vehicle status is Accident' style='background-color:yellow;color:red;padding:5px;'>#=Status#</span>" +
+                                                                "# } else { #" +
+                                                                "<span>#=Status#</span>" +
+                                                                "# } #"
+
+                                                        );
+                                                            columns.Template(@<text></text>).ClientTemplate("#=resColTemplate(data)#").Title("Items").Media("(max-width: 544px)");
+                                                            columns.Command(command =>
+                                                        {
+                                                            command.Custom("view").Text(" ").Click("viewDetails").IconClass("far fa-eye")
+                                                                .HtmlAttributes(new { @title = "View" }).Visible("canViewBOSVehicleDetails");
+                                                        }).Title("").Width(70);
+                                                        })
+                                                        .Pageable()
+                                                        .Sortable()
+                                                        .Scrollable(s => s.Height("auto"))
+                                                        .DataSource(dataSource => dataSource
+                                                            .Ajax()
+                                                            .ServerOperation(true)
+                                                            .PageSize(20)
+                                                            .Events(events => events.Error("error_handler"))
+                                                            .Model(model => model.Id(vm => vm.Id))
+                                                            .Read(read => read.Action("GetBOSVehiclesList", "VehicleManagement").Data("GridFilterParams"))
+
+                                                        )
+
+            )
+
+        </div>
+    </div>
+</div>
+<style>
+</style>
+@section scripts{
+    <script id="templateResponsiveColumn" type="text/x-kendo-template">
+        <strong>Asset No.</strong>
+        <p class="col-template-val">#=data.AssetNumber#</p>
+
+        <strong>Rego No.</strong>
+        <p class="col-template-val">#=data.RegistrationNumber#</p>
+
+        <strong>Type</strong>
+        <p class="col-template-val">#=data.VehicleType#</p>
+
+        <strong>Make</strong>
+        <p class="col-template-val">#=data.Make#</p>
+
+        <strong>Model</strong>
+        <p class="col-template-val">#=data.Model#</p>
+
+        <strong>Business Group</strong>
+        <p class="col-template-val">#=data.BusinessGroup#</p>
+
+        <strong>Center</strong>
+        <p class="col-template-val">#=data.Center#</p>
+
+        <strong>Condition</strong>
+        <p class="col-template-val">#=data.Condition#</p>
+
+        <strong>Status</strong>
+        <p class="col-template-val">#=data.Status#</p>
+
+        <strong>Mileage</strong>
+        <p class="col-template-val">#=data.CurrentMileage#</p>
+
+
+    </script>
+
+
+
+    <script type="text/javascript">
+
+    //********************* Begin - Global Document Scope Variables *****************************
+    var gridData;
+
+    var defaultCenterNumber;
+    //*******************************************************************************************
+
+
+    function onDrpCenterDataBound(e) {
+        //var defaultItem = e.sender.dataSource.at(0);
+        //defaultCenterNumber = defaultItem.Value;
+
+    }
+
+    var resColTemplate = kendo.template($("#templateResponsiveColumn").html());
+
+    function filterBusinessGroups() {
+        return {
+            businessUnitId: $("#cbxBusinessUnit").val(),
+            businessGroupFilter: $("#cbxBusinessGroup").data("kendoComboBox").input.val()
+
+        };
+    }
+
+
+
+    $(document).ready(function () {
+
+        gridData = $("#gridBOSVehicles").data("kendoGrid");
+
+        //tooltips
+        $("#gridBOSVehicles").kendoTooltip({ filter: "a[title]" });
+        $("#gridBOSVehicles").kendoTooltip({ filter: "span[title]" });
+        $("#gridBOSVehicles").kendoTooltip({ filter: "span>i.fas.fa-check[title]" });
+        $("#btnReset").kendoTooltip({ content: "Reset" });
+
+    });
+
+   function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+    function GridFilterParams() {
+
+        return {
+            assetNumber: $("#assetNumber").val(),
+            registrationNumber: $("#registrationNumber").val(),
+            unitNumber: (Number($("#cbxBusinessUnit").val()) == 0) ? -1 : Number($("#cbxBusinessUnit").val()),
+            groupNumber: (Number($("#cbxBusinessGroup").val()) == 0) ? -1 : Number($("#cbxBusinessGroup").val()),
+            center: (Number($("#drpCenter").val()) == 0) ? -1 : Number($("#drpCenter").val())
+        }
+    }
+    function onSearch(e) {
+        e.preventDefault();
+        gridData.dataSource.query({ page: 1, pageSize: 20 });
+    }
+    function onReset(e) {
+        e.preventDefault();
+        $("#assetNumber").val("");
+        $("#registrationNumber").val("");
+        $("#cbxBusinessUnit").data("kendoComboBox").value("");
+        $("#cbxBusinessGroup").data("kendoComboBox").value("");
+        $("#drpCenter").data("kendoDropDownList").value("");
+        gridData.dataSource.read();
+    }
+
+    function viewDetails(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var vehicleId = dataItem.Id;
+        window.location.href = '@Url.Action("GetVehicleDetails", "VehicleManagement")?id=' + vehicleId;
+     }
+
+    function canViewBOSVehicleDetails()
+    {
+        var r = '@canViewBOSVehicleDetails';
+
+        if (r === "True") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    </script>
+    }

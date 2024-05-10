@@ -1,0 +1,383 @@
+﻿@{
+
+    ViewBag.Title = "Vehicle Schedule Service";
+}
+<div class="container-fluid">
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            <fieldset id="fldsVehicleSearch">
+                <legend>Search</legend>
+                <!--Business Units Dropdownlist-->
+                @(Html.Kendo().ComboBox()
+                                                                .Name("cbxBusinessUnit")
+                                                                .Placeholder("Select Business Unit...")
+                                                                .DataTextField("Text")
+                                                                .DataValueField("Value")
+                                                                .Filter(FilterType.Contains)
+                                                                .DataSource(source =>
+                                                                {
+                                                                    source.Read(read =>
+                                                                    {
+                                                                        read.Action("GetBusinessUnits", "VehicleManagement");
+                                                                    });
+                                                                })
+                                                                .HtmlAttributes(new { style = "width:180px" })
+
+                )
+
+                <!--Business Groups Cascading Dropdownlist-->
+                @(Html.Kendo().ComboBox()
+                                                                .Name("cbxBusinessGroup")
+                                                                .Placeholder("Select Business Group...")
+                                                                .DataTextField("Text")
+                                                                .DataValueField("Value")
+                                                                .Filter(FilterType.Contains)
+                                                                .DataSource(source =>
+                                                                {
+                                                                    source.Read(read =>
+                                                                    {
+                                                                        read.Action("GetBusinessGroupsByBusinessUnitId", "VehicleManagement")
+                                                                            .Data("filterBusinessGroups");
+                                                                    }).ServerFiltering(true);
+                                                                })
+                                                                .Enable(false)
+                                                                .AutoBind(false)
+                                                                .CascadeFrom("cbxBusinessUnit")
+                                                                .HtmlAttributes(new { style = "width:180px" })
+                )
+
+                <!--Center Dropdownlist-->
+                @(Html.Kendo().DropDownList()
+                                                        .Name("drpCenter")
+                                                        .DataValueField("Value")
+                                                        .DataTextField("Text")
+                                                        .OptionLabel(new { Text = "Select...", Value = "" })
+                                                        .Filter(FilterType.Contains)
+                                                        .ValuePrimitive(true)
+                                                        .HtmlAttributes(new { style = "width:170px" })
+                                                        .BindTo((System.Collections.IEnumerable)ViewBag.Centers)
+                                                        .Events(events => events.DataBound("onDrpCenterDataBound"))
+                )
+
+                @(Html.Kendo().MaskedTextBox()
+                                                                .Name("registrationNumber")
+                                                                .HtmlAttributes(new { @placeholder = "Enter Rego #..." })
+                )
+
+                <!-- Checkboxes -->
+                <div style="display:inline-block;font-family: 'Roboto'">
+
+                    @(Html.Kendo().CheckBox()
+                                                                .Name("chkbxShowScheduledVehicles")
+                                                                .Label("Show Scheduled Vehicles")
+                    )
+
+                    @(Html.Kendo().CheckBox()
+                                                                .Name("chkbxShowUnscheduledVehicles")
+                                                                .Label("Show Unscheduled Vehicles")
+                    )
+
+                </div>
+
+                @(Html.Kendo().Button()
+                                                                .Name("btnSearch")
+                                                                .HtmlAttributes(new { type = "button", @class = "k-primary" })
+                                                                .Content("<span class='k-icon' title='Search'></span>")
+                                                                .Icon("search")
+                                                                .Events(events =>
+                                                                {
+                                                                    events.Click("onSearchClick");
+                                                                })
+                )
+
+                @(Html.Kendo().Button()
+                                                                .Name("btnReset")
+                                                                .Tag("em")
+                                                                .Icon("refresh")
+                                                                .Content("<span class='k-icon' title='Refresh'></span>")
+                                                                .HtmlAttributes(new { @title = "Reset" })
+                                                                .Events(events =>
+                                                                {
+                                                                    events.Click("onResetClick");
+                                                                })
+                )
+            </fieldset>
+
+        </div>
+    </div>
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            @(Html.Kendo().Grid<FMS.Web.ViewModels.VehicleServiceScheduleDisplayViewModel>()
+                                                    .Name("gridVehicleScheduleServices")
+                                                    .Columns(columns =>
+                                                    {
+
+                                                        columns.Bound(vm => vm.VehicleRegistration).Title("Rego #").Media("(min-width: 544px)");
+                                                        columns.Bound(vm => vm.VehicleDisplayInfoViewModel.VehicleType).Title("Vehicle Type").Media("(min-width: 544px)");
+                                                        columns.Bound(vm => vm.VehicleDisplayInfoViewModel.BusinessGroup).Title("Business Group").Media("(min-width: 768px)");
+                                                        columns.Bound(vm => vm.VehicleDisplayInfoViewModel.Center).Title("Center").Media("(min-width: 544px)");
+                                                        columns.Bound(vm => vm.ServiceAlertDate).Title("Alert Date").Media("(min-width: 544px)");
+                                                        columns.Bound(vm => vm.ServiceAlertMileage).Title("Alert Mileage").Media("(min-width: 992px)");
+                                                        columns.Bound(vm => vm.ScheduleServiceType).Title("Schedule Service Type").Media("(min-width: 992px)").Width(150);
+                                                        columns.Command(command => command.Custom("vehicle-service")
+                                                        .Text(" ").Click("onVehicleServiceClick")
+                                                        .Visible("showVehicleServiceButton")
+                                                        .IconClass("fas fa-wrench")
+                                                        .HtmlAttributes(new { @title = "Associated Vehicle Service" }))
+                                                        .Width(70).Title("Service");
+                                                        columns.Template(@<text></text>).ClientTemplate("#=resColTemplate(data)#").Title("Items").Media("(max-width: 544px)");
+                                                        columns.Command(command =>
+                                                    {
+                                                        command.Custom("view").Text(" ").Click("onViewDetailsClick").IconClass("far fa-eye").HtmlAttributes(new { @title = "View" });
+                                                        command.Custom("edit").Text(" ").Click("onEditDetailsClick").IconClass("fas fa-edit").HtmlAttributes(new { @title = "Edit" });
+                                                        command.Custom("delete").Text(" ").Click("onDeleteDetailsClick").IconClass("fas fa-trash-alt").HtmlAttributes(new { @title = "Delete" });
+                                                    }).Title("").Width(210);
+                                                    })
+                                                    .ToolBar(toolBar =>
+                                                    {
+                                                        toolBar.Template(@<text>
+                                                            <a class='k-button' style="float:left" href="#" onclick="onAddNewVehicleServiceScheduleClick(event)">
+                                                                <span class='k-icon k-i-add'></span>Add New Schedule
+                                                            </a>
+                                                        </text>);
+                                                    })
+                                                    .Pageable()
+                                                    .Sortable()
+                                                    .Scrollable(s => s.Height("auto"))
+                                                    .DataSource(dataSource => dataSource
+                                                        .Ajax()
+                                                        .ServerOperation(true)
+                                                        .PageSize(20)
+                                                        .Events(events => events.Error("error_handler"))
+                                                        .Model(model => model.Id(vm => vm.Id))
+                                                        .Read(read => read.Action("GetVehicleScheduledServicesList", "VehicleServiceManagement").Data("GridFilterParams"))
+                                                    )
+            )
+            <div id="wndDeleteConfirmation"></div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+</style>
+@section scripts{
+    <script type="text/x-kendo-template" id="templateDeleteConfirmation">
+        <div class="modalWindow">
+            <h2>Are you sure you want to delete this vehicle schedule service record?</h2>
+            <button id="yes" class="k-button">Yes</button>
+            <button id="no" class="k-button k-primary">No</button>
+        </div>
+    </script>
+    <script id="templateResponsiveColumn" type="text/x-kendo-template">
+
+
+        <strong>Rego No.</strong>
+        <p class="col-template-val">#=data.VehicleRegistration#</p>
+
+        <strong>Vehicle Type</strong>
+        <p class="col-template-val">#=data.VehicleDisplayInfoViewModel.VehicleType#</p>
+
+        <strong>Business Group</strong>
+        <p class="col-template-val">#=data.VehicleDisplayInfoViewModel.BusinessGroup#</p>
+
+        <strong>Center</strong>
+        <p class="col-template-val">#=data.VehicleDisplayInfoViewModel.Center#</p>
+
+        <strong>Service Alert Date</strong>
+        <p class="col-template-val">#=data.ServiceAlertDate#</p>
+
+        <strong>Service Alert Mileage</strong>
+        <p class="col-template-val">#=data.ServiceAlertMileage#</p>
+
+        <strong>Schedule Service Type</strong>
+        <p class="col-template-val">#=data.ScheduleServiceType#</p>
+
+    </script>
+
+
+
+
+    <script type="text/javascript">
+
+    //Global Variables
+
+    var windowVehicleService;
+    //var defaultCenterNumber;
+
+    function onDrpCenterDataBound(e) {
+        //var defaultItem = e.sender.dataSource.at(0);
+        //defaultCenterNumber = defaultItem.Value;
+
+    }
+
+
+    function onVehicleServiceClick(e) {
+        e.preventDefault();
+
+        row = $(e.currentTarget).closest("tr");
+        var dataItem = this.dataItem(row);
+        var scheduleServiceId = dataItem.Id;
+        var vehicleId = dataItem.VehicleId;
+        var scheduleServiceTypeId = dataItem.ScheduleServiceTypeId;
+
+        var paramStr = "?scheduleServiceId=" + scheduleServiceId + "&vehicleId=" + vehicleId + "&scheduleServiceTypeId=" + scheduleServiceTypeId;
+        var action = "/VehicleServiceManagement/CreateVehicleServiceForScheduleDetails";
+
+        window.location.href = action + paramStr;
+    }
+
+
+    function showVehicleServiceButton(dataItem) {
+        return !dataItem.ServiceExists;
+    }
+
+    var resColTemplate = kendo.template($("#templateResponsiveColumn").html());
+
+
+    function filterBusinessGroups() {
+        return {
+            businessUnitId: $("#cbxBusinessUnit").val(),
+            businessGroupFilter: $("#cbxBusinessGroup").data("kendoComboBox").input.val()
+
+        };
+    }
+    $(document).ready(function () {
+
+          templateDeleteConfirmation = kendo.template($("#templateDeleteConfirmation").html());
+
+        //tooltips
+        $("#gridVehicleScheduleServices").kendoTooltip({ filter: "a[title]" });
+
+        $("#btnReset").kendoTooltip({ content: "Reset" });
+
+        //initialize the kendo delete confirmation modal window
+        windowDeleteConfirmation = $("#wndDeleteConfirmation").kendoWindow({
+            title: "Delete Confirmation",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+        setGridFormSubmitNotification();
+
+
+
+
+    });
+
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            App.notification.show({
+                message: message
+            }, "error");
+        }
+    }
+
+    function GridFilterParams() {
+
+        var showScheduleVehicles = $("#chkbxShowScheduledVehicles").prop('checked');
+        var showUnscheduleVehicles = $("#chkbxShowUnscheduledVehicles").prop('checked');
+
+        return {
+
+            showScheduledVehicles: showScheduleVehicles,
+            showUnscheduledVehicles: showUnscheduleVehicles,
+            registrationNumber: $("#registrationNumber").val(),
+            unitNumber: (Number($("#cbxBusinessUnit").val()) == 0) ? -1 : Number($("#cbxBusinessUnit").val()),
+            groupNumber: (Number($("#cbxBusinessGroup").val()) == 0) ? -1 : Number($("#cbxBusinessGroup").val()),
+            center: (Number($("#drpCenter").val()) == 0) ? -1 : Number($("#drpCenter").val())
+        }
+    }
+
+    function onSearchClick(e) {
+        e.preventDefault();
+        var gridData = $("#gridVehicleScheduleServices").data("kendoGrid");
+        gridData.dataSource.query({ page: 1, pageSize: 20 });
+
+
+    }
+    function onResetClick(e) {
+        e.preventDefault();
+        var gridData = $("#gridVehicleScheduleServices").data("kendoGrid");
+
+        $("#chkbxShowUnscheduledVehicles").prop('checked', false);
+        $("#chkbxShowScheduledVehicles").prop('checked', false);
+        $("#registrationNumber").val("");
+        $("#cbxBusinessUnit").data("kendoComboBox").value("");
+        $("#cbxBusinessGroup").data("kendoComboBox").value("");
+        $("#drpCenter").data("kendoDropDownList").value("");
+
+
+        gridData.dataSource.read();
+    }
+
+    function onViewDetailsClick(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var id = dataItem.Id;
+        window.location.href = '@Url.Action("ViewVehicleScheduledServiceDetails", "VehicleServiceManagement")?vehicleScheduledServiceId=' + id;
+    }
+
+    function onEditDetailsClick(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var id = dataItem.Id;
+        window.location.href = '@Url.Action("EditVehicleScheduledServiceDetails", "VehicleServiceManagement")?vehicleScheduledServiceId=' + id;
+    }
+
+    function onAddNewVehicleServiceScheduleClick(e) {
+        e.preventDefault();
+        window.location.href = '@Url.Action("CreateVehicleScheduledServiceDetails", "VehicleServiceManagement")';
+    }
+
+    function onDeleteDetailsClick(e) {
+
+        e.preventDefault();
+
+        var grid = this;
+
+        var row = $(e.currentTarget).closest("tr");
+        var dataItem = this.dataItem(row);
+
+        windowDeleteConfirmation.content(templateDeleteConfirmation(dataItem));
+
+        windowDeleteConfirmation.center().open();
+
+        $("#yes").click(function () {
+
+            ajaxDelete(dataItem.Id, "VehicleServiceManagement","DeleteVehicleServiceScheduleDetails");
+            grid.removeRow(row); //removes row only
+
+            windowDeleteConfirmation.close();
+        });
+
+        $("#no").click(function () {
+            windowDeleteConfirmation.close();
+        });
+    }
+
+
+    </script>
+    }

@@ -1,0 +1,126 @@
+﻿@using FMS.Web.ViewModels;
+
+
+@{
+    ViewBag.Title = "Vehicle Compliance Dashboard";
+}
+
+
+<div class="container-fluid">
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-4">
+            <fieldset id="fldsVehicleDueForService">
+                <legend>Vehicle Due For Service</legend>
+                @(Html.Kendo().Grid<VehicleDueForServiceDisplayViewModel>()
+                                        .Name("gridVehicleDueForService")
+                                        .Columns(columns =>
+                                        {
+                                            columns.Bound(vm => vm.Center).HtmlAttributes(new { style = "color:red" });
+                                            columns.Bound(vm => vm.RegistrationNumber).HtmlAttributes(new { style = "color:red" });
+                                            columns.Bound(vm => vm.CurrentMileage).HtmlAttributes(new { style = "color:red" });
+                                            columns.Bound(vm => vm.AlertMileage).HtmlAttributes(new { style = "color:red" });
+                                            columns.Bound(vm => vm.AlertDate).Format("{0:dd/MM/yyyy}").HtmlAttributes(new { style = "color:red" });
+
+                                        })
+                                        .Pageable()
+                                        .Sortable()
+                                        .Scrollable(s => s.Height("auto"))
+                                        .DataSource(dataSource => dataSource
+                                            .Ajax()
+                                            .PageSize(50)
+                                            .Model(model =>
+                                            {
+                                                model.Id(vm => vm.Id);
+                                            })
+                                            .Read(read => read.Action("GetVehicleDueForServiceList", "VehicleComplianceManagement"))
+                                        )
+                )
+            </fieldset>
+        </div>
+
+        <div class="col-md-4">
+            <fieldset id="fldsRegistrationExpiry">
+                <legend>Vehicle Registration Expiry</legend>
+                @(Html.Kendo().Grid<VehicleRegistrationExpiryDisplayViewModel>()
+                                        .Name("gridVehicleRegistrationExpiry")
+                                        .Columns(columns =>
+                                        {
+                                            columns.Bound(vm => vm.Center).HtmlAttributes(new { style = "color:red" });
+                                            columns.Bound(vm => vm.RegistrationNumber).ClientTemplate("<a style='color:red;text-decoration:underline' href='/VehicleManagement/GetVehicleDetails?id=#=Id#'>#=RegistrationNumber#</a>").HtmlAttributes(new { style = "color:red" });
+                                            columns.Bound(vm => vm.RegistrationExpiry).Format("{0:dd/MM/yyyy}").HtmlAttributes(new { style = "color:red" });
+
+                                        })
+                                        .Pageable()
+                                        .Sortable()
+                                        .Scrollable(s => s.Height("auto"))
+                                        .DataSource(dataSource => dataSource
+                                            .Ajax()
+                                            .PageSize(50)
+                                            .Model(model =>
+                                            {
+                                                model.Id(vm => vm.Id);
+                                            })
+                                            .Read(read => read.Action("GetVehicleRegistrationExpiryList", "VehicleComplianceManagement"))
+                                        )
+                )
+            </fieldset>
+        </div>
+
+        <div class="col-md-4">
+            <fieldset id="fldsSafetyStickerExpiry">
+                <legend>Vehicle Safety Sticker Expiry</legend>
+                @(Html.Kendo().Grid<VehicleSafetyStickerExpiryDisplayViewModel>()
+                                        .Name("gridVehicleSafetyStickerExpiry")
+                                        .Columns(columns =>
+                                        {
+                                            columns.Bound(vm => vm.Center).HtmlAttributes(new { style = "color:red" });
+                                            columns.Bound(vm => vm.RegistrationNumber).ClientTemplate("<a style='color:red;text-decoration:underline' href='/VehicleManagement/GetVehicleDetails?id=#=Id#'>#=RegistrationNumber#</a>").HtmlAttributes(new { style = "color:red" });
+                                            columns.Bound(vm => vm.SafetyStickerExpiry).Format("{0:dd/MM/yyyy}").HtmlAttributes(new { style = "color:red" });
+
+                                        })
+                                        .Pageable()
+                                        .Sortable()
+                                        .Scrollable(s => s.Height("auto"))
+                                        .DataSource(dataSource => dataSource
+                                            .Ajax()
+                                            .PageSize(50)
+                                            .Model(model =>
+                                            {
+                                                model.Id(vm => vm.Id);
+                                            })
+                                            .Read(read => read.Action("GetVehicleSafetyStickerExpiryList", "VehicleComplianceManagement"))
+                                        )
+                )
+            </fieldset>
+        </div>
+
+
+    </div>
+
+</div>
+<style>
+    .k-grid .field-validation-error{
+        display:none;
+    }
+
+    span#dtEntryDate_validationMessage {
+        z-index: 2;
+        position: absolute;
+        margin-top: 30px;
+        margin-left: -130px;
+    }
+</style>
+
+
+

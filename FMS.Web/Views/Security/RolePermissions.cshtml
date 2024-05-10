@@ -1,0 +1,262 @@
+﻿
+@{
+    ViewBag.Title = "Manage Role Permissions";
+    var canManageRolePermission = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionManagePermission"];
+}
+<script type="text/javascript">
+    var canManageRolePermission = '@canManageRolePermission'== 'True'?true:false;
+</script>
+<div class="container-fluid">
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            <fieldset id="fldsUserDetailsSearch">
+                <legend>Search</legend>
+                @Html.Label("Select Role", new { style = "font-weight: normal" })
+                @(Html.Kendo().DropDownList()
+                        .Name("drpRoleName")
+                        .DataValueField("Value")
+                        .DataTextField("Text")
+                        .Filter(FilterType.Contains)
+                        .ValuePrimitive(true)
+                        .HtmlAttributes(new { style = "width:100%; max-width:240px" })
+                        .BindTo((System.Collections.IEnumerable)ViewBag.Roles)
+                        .Events(events =>
+                        {
+                            events.Change("onRoleNameChange");
+                        })
+                )
+
+
+                @(Html.Kendo().Button()
+                        .Name("btnSearch")
+                        .HtmlAttributes(new { type = "button", @class = "k-primary", style = "display:none" })
+                            .Content("<span class='k-icon' title='Search'></span>")
+                        .Icon("search")
+                        .Events(events =>
+                        {
+                            events.Click("onSearchButtonClick");
+                        })
+                )
+
+
+
+            </fieldset>
+
+            <h4>Permission Selection</h4>
+            @(Html.Kendo().TreeView()
+                        .Name("tviewPermissionSelection")
+                        .ExpandAll(true)
+                        .DataTextField("Name")
+                        .Checkboxes(checkboxes => checkboxes
+                            .Name("IsAllowed")
+                            .CheckChildren(false)
+                        //.Template("<input name='IsAllowed' type='checkbox' #=canManageRolePermission==false? 'disabled=\"disabled\"': '' # />")
+                        )
+                        .DataSource(dataSource => dataSource
+                            .Read(read => read
+                                .Action("GetRolePermissions", "Security").Data("filterParams")
+                            )
+
+                        )
+
+                            .Events(events => events
+                            .Check("onTreeViewCheck")
+                            .DataBound("onTreeViewDatabound")
+
+                            )
+                            .LoadOnDemand(false)
+                            .Animation(false)
+
+
+            )
+        </div>
+    </div>
+
+</div>
+
+
+@section scripts{
+
+
+    <script type="text/javascript">
+
+        //global documument variables
+        var tviewPermissionSelection;
+        
+
+        $(document).ready(function () {
+          
+            tviewPermissionSelection = $("#tviewPermissionSelection").data("kendoTreeView");
+            $("#btnSearch").kendoTooltip({ content: "Search" });                       
+
+        });
+
+        function onRoleNameChange(e) {
+            $("#btnSearch").trigger("click");
+        }
+
+
+
+        function filterParams() {
+            return {
+                roleName: $("#drpRoleName").val()
+            }
+        }
+
+        function onSearchButtonClick(e) {
+            e.preventDefault();
+            kendo.ui.progress($("#tviewPermissionSelection"), true);
+
+            $.when(tviewPermissionSelection.dataSource.read()).done(function (data,statusText, jqXHR) {
+                kendo.ui.progress($("#tviewPermissionSelection"), false);
+            });
+           
+        }
+
+        function checkChildren(tview, childNodes, isParentChecked) {
+            var node;
+            for (var i = 0; i < childNodes.length; i++) {
+                node = childNodes[i];
+                tview.dataItem(childNodes[i]).set("checked", isParentChecked);                   
+
+                if (node.children) {
+                    checkChildren(tview,node.children, isParentChecked);
+                }
+            }
+        }
+
+        function onTreeViewCheck(e) {
+
+            
+            $("#drpRoleName").data("kendoDropDownList").enable(false);
+
+            checkChildren(tviewPermissionSelection, e.node.children, tviewPermissionSelection.dataItem(e.node).checked);
+
+            
+            var dataItem = e.sender.dataItem(e.node);
+            var nodes = [];
+
+            var rolePermissions = populateAffectedNodes(dataItem, nodes);    
+
+            $.when(ajaxUpdateRolePermission("/Security/UpdateRolePermissions", rolePermissions)).done(function (data, statusText, jqXHR) {
+
+
+                if (statusText == "success") {
+
+                    if (data.isError) {
+                        App.notification.show({
+                            message: data.message
+                        }, "error");
+                    }
+                    else {
+
+                        window.hubReady.done(function () {
+                            //Force logout all active users in role so that the new permissions can be used
+                            $.connection.comsHub.server.forceLogoutUsersInRole(dataItem.RoleName);
+                        });
+           
+
+
+
+                        App.notification.show({
+                            message: data.message
+                        }, "success");
+                    }
+                }
+
+                $("#drpRoleName").data("kendoDropDownList").enable(true);
+
+            });
+
+        }
+
+        function objectify(dataItem) {
+
+            var obj = {};
+
+            obj.id = dataItem.id;
+            obj.ParentId = dataItem.ParentId;
+            obj.Name = dataItem.Name;
+            obj.RoleName = dataItem.RoleName;
+            obj.RolePermissionType = dataItem.RolePermissionType;
+            obj.checked = dataItem.checked;
+            obj.hasChildren = dataItem.hasChildren;
+
+            return obj;
+        }
+
+        function populateAffectedNodes(dataItem , nodes) {
+
+            nodes.push(objectify(dataItem));
+
+            if (dataItem.hasChildren) {
+                dataItem.children.data().forEach(function (childDataItem) {
+                    populateAffectedNodes(childDataItem, nodes); //recursively call to get selected node and all child nodes hiarachically 
+                });
+            }
+
+            return nodes;
+        }
+
+        function onTreeViewDatabound(e) {
+            var nodes = tviewPermissionSelection.dataSource.view();    
+            toggleTreeViewEnable(nodes, canManageRolePermission);              
+        }
+
+        function ajaxUpdateRolePermission(action, rolePermissions) {
+
+            return $.ajax({
+                type: "POST",
+                url: action,
+                data: AddAntiForgeryToken({ rolePermissions: rolePermissions }),
+                dataType: "json",               
+                async: true,
+                beforeSend: function (xhr) {
+                    //show progress bar
+                    kendo.ui.progress($("#tviewPermissionSelection"), true);
+                },
+                success: function (result, status, jqXHR) {
+
+                },
+
+                error: function (xhr, status, error) {
+
+                    App.notification.show({
+                        message: "An error occured: " + xhr.status + " " + xhr.statusText
+                    }, "error");
+
+                },
+                complete: function (xhr, status) {
+
+                    kendo.ui.progress($("#tviewPermissionSelection"), false);
+
+
+                }
+            });
+        }
+
+        function toggleTreeViewEnable(nodes, isEnabled){
+            
+            for (var i = 0; i < nodes.length; i++) {
+                var node = nodes[i];
+                node.set("enabled", isEnabled);
+                if (node.hasChildren) {
+                    toggleTreeViewEnable(node.children, isEnabled);
+                }
+            }
+        }
+
+
+
+    </script>
+}

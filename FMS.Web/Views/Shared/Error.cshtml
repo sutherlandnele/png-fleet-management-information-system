@@ -1,0 +1,36 @@
+﻿@model System.Web.Mvc.HandleErrorInfo
+
+@{
+    ViewBag.Title = "Error!";
+    Layout = "~/Views/Shared/_LayoutPublic.cshtml";
+}
+<div class="container-fluid">
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+            <h1 class="text-danger">Error.</h1>
+            <h2 class="text-danger">An error occurred while processing your request.</h2>
+            <p style="color:red">Error Message: @Html.DisplayFor(m => m.Exception.Message)</p>
+            <p>Please kindly <a class="reportApplicationIssueLink" href="#">Contact Us</a> and raise the issue with us.</p>
+            @(Html.Kendo().Button()
+                    .Name("btnBottomCancel")
+                    .Content("Back")
+                    .HtmlAttributes(new { type = "button", @class = "k-button" })
+                    .Icon("undo")
+            )
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+
+    $(document).ready(function () {
+        $("#btnBottomCancel").click(function (event) {
+            var newSrc = "NA";
+            window.location.href = document.referrer.replace(/(message=).*?(&)/, '$1' + newSrc + '$2');
+        });       
+    });
+
+</script>

@@ -1,0 +1,246 @@
+﻿@using FMS.Common;
+@{
+    ViewBag.Title = ViewBag.ListTitle;
+    //set UI visibility permissions
+    var canUpdateContacts = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionManageContacts"];
+    var canViewContacts = ((Dictionary<string, bool>)(Session[Session["CurrentUserRole"] + "UIVisibilityList"]))["ActionViewContacts"];
+}
+
+<div class="container-fluid">
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            <fieldset id="fldsEmployeeContactDetailsSearch">
+                <legend>Search</legend>
+
+                @(Html.Kendo().MaskedTextBox()
+                                                .Name("txtContactName")
+                                                .HtmlAttributes(new { @placeholder = ViewBag.ContactNameTitle + "...", style = "width:100%;max-width:170px" })
+                )
+
+
+                @(Html.Kendo().Button()
+                                                .Name("btnSearch")
+                                                .HtmlAttributes(new { type = "button", @class = "k-primary" })
+                                                    .Content("<span class='k-icon' title='Search'></span>")
+                                                .Icon("search")
+                                                .Events(events =>
+                                                {
+                                                    events.Click("onSearchButtonClick");
+                                                })
+                )
+
+                @(Html.Kendo().Button()
+                                                .Name("btnReset")
+                                                .Tag("em")
+                                                .Icon("refresh")
+                                                .Content("<span class='k-icon' title='Refresh'></span>")
+                                                .HtmlAttributes(new { @title = "Reset" })
+                                                .Events(events =>
+                                                {
+                                                    events.Click("onResetButtonClick");
+                                                })
+                )
+            </fieldset>
+
+
+
+            @(Html.Kendo().Grid<FMS.Web.ViewModels.ContactDetailDisplayViewModel>()
+                                            .Name("gridContactDetails")
+                                            .Columns(columns =>
+                                            {
+                                                columns.Bound(vm => vm.ContactName).Title(ViewBag.ContactNameTitle);
+                                                columns.Bound(vm => vm.Center);
+                                                columns.Bound(vm => vm.Email);
+                                                columns.Bound(vm => vm.Telephone);
+                                                columns.Bound(vm => vm.PPLPermitNumber).Hidden((int)ViewBag.ContactType != (int)Parameters.ContactType.Employee);
+                                                columns.Bound(vm => vm.PPLPermitIssueDate).Hidden((int)ViewBag.ContactType != (int)Parameters.ContactType.Employee);
+                                                columns.Bound(vm => vm.SupplierType).Hidden((int)ViewBag.ContactType != (int)Parameters.ContactType.Supplier);
+                                                columns.Command(command =>
+                                                {
+                                                    command.Custom("view").Text(" ").Click("onViewDetailsClick").IconClass("far fa-eye").HtmlAttributes(new { @title = "View" }).Visible("canViewContacts");
+                                                    command.Custom("edit").Text(" ").Click("onEditDetailsClick").IconClass("fas fa-edit").HtmlAttributes(new { @title = "Edit" }).Visible("canUpdateContacts");
+                                                    command.Custom("delete").Text(" ").Click("onDeleteDetailsClick").IconClass("fas fa-trash-alt").HtmlAttributes(new { @title = "Delete" }).Visible("canUpdateContacts");
+                                                }).Title("").Width(210);
+                                            })
+                                            .ToolBar(toolBar =>
+                                            {
+                                                toolBar.Template(@<text>
+
+                                                    @if (canUpdateContacts)
+                                                        {
+                                                        <a class='k-button' style="float:left" href="#" onclick="onAddNewDetailsClick(event)">
+                                                            <span class='k-icon k-i-add'></span>Add New @(((string)ViewBag.ListTitle).Replace("Contacts", ""))
+                                                        </a>
+                                                        }
+                                                   
+                                                </text>);
+                                            })
+                                            .Pageable()
+                                            .Sortable()
+                                            .Scrollable(s => s.Height("auto"))
+                                            .DataSource(dataSource => dataSource
+                                                .Ajax()
+                                                .PageSize(20)
+                                                .Events(events => events
+                                                    .Error("onError")
+                                                )
+                                                .Model(model =>
+                                                {
+                                                    model.Id(vm => vm.Id);
+                                                })
+                                                .Read(read => read.Action("GetContactDetailList", "OrganisationManagement").Data("GridFilterParams"))
+                                            )
+
+            )
+
+            <div id="wndDeleteConfirmation"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+</style>
+@section scripts{
+
+    <script type="text/x-kendo-template" id="templateDeleteConfirmation">
+        <div class="modalWindow">
+            <h2>Are you sure you want to delete this record?</h2>
+            <button id="yes" class="k-button">Yes</button>
+            <button id="no" class="k-button k-primary">No</button>
+        </div>
+    </script>
+
+    <script type="text/javascript">
+
+    var gridData;
+    var windowDeleteConfirmation;
+
+    $(document).ready(function () {
+        //tooltips
+        $("#gridContactDetails").kendoTooltip({ filter: "a[title]" });
+
+        gridData = $("#gridContactDetails").data("kendoGrid");
+
+        templateDeleteConfirmation = kendo.template($("#templateDeleteConfirmation").html());
+
+        setGridFormSubmitNotification();
+
+        //initialize the kendo delete confirmation modal window
+        windowDeleteConfirmation = $("#wndDeleteConfirmation").kendoWindow({
+            title: "Delete Confirmation",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+
+    });
+    function onError(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            e.sender.read(); //refresh the datasource
+            App.notification.show({
+                message: message.length > 100 ? message.substring(0, 100) + "..." : message
+            }, "error");
+        }
+    }
+
+    function GridFilterParams() {
+        return {
+            contactName: $("#txtContactName").val(),
+            contactType: '@ViewBag.ContactType'
+        }
+    }
+    function onSearchButtonClick(e) {
+        e.preventDefault();
+        gridData.dataSource.query({ page: 1, pageSize: 20 });
+    }
+    function onResetButtonClick(e) {
+        e.preventDefault();
+        $("#txtContactName").val("");
+        gridData.dataSource.read();
+    }
+
+
+   function onViewDetailsClick(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var id = dataItem.Id;
+        window.location.href = '@Url.Action("GetContactDetails", "OrganisationManagement")?id=' + id+ '&contactType=@ViewBag.ContactType';
+    }
+
+    function onEditDetailsClick(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var id = dataItem.Id;
+        window.location.href = '@Url.Action("EditContactDetails", "OrganisationManagement")?id=' + id + '&contactType=@ViewBag.ContactType';
+    }
+
+    function onAddNewDetailsClick(e) {
+        e.preventDefault();
+        window.location.href = '@Url.Action("CreateContactDetails", "OrganisationManagement")?contactType=@ViewBag.ContactType';
+    }
+
+    function onDeleteDetailsClick(e) {
+        e.preventDefault();
+        var grid = this;
+        var row = $(e.currentTarget).closest("tr");
+        var dataItem = this.dataItem(row);
+        windowDeleteConfirmation.content(templateDeleteConfirmation(dataItem));
+        windowDeleteConfirmation.center().open();
+        $("#yes").click(function () {
+            ajaxDelete(dataItem.Id, "OrganisationManagement", "DeleteContactDetails");
+            grid.removeRow(row); //removes row only
+            windowDeleteConfirmation.close();
+        });
+
+        $("#no").click(function () {
+            windowDeleteConfirmation.close();
+        });
+    }
+
+    function canUpdateContacts() {
+
+        var r = '@canUpdateContacts';
+
+        if (r === "True") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    function canViewContacts() {
+
+        var r = '@canViewContacts';
+
+        if (r === "True") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+
+    </script>
+    }

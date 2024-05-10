@@ -1,0 +1,6 @@
+﻿@model Nullable<System.Int32>
+
+@(Html.Kendo().NumericTextBoxFor(m=>m)
+    .HtmlAttributes(new { style = "width:100%; max-width:170px" }) 
+    .Min(0)
+)

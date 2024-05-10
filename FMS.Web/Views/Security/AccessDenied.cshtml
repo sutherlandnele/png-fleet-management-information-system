@@ -1,0 +1,88 @@
+﻿
+@{
+    ViewBag.Title = "Access Denied!";
+}
+<div class="container-fluid">
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4 style="color:red">@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+            <div id="wndAccessDenied"></div>
+            <p>Your access to this resource has been denied. Please kindly request for access <a id="accessDeniedLink" href="#">here</a>.</p>
+
+        </div>
+    </div>
+    
+</div>
+
+<script type="text/javascript">
+
+
+    var wndAccessDenied;
+
+    function initializeAccessDeniedWindow() {
+
+        $("#frmApplicationIssueRegistration").submit(function (event) {
+            event.preventDefault();
+            ajaxCreateUpdate(this, $("#frmApplicationIssueRegistration #Id").val(), "Home", "CreateApplicationIssue", "", "", wndAccessDenied);
+        });
+               
+        $("#btnClose").click(function (e) {
+            e.preventDefault();
+            wndAccessDenied.close();
+        });
+
+
+    }
+
+    $(document).ready(function () {
+
+        //********************************* Begin -- Access Denied Modal Window ***************************************  
+
+        $("#accessDeniedLink").click(function (e) {
+
+            e.preventDefault();
+
+            //the bound refresh method of the window object is fired here
+            wndAccessDenied.refresh({
+                url: "/Home/ApplicationPermissionRequest",
+                beforeSend: function (xhr) {
+                    //show progress bar
+                    kendo.ui.progress($("#progressIndicator"), true);
+                },
+                complete: function (xhr, status) {
+                    kendo.ui.progress($("#progressIndicator"), false);
+                }
+            });
+
+        });
+
+
+        //initialize the kendo vehicle disposal modal window
+        wndAccessDenied = $("#wndAccessDenied").kendoWindow({
+            title: "Application Permission Request",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 450
+        }).data("kendoWindow");
+
+        //because you are loading a view through an action, use the bind to the "refresh" function
+        wndAccessDenied.bind("refresh", function (e) {
+            initializeAccessDeniedWindow();
+            //NB: need to put the center open window in the refresh method coz if you put it outside, the center window fires b4 content is loaded and messes up the UI
+            wndAccessDenied.center().open();
+        });
+
+        //********************************* End -- Access Denied Modal Window *****************************************
+
+    });
+
+</script>

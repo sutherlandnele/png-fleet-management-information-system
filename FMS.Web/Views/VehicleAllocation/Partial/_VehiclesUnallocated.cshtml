@@ -1,0 +1,85 @@
+﻿
+<h4>Vehicles Unallocated</h4>
+<fieldset id="fldsVehicleSearch">
+    <legend>Search</legend>
+    <!--Business Units Dropdownlist-->
+    @(Html.Kendo().ComboBox()
+                    .Name("cbxRegistionNumberUnallocVeh")
+                    .Placeholder("Select Registration Number...")
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    .Filter(FilterType.Contains)
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetVehicles", "VehicleManagement");
+                        });
+                    })
+                    .HtmlAttributes(new { style = "width:180px" })
+    )
+
+    @(Html.Kendo().Button()
+                    .Name("btnSearchUnallocVeh")
+                    .HtmlAttributes(new { type = "button", @class = "k-primary" })
+                    .Content("Search")
+                    .Icon("search")
+                    .Events(events =>
+                    {
+                        events.Click("onUnallocVehSearchClick");
+                    })
+    )
+
+    @(Html.Kendo().Button()
+                    .Name("btnResetUnallocVeh")
+                    .Tag("em")
+                    .Icon("refresh")
+                    .Content("<span class='k-icon' title='Refresh'></span>")
+                    .HtmlAttributes(new { @title = "Reset" })
+                    .Events(events =>
+                    {
+                        events.Click("onUnallocVehResetClick");
+                    })
+    )
+</fieldset>
+
+@(Html.Kendo().Grid<FMS.Web.ViewModels.VehicleDisplayViewModel>()
+            .Name("gridUnallocatedVehicles")
+            .Columns(columns =>
+            {
+                columns.Bound(vm => vm.RegistrationNumber).Title("Rego #").Media("(min-width: 544px)");
+                columns.Bound(vm => vm.VehicleType).Title("Type").Media("(min-width: 768px)");
+                columns.Bound(vm => vm.Make).Title("Make").Media("(min-width: 544px)");
+                columns.Bound(vm => vm.Model).Title("Model").Media("(min-width: 544px)");
+                columns.Bound(vm => vm.Condition).Title("Condition").Media("(min-width: 768px)");
+                columns.Bound(vm => vm.Status).Title("Status").Media("(min-width: 544px)");
+                columns.Bound(vm => vm.BusinessGroup).Title("Business Group").Media("(min-width: 992px)");
+                columns.Bound(vm => vm.Center).Title("Center").Media("(min-width: 768px)");
+                columns.Template(@<text></text>).ClientTemplate("#=resColTemplateUnallVeh(data)#").Title("Items").Media("(max-width: 544px)");
+                        columns.Command(command =>
+                        {
+                            command.Custom("allocate-vehicle").Text(" ").Click("onAllocateVehicleClick").IconClass("fas fa-thumbtack").HtmlAttributes(new { @title = "Vehicle Allocation Details" });
+                        }).Title("Allocate Vehicle").Width(70);
+
+                        columns.Command(command =>
+                        {
+                            command.Custom("transfer-vehicle").Text(" ").Click("onTransferVehicleClick").IconClass("fas fa-exchange-alt").HtmlAttributes(new { @title = "Vehicle Transfer Details" });
+                        }).Title("Transfer Vehicle").Width(70);
+                    })
+                    .Pageable()
+                    .Sortable()
+                    .Scrollable(s => s.Height("auto"))
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(20)
+                        .ServerOperation(true)
+                        .Events(events => events.Error("error_handler"))
+                        .Model(model => model.Id(vm => vm.Id))                        
+                        .Read(read => read.Action("Get_Unallocated_Vehicles", "VehicleAllocation").Data("GridFilterParamsUnallocVeh")
+
+                        )
+                    )
+                    .Events(events => events
+                        .DataBound("onDataBound")
+                    )
+)

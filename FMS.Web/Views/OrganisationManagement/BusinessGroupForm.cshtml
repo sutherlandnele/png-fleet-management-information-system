@@ -1,0 +1,125 @@
+﻿@using FMS.Web.CustomHTMLHelpers
+@using FMS.Common
+@model FMS.Web.ViewModels.BusinessGroupEditViewModel
+
+@{
+    ViewBag.Title = "Business Group Details";
+}
+
+<div class="container-fluid" style="margin-top:15px">
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutters h-100 justify-content-center align-items-center">
+
+        <div class="col-md-10">
+
+            @using (Html.BeginForm("frmBusinessGroup"))
+            {
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.AntiForgeryToken()
+                <div class="container-fluid" id="FormContainer" style="margin-bottom:15px;">
+                    <div class="row no-gutters h-100 justify-content-center align-items-center">
+                        <div class="col-md-6">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+
+                                    <tr>
+                                        <th>@Html.LabelForRequired(m => m.GroupName)</th>
+                                        <td>
+                                            @Html.HiddenFor(m => m.GroupNumber)
+
+                                            @(Html.Kendo().MaskedTextBoxFor(m => m.GroupName)
+                                                                                 .HtmlAttributes(new { style = "width:100%;max-width:170px" })
+                                            )
+                                            <br /><span class="k-invalid-msg" data-for="GroupName"></span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>@Html.LabelForRequired(m => m.BusinessUnitId)</th>
+                                        <td>
+                                            @Html.EditorFor(m => m.BusinessUnitId)
+                                            <br /><span class="k-invalid-msg" data-for="BusinessUnitId"></span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="table-responsive">
+                                <table class="table no-border">
+                                    <tr>
+                                        <th>@Html.LabelFor(m => m.CotactDetailId)</th>
+                                        <td>
+                                            @Html.EditorFor(m => m.CotactDetailId)
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-gutters h-100 justify-content-center align-items-center">
+                        <div class="col-md-12" style="margin-bottom: -10px;margin-top: -30px;">
+                            <hr />
+                        </div>
+                    </div>
+                    <div class="row no-gutters h-100 justify-content-center align-items-center" style="float: right;margin-right: 50px;">
+                        <div class="col-md-12">
+                            <div>
+                                @(Html.Kendo().Button()
+                                                                            .Name("btnBottomSave")
+                                                                            .Icon("save")
+                                                                            .Content("Save")
+                                                                            .HtmlAttributes(new { type = "submit", @class = "k-button k-primary" })
+                                )
+                                @(Html.Kendo().Button()
+                                                                            .Name("btnBottomCancel")
+                                                                            .Content("Back")
+                                                                            .HtmlAttributes(new { type = "button", @class = "k-button" })
+                                                                            .Icon("undo")
+                                )
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+
+        <div class="col-md-2">
+            @Html.DisplayFor(m => m.contactDetailDisplayViewModel, "ContactInfoDisplay")
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+
+        $(document).ready(function () {
+
+            $("#btnBottomCancel").click(function (event) {
+                var newSrc = "NA";
+                window.location.href = document.referrer.replace(/(message=).*?(&)/, '$1' + newSrc + '$2');
+            });
+
+            $("#CotactDetailId").data("kendoDropDownList").bind("change", function (e) {
+                populateContactInfoBox(this.value());
+            });
+        });
+
+
+
+        $("#frmBusinessGroup").submit(function (event) {
+
+            event.preventDefault();
+            ajaxCreateUpdate(this, $("#GroupNumber").val(), "OrganisationManagement", "CreateBusinessGroup", "UpdateBusinessGroup", "BusinessGroups", "");
+
+        });
+
+    </script>
+    }

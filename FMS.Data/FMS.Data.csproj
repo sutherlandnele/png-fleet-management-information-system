@@ -1,0 +1,378 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3D70F5CC-402F-4D46-8CDC-40750F30C8FF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FMS.Data</RootNamespace>
+    <AssemblyName>FMS.Data</AssemblyName>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Configuration\AppIssueConfiguration.cs" />
+    <Compile Include="Configuration\ExternalLoginConfiguration.cs" />
+    <Compile Include="Configuration\RoleConfiguration.cs" />
+    <Compile Include="Configuration\UserConfiguration.cs" />
+    <Compile Include="Configuration\ClaimConfiguration.cs" />
+    <Compile Include="FMSEntities.cs" />
+    <Compile Include="Configuration\UserContactConfiguration.cs" />
+    <Compile Include="Configuration\VehicleAllocationConfiguration.cs" />
+    <Compile Include="Configuration\NotificationConfiguration.cs" />
+    <Compile Include="Configuration\DepotDailyMeasurementConfiguration.cs" />
+    <Compile Include="Configuration\CenterSecurityConfiguration.cs" />
+    <Compile Include="Configuration\BusinessGroupSecurityConfiguration.cs" />
+    <Compile Include="Configuration\AlertConfiguration.cs" />
+    <Compile Include="Configuration\AppStringConfiguration.cs" />
+    <Compile Include="Configuration\AppSetConfiguration.cs" />
+    <Compile Include="Configuration\AppObjectConfiguration.cs" />
+    <Compile Include="Configuration\AppLockConfiguration.cs" />
+    <Compile Include="Configuration\VehicleTypeConfiguration.cs" />
+    <Compile Include="Configuration\VehicleTransferConfiguration.cs" />
+    <Compile Include="Configuration\VehicleRefuelConfiguration.cs" />
+    <Compile Include="Configuration\VehicleDisposalConfiguration.cs" />
+    <Compile Include="Configuration\VehicleConfiguration.cs" />
+    <Compile Include="Configuration\SystemParameterConfiguration.cs" />
+    <Compile Include="Configuration\SystemParameterCodeConfiguration.cs" />
+    <Compile Include="Configuration\SqlAuditConfiguration.cs" />
+    <Compile Include="Configuration\ServiceConfiguration.cs" />
+    <Compile Include="Configuration\ScheduleServiceConfiguration.cs" />
+    <Compile Include="Configuration\RegionalConfiguration.cs" />
+    <Compile Include="Configuration\OperatorConfiguration.cs" />
+    <Compile Include="Configuration\ModelConfiguration.cs" />
+    <Compile Include="Configuration\IncidentFileUploadConfiguration.cs" />
+    <Compile Include="Configuration\IncidentConfiguration.cs" />
+    <Compile Include="Configuration\FuelVoucherConfiguration.cs" />
+    <Compile Include="Configuration\EmailTemplateConfiguration.cs" />
+    <Compile Include="Configuration\DepotTankConfiguration.cs" />
+    <Compile Include="Configuration\DepotRefuelConfiguration.cs" />
+    <Compile Include="Configuration\DashboardConfiguration.cs" />
+    <Compile Include="Configuration\ContactDetailConfiguration.cs" />
+    <Compile Include="Configuration\ComplianceConfiguration.cs" />
+    <Compile Include="Configuration\ClientInformationConfiguration.cs" />
+    <Compile Include="Configuration\CenterConfiguration.cs" />
+    <Compile Include="Configuration\BusinessUnitConfiguration.cs" />
+    <Compile Include="Configuration\BusinessGroupConfiguration.cs" />
+    <Compile Include="Configuration\AppRoleMenuAccessConfiguration.cs" />
+    <Compile Include="Configuration\AppRoleInterfaceAccessConfiguration.cs" />
+    <Compile Include="Configuration\AppRoleActionAccessConfiguration.cs" />
+    <Compile Include="Configuration\AppMenuConfiguration.cs" />
+    <Compile Include="Configuration\AppInterfaceConfiguration.cs" />
+    <Compile Include="Configuration\AppActionConfiguration.cs" />
+    <Compile Include="Infrastructure\DbFactory.cs" />
+    <Compile Include="Infrastructure\Disposable.cs" />
+    <Compile Include="Infrastructure\IDbFactory.cs" />
+    <Compile Include="Infrastructure\RepositoryBase.cs" />
+    <Compile Include="Infrastructure\UnitOfWork.cs" />
+    <Compile Include="Infrastructure\IUnitOfWork.cs" />
+    <Compile Include="Infrastructure\IRepository.cs" />
+    <Compile Include="Migrations\201811300318492_InitialCreate.cs" />
+    <Compile Include="Migrations\201811300318492_InitialCreate.Designer.cs">
+      <DependentUpon>201811300318492_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201811300325467_updateDbColumns01.cs" />
+    <Compile Include="Migrations\201811300325467_updateDbColumns01.Designer.cs">
+      <DependentUpon>201811300325467_updateDbColumns01.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201812070211125_updateFileUploadColumns.cs" />
+    <Compile Include="Migrations\201812070211125_updateFileUploadColumns.Designer.cs">
+      <DependentUpon>201812070211125_updateFileUploadColumns.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201812070218479_updateFileUploadColumns02.cs" />
+    <Compile Include="Migrations\201812070218479_updateFileUploadColumns02.Designer.cs">
+      <DependentUpon>201812070218479_updateFileUploadColumns02.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201812170221272_UpdateUserEmailAddress.cs" />
+    <Compile Include="Migrations\201812170221272_UpdateUserEmailAddress.Designer.cs">
+      <DependentUpon>201812170221272_UpdateUserEmailAddress.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201812182125565_updateuser01.cs" />
+    <Compile Include="Migrations\201812182125565_updateuser01.Designer.cs">
+      <DependentUpon>201812182125565_updateuser01.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901060813505_update-identityuser01.cs" />
+    <Compile Include="Migrations\201901060813505_update-identityuser01.Designer.cs">
+      <DependentUpon>201901060813505_update-identityuser01.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901070045027_update-identity-user-again.cs" />
+    <Compile Include="Migrations\201901070045027_update-identity-user-again.Designer.cs">
+      <DependentUpon>201901070045027_update-identity-user-again.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901142113491_AddColMaxVehServiceCount.cs" />
+    <Compile Include="Migrations\201901142113491_AddColMaxVehServiceCount.Designer.cs">
+      <DependentUpon>201901142113491_AddColMaxVehServiceCount.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901150530246_AddColMaxVehServiceCount02.cs" />
+    <Compile Include="Migrations\201901150530246_AddColMaxVehServiceCount02.Designer.cs">
+      <DependentUpon>201901150530246_AddColMaxVehServiceCount02.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901150643569_AddColMaxVehServiceCount03.cs" />
+    <Compile Include="Migrations\201901150643569_AddColMaxVehServiceCount03.Designer.cs">
+      <DependentUpon>201901150643569_AddColMaxVehServiceCount03.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901150656180_AddColMaxVehServiceCount04.cs" />
+    <Compile Include="Migrations\201901150656180_AddColMaxVehServiceCount04.Designer.cs">
+      <DependentUpon>201901150656180_AddColMaxVehServiceCount04.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901240027225_udpateVehicleRefuelAddFKFuelDistributor.cs" />
+    <Compile Include="Migrations\201901240027225_udpateVehicleRefuelAddFKFuelDistributor.Designer.cs">
+      <DependentUpon>201901240027225_udpateVehicleRefuelAddFKFuelDistributor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902022114012_AddVehicleRefuelTableCols.cs" />
+    <Compile Include="Migrations\201902022114012_AddVehicleRefuelTableCols.Designer.cs">
+      <DependentUpon>201902022114012_AddVehicleRefuelTableCols.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902022121361_AddMaxFuelVoucherCountCol.cs" />
+    <Compile Include="Migrations\201902022121361_AddMaxFuelVoucherCountCol.Designer.cs">
+      <DependentUpon>201902022121361_AddMaxFuelVoucherCountCol.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902061202151_updatecolIsVoucherAcquited.cs" />
+    <Compile Include="Migrations\201902061202151_updatecolIsVoucherAcquited.Designer.cs">
+      <DependentUpon>201902061202151_updatecolIsVoucherAcquited.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201903091536125_update-contact-details-gender.cs" />
+    <Compile Include="Migrations\201903091536125_update-contact-details-gender.Designer.cs">
+      <DependentUpon>201903091536125_update-contact-details-gender.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201903191223524_AddCenterCode.cs" />
+    <Compile Include="Migrations\201903191223524_AddCenterCode.Designer.cs">
+      <DependentUpon>201903191223524_AddCenterCode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201903191409347_updateVoucherAndServiceJobNumberStringLength.cs" />
+    <Compile Include="Migrations\201903191409347_updateVoucherAndServiceJobNumberStringLength.Designer.cs">
+      <DependentUpon>201903191409347_updateVoucherAndServiceJobNumberStringLength.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201903200238404_AddAuditFields.cs" />
+    <Compile Include="Migrations\201903200238404_AddAuditFields.Designer.cs">
+      <DependentUpon>201903200238404_AddAuditFields.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201903201250356_AddAuditFieldsToIncidents.cs" />
+    <Compile Include="Migrations\201903201250356_AddAuditFieldsToIncidents.Designer.cs">
+      <DependentUpon>201903201250356_AddAuditFieldsToIncidents.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201903250715504_AddNewModelAppIssue.cs" />
+    <Compile Include="Migrations\201903250715504_AddNewModelAppIssue.Designer.cs">
+      <DependentUpon>201903250715504_AddNewModelAppIssue.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201903250722511_UpdateAppIssueModel.cs" />
+    <Compile Include="Migrations\201903250722511_UpdateAppIssueModel.Designer.cs">
+      <DependentUpon>201903250722511_UpdateAppIssueModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\AppIssueRepository.cs" />
+    <Compile Include="Repositories\AppActionRepository.cs" />
+    <Compile Include="Repositories\AppRoleActionAccessRepository.cs" />
+    <Compile Include="Repositories\AppInterfaceRepository.cs" />
+    <Compile Include="Repositories\AppRoleInterfaceAccessRepository.cs" />
+    <Compile Include="Repositories\AppRoleMenuAccessRepository.cs" />
+    <Compile Include="Repositories\AppMenuRepository.cs" />
+    <Compile Include="Repositories\ClientInformationRepository.cs" />
+    <Compile Include="Repositories\DashboardRepository.cs" />
+    <Compile Include="Repositories\EmailTemplateRepository.cs" />
+    <Compile Include="Repositories\BusinessGroupSecurityRepository.cs" />
+    <Compile Include="Repositories\BusinessUnitRepository.cs" />
+    <Compile Include="Repositories\AlertRepository.cs" />
+    <Compile Include="Repositories\DepotDailyMeasurementRepository.cs" />
+    <Compile Include="Repositories\DepotRefuelRepository.cs" />
+    <Compile Include="Repositories\IAppIssueRepository.cs" />
+    <Compile Include="Repositories\IAppRoleActionAccessRepository.cs" />
+    <Compile Include="Repositories\IAppRoleInterfaceAccessRepository.cs" />
+    <Compile Include="Repositories\IAppRoleMenuAccessRepository.cs" />
+    <Compile Include="Repositories\IAppActionRepository.cs" />
+    <Compile Include="Repositories\IAppInterfaceRepository.cs" />
+    <Compile Include="Repositories\IAppMenuRepository.cs" />
+    <Compile Include="Repositories\IClientInformationRepository.cs" />
+    <Compile Include="Repositories\IDashboardRepository.cs" />
+    <Compile Include="Repositories\IEmailTemplateRepository.cs" />
+    <Compile Include="Repositories\IDepotDailyMeasurementRepository.cs" />
+    <Compile Include="Repositories\IDepotRefuelRepository.cs" />
+    <Compile Include="Repositories\ISystemParameterCodeRepository.cs" />
+    <Compile Include="Repositories\NotificationRepository.cs" />
+    <Compile Include="Repositories\INotificationRepository.cs" />
+    <Compile Include="Repositories\IAlertRepository.cs" />
+    <Compile Include="Repositories\RegionRepository.cs" />
+    <Compile Include="Repositories\DepotTankRepository.cs" />
+    <Compile Include="Repositories\IDepotTankRepository.cs" />
+    <Compile Include="Repositories\IServiceRepository.cs" />
+    <Compile Include="Repositories\IRegionRepository.cs" />
+    <Compile Include="Repositories\OperatorRepository.cs" />
+    <Compile Include="Repositories\IBusinessGroupSecurityRepository.cs" />
+    <Compile Include="Repositories\IOperatorRepository.cs" />
+    <Compile Include="Repositories\IBusinessUnitRepository.cs" />
+    <Compile Include="Repositories\IScheduleServiceRepository.cs" />
+    <Compile Include="Repositories\IncidentRepository.cs" />
+    <Compile Include="Repositories\FuelVoucherRepository.cs" />
+    <Compile Include="Repositories\CenterSecurityRepository.cs" />
+    <Compile Include="Repositories\CenterRepository.cs" />
+    <Compile Include="Repositories\IFuelVoucherRepository.cs" />
+    <Compile Include="Repositories\IComplianceRepository.cs" />
+    <Compile Include="Repositories\ComplianceRepository.cs" />
+    <Compile Include="Repositories\IIncidentRepository.cs" />
+    <Compile Include="Repositories\IVehicleDisposalRepository.cs" />
+    <Compile Include="Repositories\IVehicleRefuelRepository.cs" />
+    <Compile Include="Repositories\IVehicleAllocationRepository.cs" />
+    <Compile Include="Repositories\IVehicleTransferRepository.cs" />
+    <Compile Include="Repositories\ServiceRepository.cs" />
+    <Compile Include="Repositories\SystemParameterCodeRepository.cs" />
+    <Compile Include="Repositories\VehicleAllocationRepository.cs" />
+    <Compile Include="Repositories\VehicleTransferRepository.cs" />
+    <Compile Include="Repositories\VehicleRefuelRepository.cs" />
+    <Compile Include="Repositories\VehicleDisposalRepository.cs" />
+    <Compile Include="Repositories\ScheduleServiceRepository.cs" />
+    <Compile Include="Repositories\UserContactRepository.cs" />
+    <Compile Include="Repositories\IUserContactRepository.cs" />
+    <Compile Include="Repositories\ICenterSecurityRepository.cs" />
+    <Compile Include="Repositories\ISqlAuditRepository.cs" />
+    <Compile Include="Repositories\SqlAuditRepository.cs" />
+    <Compile Include="Repositories\VehicleTypeRepository.cs" />
+    <Compile Include="Repositories\SystemParameterRepository.cs" />
+    <Compile Include="Repositories\ModelRepository.cs" />
+    <Compile Include="Repositories\ContactDetailRepository.cs" />
+    <Compile Include="Repositories\ExternalLoginRepository.cs" />
+    <Compile Include="Repositories\IVehicleTypeRepository.cs" />
+    <Compile Include="Repositories\ICenterRepository.cs" />
+    <Compile Include="Repositories\ISystemParameterRepository.cs" />
+    <Compile Include="Repositories\IModelRepository.cs" />
+    <Compile Include="Repositories\IContactDetailRepository.cs" />
+    <Compile Include="Repositories\IExternalLoginRepository.cs" />
+    <Compile Include="Repositories\IRoleRepository.cs" />
+    <Compile Include="Repositories\IUserRepository.cs" />
+    <Compile Include="Repositories\IBusinessGroupRepository.cs" />
+    <Compile Include="Repositories\IVehicleRepository.cs" />
+    <Compile Include="Repositories\RoleRepository.cs" />
+    <Compile Include="Repositories\UserRepository.cs" />
+    <Compile Include="Repositories\BusinessGroupRepository.cs" />
+    <Compile Include="Repositories\VehicleRepository.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FMS.Common\FMS.Common.csproj">
+      <Project>{f3bc2a0e-5f4f-4342-9c3d-1b0b1b005438}</Project>
+      <Name>FMS.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FMS.Model\FMS.Model.csproj">
+      <Project>{3c67e033-538a-48fe-88ef-d5d4978193b4}</Project>
+      <Name>FMS.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201811300318492_InitialCreate.resx">
+      <DependentUpon>201811300318492_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811300325467_updateDbColumns01.resx">
+      <DependentUpon>201811300325467_updateDbColumns01.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201812070211125_updateFileUploadColumns.resx">
+      <DependentUpon>201812070211125_updateFileUploadColumns.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201812070218479_updateFileUploadColumns02.resx">
+      <DependentUpon>201812070218479_updateFileUploadColumns02.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201812170221272_UpdateUserEmailAddress.resx">
+      <DependentUpon>201812170221272_UpdateUserEmailAddress.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201812182125565_updateuser01.resx">
+      <DependentUpon>201812182125565_updateuser01.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901060813505_update-identityuser01.resx">
+      <DependentUpon>201901060813505_update-identityuser01.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901070045027_update-identity-user-again.resx">
+      <DependentUpon>201901070045027_update-identity-user-again.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901142113491_AddColMaxVehServiceCount.resx">
+      <DependentUpon>201901142113491_AddColMaxVehServiceCount.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901150530246_AddColMaxVehServiceCount02.resx">
+      <DependentUpon>201901150530246_AddColMaxVehServiceCount02.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901150643569_AddColMaxVehServiceCount03.resx">
+      <DependentUpon>201901150643569_AddColMaxVehServiceCount03.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901150656180_AddColMaxVehServiceCount04.resx">
+      <DependentUpon>201901150656180_AddColMaxVehServiceCount04.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901240027225_udpateVehicleRefuelAddFKFuelDistributor.resx">
+      <DependentUpon>201901240027225_udpateVehicleRefuelAddFKFuelDistributor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902022114012_AddVehicleRefuelTableCols.resx">
+      <DependentUpon>201902022114012_AddVehicleRefuelTableCols.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902022121361_AddMaxFuelVoucherCountCol.resx">
+      <DependentUpon>201902022121361_AddMaxFuelVoucherCountCol.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902061202151_updatecolIsVoucherAcquited.resx">
+      <DependentUpon>201902061202151_updatecolIsVoucherAcquited.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201903091536125_update-contact-details-gender.resx">
+      <DependentUpon>201903091536125_update-contact-details-gender.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201903191223524_AddCenterCode.resx">
+      <DependentUpon>201903191223524_AddCenterCode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201903191409347_updateVoucherAndServiceJobNumberStringLength.resx">
+      <DependentUpon>201903191409347_updateVoucherAndServiceJobNumberStringLength.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201903200238404_AddAuditFields.resx">
+      <DependentUpon>201903200238404_AddAuditFields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201903201250356_AddAuditFieldsToIncidents.resx">
+      <DependentUpon>201903201250356_AddAuditFieldsToIncidents.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201903250715504_AddNewModelAppIssue.resx">
+      <DependentUpon>201903250715504_AddNewModelAppIssue.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201903250722511_UpdateAppIssueModel.resx">
+      <DependentUpon>201903250722511_UpdateAppIssueModel.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

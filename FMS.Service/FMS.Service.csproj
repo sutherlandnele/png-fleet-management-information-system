@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F476639A-1104-4E88-97A4-ADCFA77B8E8C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FMS.Service</RootNamespace>
+    <AssemblyName>FMS.Service</AssemblyName>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.2\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Owin">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.2\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin">
+      <HintPath>..\packages\Microsoft.Owin.4.0.0\lib\net451\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.4.0.0\lib\net451\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security">
+      <HintPath>..\packages\Microsoft.Owin.Security.4.0.0\lib\net451\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AppIssueService.cs" />
+    <Compile Include="AppRoleActionAccessService.cs" />
+    <Compile Include="AppRoleInterfaceAccessService.cs" />
+    <Compile Include="AppRoleMenuAccessService.cs" />
+    <Compile Include="AppActionService.cs" />
+    <Compile Include="AppInterfaceService.cs" />
+    <Compile Include="AppMenuService.cs" />
+    <Compile Include="CenterSecurityService.cs" />
+    <Compile Include="ClientInformationService.cs" />
+    <Compile Include="DashboardService.cs" />
+    <Compile Include="EmailTemplateService.cs" />
+    <Compile Include="BusinessGroupService.cs" />
+    <Compile Include="AlertService.cs" />
+    <Compile Include="DepotRefuelService.cs" />
+    <Compile Include="DepotTankService.cs" />
+    <Compile Include="IAppIssueService.cs" />
+    <Compile Include="IAppRoleActionAccessService.cs" />
+    <Compile Include="IAppRoleInterfaceAccessService.cs" />
+    <Compile Include="IAppRoleMenuAccessService.cs" />
+    <Compile Include="IAppActionService.cs" />
+    <Compile Include="IAppInterfaceService.cs" />
+    <Compile Include="IAppMenuService.cs" />
+    <Compile Include="ICenterSecurityService.cs" />
+    <Compile Include="IClientInformationService.cs" />
+    <Compile Include="IDashboardService.cs" />
+    <Compile Include="IEmailTemplateService.cs" />
+    <Compile Include="IAlertService.cs" />
+    <Compile Include="IComplianceService.cs" />
+    <Compile Include="ComplianceService.cs" />
+    <Compile Include="ISystemParameterCodeService.cs" />
+    <Compile Include="NotificationService.cs" />
+    <Compile Include="INotificationService.cs" />
+    <Compile Include="IDepotRefuelService.cs" />
+    <Compile Include="IDepotTankService.cs" />
+    <Compile Include="IOperatorService.cs" />
+    <Compile Include="IIncidentService.cs" />
+    <Compile Include="IDepotDailyMeasurementService.cs" />
+    <Compile Include="IVehicleServiceScheduleService.cs" />
+    <Compile Include="IVehicleFuelManagementService.cs" />
+    <Compile Include="IVehicleServiceService.cs" />
+    <Compile Include="IVehicleTransferService.cs" />
+    <Compile Include="IVehicleAllocationService.cs" />
+    <Compile Include="IVehicleTypeService.cs" />
+    <Compile Include="IncidentService.cs" />
+    <Compile Include="DepotDailyMeasurementService.cs" />
+    <Compile Include="SystemParameterCodeService.cs" />
+    <Compile Include="VehicleServiceScheduleService.cs" />
+    <Compile Include="VehicleFuelManagementService.cs" />
+    <Compile Include="VehicleServiceService.cs" />
+    <Compile Include="ModelService.cs" />
+    <Compile Include="IModelService.cs" />
+    <Compile Include="OperatorService.cs" />
+    <Compile Include="VehicleTransferService.cs" />
+    <Compile Include="VehicleAllocationService.cs" />
+    <Compile Include="VehicleTypeService.cs" />
+    <Compile Include="RegionService.cs" />
+    <Compile Include="ContactDetailService.cs" />
+    <Compile Include="IRegionService.cs" />
+    <Compile Include="IContactDetailService.cs" />
+    <Compile Include="SystemParameterService.cs" />
+    <Compile Include="CenterService.cs" />
+    <Compile Include="IBusinessGroupService.cs" />
+    <Compile Include="ISystemParameterService.cs" />
+    <Compile Include="ICenterService.cs" />
+    <Compile Include="IBusinessUnitService.cs" />
+    <Compile Include="IVehicleDisposalService.cs" />
+    <Compile Include="IVehicleManagementService.cs" />
+    <Compile Include="AuditingService.cs" />
+    <Compile Include="BusinessUnitService.cs" />
+    <Compile Include="VehicleDisposalService.cs" />
+    <Compile Include="VehicleManagementService.cs" />
+    <Compile Include="IAuditingService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FMS.Common\FMS.Common.csproj">
+      <Project>{f3bc2a0e-5f4f-4342-9c3d-1b0b1b005438}</Project>
+      <Name>FMS.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FMS.Data\FMS.Data.csproj">
+      <Project>{3d70f5cc-402f-4d46-8cdc-40750f30c8ff}</Project>
+      <Name>FMS.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FMS.Model\FMS.Model.csproj">
+      <Project>{3c67e033-538a-48fe-88ef-d5d4978193b4}</Project>
+      <Name>FMS.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

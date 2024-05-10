@@ -1,0 +1,47 @@
+﻿@using FMS.Web.ViewModels
+@using FMS.Web.CustomHTMLHelpers
+
+@model VehicleRefuelEditViewModel
+
+
+@using (Html.BeginForm("frmVehicleRefuelAcquital"))
+{
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="container-fluid" id="FormContainer">
+        <div class="row no-gutters h-100 justify-content-center align-items-center">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table no-border">
+                        <tr>
+                            <th style="vertical-align:middle">Fuel Voucher #</th>
+                            <td>
+                                @Html.HiddenFor(model => model.Id)
+                            <h4>@Html.DisplayFor(m => m.VoucherNumber)</h4>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <td>
+                            @(Html.Kendo().CheckBoxFor(model => model.IsVoucherAcquitted))
+                            <br />@Html.ValidationMessageFor(model => model.IsVoucherAcquitted)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>@Html.LabelFor(model => model.VoucherReceiptNumber)</th>
+                        <td>
+                            @(Html.Kendo().TextBoxFor(model => model.VoucherReceiptNumber).HtmlAttributes(new { style = "width:250px;background-color:#e6e6e6;" }))                      
+                    </td>
+                </tr>
+
+
+            </table>
+        </div>
+        </div>
+        <div id="wndProgressIndicator"></div>
+        </div>
+        <div class="row h-100 justify-content-center align-items-center formButtonRow">
+            @Html.Partial("_ModalFormButtons")
+        </div>
+        
+    </div>
+}

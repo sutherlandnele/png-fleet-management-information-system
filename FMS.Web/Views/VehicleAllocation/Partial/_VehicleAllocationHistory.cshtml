@@ -1,0 +1,78 @@
+﻿
+<h4>Vehicle Allocation History</h4>
+<fieldset id="fldsVehicleSearch">
+    <legend>Search</legend>
+    <!--Business Units Dropdownlist-->
+    @(Html.Kendo().ComboBox()
+                    .Name("cbxRegistionNumberAllocHist")
+                    .Placeholder("Select Registration Number...")
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    .Filter(FilterType.Contains)
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetVehicles", "VehicleManagement");
+                        });
+                    })
+                    .HtmlAttributes(new { style = "width:180px" })
+    )
+
+    @(Html.Kendo().Button()
+                    .Name("btnSearchAllocHist")
+                    .HtmlAttributes(new { type = "button", @class = "k-primary" })
+                    .Content("Search")
+                    .Icon("search")
+                    .Events(events =>
+                    {
+                        events.Click("onAllocHistSearchClick");
+                    })
+    )
+
+    @(Html.Kendo().Button()
+                        .Name("btnResetAllocHist")
+                        .Tag("em")
+                        .Icon("refresh")
+                        .Content("<span class='k-icon' title='Refresh'></span>")
+                        .HtmlAttributes(new { @title = "Reset" })
+                        .Events(events =>
+                        {
+                            events.Click("onAllocHistResetClick");
+                        })
+    )
+</fieldset>
+
+@(Html.Kendo().Grid<FMS.Web.ViewModels.VehicleAllocationViewModel>()
+                    .Name("gridAllocHist")
+                    .Columns(columns =>
+                    {
+                    columns.Bound(vm => vm.VehicleDisplayInfoViewModel.VehicleRegistrationNumber).Title("Rego #").Media("(min-width: 544px)");
+                    columns.Bound(vm => vm.VehicleDisplayInfoViewModel.VehicleStatus).Title("Status").Media("(min-width: 544px)");
+                    columns.Bound(vm => vm.VehicleDisplayInfoViewModel.VehicleCondition).Title("Condition").Media("(min-width: 768px)");
+                    columns.Bound(vm => vm.VehicleDisplayInfoViewModel.VehicleMake).Title("Make").Media("(min-width: 544px)");
+                    columns.Bound(vm => vm.VehicleDisplayInfoViewModel.VehicleModel).Title("Model").Media("(min-width: 544px)");
+                    columns.Bound(vm => vm.OperatorDisplayInfoViewModel.DriverName).Title("Driver Name").Media("(min-width: 992px)");
+                    columns.Bound(vm => vm.OperatorDisplayInfoViewModel.DriverMobile).Title("Mobile").Media("(min-width: 768px)");
+                    columns.Bound(vm => vm.StartDate).Title("Start Date").Media("(min-width: 768px)").Format("{0:dd/MM/yyyy}");
+                    columns.Bound(vm => vm.EndDate).Title("End Date").Media("(min-width: 768px)").Format("{0:dd/MM/yyyy}");
+                    columns.Template(@<text></text>).ClientTemplate("#=resColTemplateAllocHist(data)#").Title("Items").Media("(max-width: 544px)");
+                               
+                            })
+                            .Pageable()
+                            .Sortable()
+                            .Scrollable(s => s.Height("auto"))
+                            .DataSource(dataSource => dataSource
+                                .Ajax()
+                                .ServerOperation(true)
+                                .PageSize(20)
+                                .Events(events => events.Error("error_handler"))
+                                .Model(model => model.Id(vm => vm.Id))                               
+                                .Read(read => read.Action("Get_Allocation_History", "VehicleAllocation").Data("GridFilterParamsAllocHist")
+
+                                )
+                            )
+                            .Events(events => events
+                                .DataBound("onDataBound")
+                            )
+)

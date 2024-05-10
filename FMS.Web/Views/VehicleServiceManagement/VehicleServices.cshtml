@@ -1,0 +1,369 @@
+﻿@{
+
+    ViewBag.Title = "Vehicle Service";
+}
+<div class="container-fluid">
+
+    <div class="row no-gutters h-100 justify-content-center align-items-center" style="background-color: azure; margin-top: 15px; margin-bottom: 15px;  padding: 5px;padding-left: 15px;">
+        <div class="col-md-12">
+            <div class="formHeadingRegion">
+                <h4>@ViewBag.Title</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            <fieldset id="fldsVehicleSearch">
+                <legend>Search</legend>
+                <!--Business Units Dropdownlist-->
+                @(Html.Kendo().ComboBox()
+                                                    .Name("cbxBusinessUnit")
+                                                    .Placeholder("Select Business Unit...")
+                                                    .DataTextField("Text")
+                                                    .DataValueField("Value")
+                                                    .Filter(FilterType.Contains)
+                                                    .DataSource(source =>
+                                                    {
+                                                        source.Read(read =>
+                                                        {
+                                                            read.Action("GetBusinessUnits", "VehicleManagement");
+                                                        });
+                                                    })
+                                                    .HtmlAttributes(new { style = "width:180px" })
+                )
+
+                <!--Business Groups Cascading Dropdownlist-->
+                @(Html.Kendo().ComboBox()
+                                                    .Name("cbxBusinessGroup")
+                                                    .Placeholder("Select Business Group...")
+                                                    .DataTextField("Text")
+                                                    .DataValueField("Value")
+                                                    .Filter(FilterType.Contains)
+                                                    .DataSource(source =>
+                                                    {
+                                                        source.Read(read =>
+                                                        {
+                                                            read.Action("GetBusinessGroupsByBusinessUnitId", "VehicleManagement")
+                                                                .Data("filterBusinessGroups");
+                                                        }).ServerFiltering(true);
+                                                    })
+                                                    .Enable(false)
+                                                    .AutoBind(false)
+                                                    .CascadeFrom("cbxBusinessUnit")
+                                                    .HtmlAttributes(new { style = "width:180px" })
+                )
+
+
+                <!--Center Dropdownlist-->
+                @(Html.Kendo().DropDownList()
+                                                        .Name("drpCenter")
+                                                        .DataValueField("Value")
+                                                        .DataTextField("Text")
+                                                        .OptionLabel(new { Text = "Select...", Value = "" })
+                                                        .Filter(FilterType.Contains)
+                                                        .ValuePrimitive(true)
+                                                        .HtmlAttributes(new { style = "width:170px" })
+                                                        .BindTo((System.Collections.IEnumerable)ViewBag.Centers)
+                                                        .Events(events => events.DataBound("onDrpCenterDataBound"))
+                )
+
+                @(Html.Kendo().MaskedTextBox()
+                                                    .Name("registrationNumber")
+                                                    .HtmlAttributes(new { @placeholder = "Enter Rego #..." })
+                )
+
+                @(Html.Kendo().MaskedTextBox()
+                                                        .Name("serviceJobNumber")
+                                                        .HtmlAttributes(new { @placeholder = "Enter Service Job #...", style = "width:180px;" })
+                )
+
+                <!-- Checkboxes -->
+                <div style="display:inline-block;font-family: 'Roboto'">
+
+                    @(Html.Kendo().CheckBox()
+                                                        .Name("chkbxInCompleteStatus")
+                                                        .Label("Incompleted Service")
+                    )
+
+                    @(Html.Kendo().CheckBox()
+                                                        .Name("chkbxCompleteStatus")
+                                                        .Label("Completed Service")
+                    )
+
+                </div>
+
+                @(Html.Kendo().Button()
+                                                        .Name("btnSearch")
+                                                        .HtmlAttributes(new { type = "button", @class = "k-primary" })
+                                                        .Content("<span class='k-icon' title='Search'></span>")
+                                                        .Icon("search")
+                                                        .Events(events =>
+                                                        {
+                                                            events.Click("onSearchClick");
+                                                        })
+                )
+
+                @(Html.Kendo().Button()
+                                                        .Name("btnReset")
+                                                        .Tag("em")
+                                                        .Icon("refresh")
+                                                        .Content("<span class='k-icon' title='Refresh'></span>")
+                                                        .HtmlAttributes(new { @title = "Reset" })
+                                                        .Events(events =>
+                                                        {
+                                                            events.Click("onResetClick");
+                                                        })
+                )
+            </fieldset>
+
+        </div>
+    </div>
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-md-12">
+
+            @(Html.Kendo().Grid<FMS.Web.ViewModels.VehicleServiceDisplayViewModel>()
+                                            .Name("gridVehicleServices")
+                                            .Columns(columns =>
+                                            {
+                                                columns.Bound(vm => vm.ServiceJobNumber).Title("Service Job #").Media("(min-width: 544px)");
+                                                columns.Bound(vm => vm.VehicleRegistration).Title("Rego #").Media("(min-width: 544px)");
+                                                columns.Bound(vm => vm.BusinessGroup).Title("Business Group").Media("(min-width: 544px)");
+                                                columns.Bound(vm => vm.Center).Title("Center").Media("(min-width: 768px)");
+                                                columns.Bound(vm => vm.StartDate).Title("Start Date").Media("(min-width: 544px)");
+                                                columns.Bound(vm => vm.EndDate).Title("End Date").Media("(min-width: 544px)");
+                                                columns.Bound(vm => vm.Cost).Title("Cost (Kina)").Media("(min-width: 992px)");
+                                                columns.Template(@<text></text>).ClientTemplate("#=resColTemplate(data)#").Title("Items").Media("(max-width: 544px)");
+                                                columns.Command(command =>
+                                            {
+                                                command.Custom("view").Text(" ").Click("onViewDetailsClick").IconClass("far fa-eye").HtmlAttributes(new { @title = "View" });
+                                                command.Custom("edit").Text(" ").Click("onEditDetailsClick").IconClass("fas fa-edit").HtmlAttributes(new { @title = "Edit" });
+                                                command.Custom("delete").Text(" ").Click("onDeleteDetailsClick").IconClass("fas fa-trash-alt").HtmlAttributes(new { @title = "Delete" });
+                                            }).Title("").Width(210);
+                                            })
+                                    .ToolBar(toolBar =>
+                                    {
+                                        toolBar.Template(@<text>
+                                            <a class='k-button' style="float:left" href="#" onclick="onAddNewVehicleServiceClick(event)">
+                                                <span class='k-icon k-i-add'></span>Add New Vehicle Service
+                                            </a>
+                                        </text>);
+
+                                    })
+                            .Pageable()
+                            .Sortable()
+                            .Scrollable(s => s.Height("auto"))
+                            .DataSource(dataSource => dataSource
+                                .Ajax()
+                                .ServerOperation(true)
+                                .PageSize(20)
+                                .Events(events => events.Error("error_handler"))
+                                .Model(model => model.Id(vm => vm.Id))
+                                .Read(read => read.Action("GetVehicleServicesList", "VehicleServiceManagement").Data("GridFilterParams")
+
+                                )
+                            )
+
+            )
+            <div id="wndDeleteConfirmation"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+</style>
+@section scripts{
+    <script type="text/x-kendo-template" id="templateDeleteConfirmation">
+        <div class="modalWindow">
+            <h2>Are you sure you want to delete this vehicle service record?</h2>
+            <button id="yes" class="k-button">Yes</button>
+            <button id="no" class="k-button k-primary">No</button>
+        </div>
+    </script>
+
+
+    <script id="templateResponsiveColumn" type="text/x-kendo-template">
+
+        <strong>Service Job No.</strong>
+        <p class="col-template-val">#=data.ServiceJobNumber#</p>
+
+        <strong>Rego No.</strong>
+        <p class="col-template-val">#=data.VehicleRegistration#</p>
+
+        <strong>Business Group</strong>
+        <p class="col-template-val">#=data.BusinessGroup#</p>
+
+        <strong>Center</strong>
+        <p class="col-template-val">#=data.Center#</p>
+
+        <strong>Start Date</strong>
+        <p class="col-template-val">#=data.StartDate#</p>
+
+        <strong>End Date</strong>
+        <p class="col-template-val">#=data.EndDate#</p>
+
+        <strong>Cost</strong>
+        <p class="col-template-val">#=data.Cost#</p>
+
+    </script>
+
+
+
+
+    <script type="text/javascript">
+
+    //Global Variables
+    var windowDeleteConfirmation;
+    //var defaultCenterNumber;
+
+
+
+
+    var resColTemplate = kendo.template($("#templateResponsiveColumn").html());
+
+
+    function onDrpCenterDataBound(e) {
+        //var defaultItem = e.sender.dataSource.at(0);
+        //defaultCenterNumber = defaultItem.Value;
+
+    }
+
+
+    function filterBusinessGroups() {
+        return {
+            businessUnitId: $("#cbxBusinessUnit").val(),
+            businessGroupFilter: $("#cbxBusinessGroup").data("kendoComboBox").input.val()
+
+        };
+    }
+    $(document).ready(function () {
+
+
+
+        //tooltips
+        $("#gridVehicleServices").kendoTooltip({ filter: "a[title]" });
+
+        $("#btnReset").kendoTooltip({ content: "Reset" });
+
+
+        //initialize the kendo delete confirmation modal window
+        templateDeleteConfirmation = kendo.template($("#templateDeleteConfirmation").html());
+        windowDeleteConfirmation = $("#wndDeleteConfirmation").kendoWindow({
+            title: "Delete Confirmation",
+            modal: true,
+            visible: false,
+            resizable: false,
+            width: 300
+        }).data("kendoWindow");
+
+
+        setGridFormSubmitNotification();
+
+    });
+
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            App.notification.show({
+                message: message
+            }, "error");
+        }
+    }
+
+    function GridFilterParams() {
+
+        var iCStatus = $("#chkbxInCompleteStatus").prop('checked');
+        var cStatus = $("#chkbxCompleteStatus").prop('checked');
+
+        return {
+
+            InCompleteStatus: iCStatus,
+            completeStatus: cStatus,
+            registrationNumber: $("#registrationNumber").val(),
+            serviceJobNumber: $("#serviceJobNumber").val(),
+            unitNumber: (Number($("#cbxBusinessUnit").val()) == 0) ? -1 : Number($("#cbxBusinessUnit").val()),
+            groupNumber: (Number($("#cbxBusinessGroup").val()) == 0) ? -1 : Number($("#cbxBusinessGroup").val()),
+            center: (Number($("#drpCenter").val()) == 0) ? -1 : Number($("#drpCenter").val())
+        }
+    }
+
+    function onSearchClick(e) {
+        e.preventDefault();
+        var gridData = $("#gridVehicleServices").data("kendoGrid");
+        gridData.dataSource.query({ page: 1, pageSize: 20 });
+
+    }
+    function onResetClick(e) {
+        e.preventDefault();
+        var gridData = $("#gridVehicleServices").data("kendoGrid");
+
+        $("#chkbxCompleteStatus").prop('checked', false);
+        $("#chkbxInCompleteStatus").prop('checked', false);
+        $("#registrationNumber").val("");
+        $("#serviceJobNumber").val("");
+        $("#cbxBusinessUnit").data("kendoComboBox").value("");
+        $("#cbxBusinessGroup").data("kendoComboBox").value("");
+        $("#drpCenter").data("kendoDropDownList").value("");
+
+
+        gridData.dataSource.read();
+    }
+
+
+
+    function onViewDetailsClick(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var id = dataItem.Id;
+        window.location.href = '@Url.Action("ViewVehicleServiceDetails", "VehicleServiceManagement")?id=' + id;
+    }
+
+    function onEditDetailsClick(e) {
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var id = dataItem.Id;
+        window.location.href = '@Url.Action("EditVehicleServiceDetails", "VehicleServiceManagement")?vehicleServiceId=' + id;
+    }
+
+    function onAddNewVehicleServiceClick(e) {
+        e.preventDefault();
+        window.location.href = '@Url.Action("CreateVehicleServiceDetails", "VehicleServiceManagement")';
+    }
+
+    function onDeleteDetailsClick(e) {
+
+        e.preventDefault();
+
+        var grid = this;
+
+        var row = $(e.currentTarget).closest("tr");
+        var dataItem = this.dataItem(row);
+
+        windowDeleteConfirmation.content(templateDeleteConfirmation(dataItem));
+
+        windowDeleteConfirmation.center().open();
+
+        $("#yes").click(function () {
+
+            ajaxDelete(dataItem.Id, "VehicleServiceManagement","DeleteVehicleServiceDetails");
+            grid.removeRow(row); //removes row only
+
+            windowDeleteConfirmation.close();
+        });
+
+        $("#no").click(function () {
+            windowDeleteConfirmation.close();
+        });
+    }
+
+
+    </script>
+    }
