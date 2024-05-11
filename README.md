@@ -11,8 +11,6 @@
 
 ---
 
-<iframe src="https://www.cloudcode.com.pg" style="width:100%; height:600px;"></iframe>
-
 Welcome to the repository for the PNG Fleet Management Information System, a comprehensive management information system built on the .NET Framework 4.6 using ASP.NET MVC architecture. This system is designed to manage various aspects of a vehicle fleet, enhancing operational efficiency and oversight.
 
 This system is currently used by PNG Power Limited.
@@ -29,6 +27,10 @@ This application provides a wide range of features including:
 - **Vehicle Incident Management**: Record and manage incidents involving fleet vehicles.
 - **Management Information System Reporting**: Generate comprehensive reports for informed decision-making.
 - **System Administration**: Manage system settings and configurations.
+
+## User Manual
+
+[View PDF Document](https://github.com/username/repo/blob/main/document.pdf)
 
 ## Technical Architecture
 
