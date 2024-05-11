@@ -30,7 +30,7 @@ This application provides a wide range of features including:
 
 ## User Manual
 
-[View PDF Document](https://github.com/username/repo/blob/main/document.pdf)
+[View PDF Document](./PPL FMS V2 User Manual.pdf)
 
 ## Technical Architecture
 
