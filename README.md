@@ -1,6 +1,6 @@
 # PNG Fleet Management Information System
 
-Welcome to the repository for the PNG Fleet Management Information System, a comprehensive tool built on the .NET Framework 4.6 using ASP.NET MVC architecture. This system is designed to manage various aspects of a vehicle fleet, enhancing operational efficiency and oversight.
+Welcome to the repository for the PNG Fleet Management Information System, a comprehensive management information system built on the .NET Framework 4.6 using ASP.NET MVC architecture. This system is designed to manage various aspects of a vehicle fleet, enhancing operational efficiency and oversight.
 
 ## Features
 
