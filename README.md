@@ -30,7 +30,10 @@ This application provides a wide range of features including:
 
 ## User Manual
 
-[View PDF Document](./PPL FMS V2 User Manual.pdf)
+<a href="./PPL%20FMS%20V2%20User%20Manual.pdf" target="_blank">
+    <img src="https://img.shields.io/badge/-Download%20PDF-red?style=flat&logo=adobe&logoColor=white"/>
+</a>
+
 
 ## Technical Architecture
 
