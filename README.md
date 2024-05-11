@@ -45,7 +45,7 @@ To set up and run the project locally, follow these steps:
 git clone https://github.com/sutherlandnele/png-fleet-management-information-system.git
 ```
 2. **Set up your development environment:**
-- Ensure that Visual Studio 2017/2019/2022 Pro/Ent/Ultimate Edition is installed.
+- Ensure that Visual Studio 2017/2019/2022 Pro/Ent/Ultimate Edition is installed with Licensed Telerik/Kendo UI 2029 UI Toolset
 - Open the solution file in Visual Studio and restore all Nugget packages.
 - Install MS SQL Server 2014 Developer Edition or above and restore the database backup file.
 - Update the `web.config` file to point to the correct database and configure IIS.
