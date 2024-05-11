@@ -32,3 +32,20 @@ The application is structured into several layers:
 To set up and run the project locally, follow these steps:
 
 1. **Clone the repository:**
+```bash
+git clone https://github.com/sutherlandnele/png-fleet-management-information-system.git
+```
+2. **Set up your development environment:**
+- Ensure that Visual Studio 2017/2019/2022 Pro/Ent/Ultimate Edition is installed.
+- Open the solution file in Visual Studio and restore all Nugget packages.
+- Install MS SQL Server 2014 Developer Edition or above and restore the database backup file.
+- Update the `web.config` file to point to the correct database and configure IIS.
+- Ensure IIS Web Server is running to deploy the web application.
+
+## Contribution
+
+If you clone, pull, or use the ideas and source code from this repository, consider giving it a star on GitHub to show your support.
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE.md](LICENSE.md) file for details.
