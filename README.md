@@ -30,7 +30,7 @@ This application provides a wide range of features including:
 
 ## User Manual
 
-<a href="./PPL%20FMS%20V2%20User%20Manual.pdf" target="_blank">
+<a href="./PNG%20FMS%20V2.0.0%20User%20Manual.pdf" target="_blank">
     <img src="https://img.shields.io/badge/-Download%20PDF-red?style=flat&logo=adobe&logoColor=white" style="width: 360px; height: auto;"/>
 </a>
 
